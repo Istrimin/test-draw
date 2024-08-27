@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Draw</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="module" src="main.js"></script>
+<!-- 
+<script src="cursors.js"></script>
+<script src="script.js" defer></script> -->
+
+</head>
+<body>
+    <div class="parent-container">
+        <div class="container">
+            <div class="button-column">
+                <label for="imageInput">
+                    <button id="customUploadButton" title="Загрузить изображение">🌺</button>
+                </label>
+                <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                <button id="saveImageBtn" title="Сохранить изображение">🎬 </button>
+                <button id="eraser" title="Ластик">💩</button>
+                <button id="undo" title="Отменить">⟲  </button>
+                <button id="redo" title="Повторить">⟳ </button>
+                <button id="clear" title="Очистить">💀</button>                
+                <button id="symmetry" title="Симметрия">🦋</button>
+                <button id="thickenLinesBtn" title="Утолщить все линии">!</button>
+                <div class="tools">
+                    <div class="tools-column">
+                        <input type="color" id="backgroundPicker" value="#ffffff" title="Цвет фона">
+                        <input type="color" id="colorPicker" value="#000000" title="Цвет кисти">
+                    </div>
+                </div>
+                <button id="changeCursorBtn" title="Сменить курсор">🎨</button>
+                <button id="inviteFriends" title="Пригласить друзей"> 👥</button>
+                <button id="addToFavorites" title="Добавить в избранное">📌</button>                
+                <button id="settings" title="Настройки">⚙️</button>
+            </div>
+        </div>
+        <div class="canvas-and-sliders">
+            <div class="container">
+                <canvas id="drawingCanvas" width="800" height="600"></canvas>
+            </div>
+            <div class="tools-column">
+                <label for="opacity" title="Прозрачность">👻 </label>
+                <input type="range" id="opacity" min="1" max="100" value="100">
+            </div>
+            <div class="tools-column">
+                <label for="brushSize" title="Размер кисти">◯ </label>
+                <input type="range" id="brushSize" min="1" max="100" value="1">
+            </div>
+        </div>
+    </div>
+
+    <!-- Добавляем вкладку с курсорами -->
+    <div id="cursorPanel" class="cursor-panel" style="display: none;">
+        <h3>Выберите курсор</h3>
+        <div id="cursorList">
+            <!-- Здесь будут отображаться доступные курсоры -->
+        </div>
+    </div>
+
+    <script>
+        vkBridge.send('VKWebAppInit');
+
+
+
+// // Список доступных курсоров
+// const cursors = [
+//     { name: 'Карандаш', file: 'pencil.png' },
+//     { name: 'Кисть', file: 'brush.png' },
+//     { name: 'Ластик', file: 'eraser.png' },
+//     // Добавьте другие курсоры по необходимости
+// ];
+
+// // Функция для загрузки курсоров
+// function loadCursors() {
+//     const cursorList = document.getElementById('cursorList');
+//     cursorList.innerHTML = '';  // Очищаем список перед добавлением новых элементов
+    
+//     cursors.forEach(cursor => {
+//         const cursorItem = document.createElement('div');
+//         cursorItem.className = 'cursor-item';
+        
+//         const cursorPreview = document.createElement('img');
+//         cursorPreview.src = `cursors/${cursor.file}`;
+//         cursorPreview.className = 'cursor-preview';
+//         cursorPreview.alt = cursor.name;
+//         cursorPreview.title = cursor.name;
+//         cursorItem.appendChild(cursorPreview);
+
+//         cursorItem.addEventListener('click', function() {
+//             document.getElementById('drawingCanvas').style.cursor = `url('cursors/${cursor.file}'), auto`;
+//             document.getElementById('cursorPanel').style.display = 'none';
+//         });
+//         cursorList.appendChild(cursorItem);
+//     });
+// }
+
+// // Обработчик для кнопки смены курсора
+// document.getElementById('changeCursorBtn').addEventListener('click', function() {
+//     const cursorPanel = document.getElementById('cursorPanel');
+//     if (cursorPanel.style.display === 'none') {
+//         cursorPanel.style.display = 'block';
+//         loadCursors();
+//     } else {
+//         cursorPanel.style.display = 'none';
+//     }
+// });
+    </script>
+</body>
+</html>
