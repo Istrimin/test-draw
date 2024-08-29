@@ -1,5 +1,7 @@
 // let lastDrawTime = 0;
-let lastX, lastY;
+// let lastX, lastY;
+let lastX=0;
+let lastY=0;
 function draw(e) {
     if (!isDrawing) return;
     e.preventDefault();
