@@ -78,10 +78,23 @@
     </div>
     <script>
         vkBridge.send('VKWebAppInit');
-        
-        document.getElementById("myBtn").addEventListener("click", function() {
-  document.getElementById("message").style.display = "block";
-});
+const messageElement = document.getElementById('message');
+const containerElement = document.getElementById('message-container');
+
+function adjustFontSize() {
+  let fontSize = parseInt(window.getComputedStyle(messageElement).fontSize, 10);
+
+  // Reduce font size until it fits within the container
+  while (messageElement.offsetWidth > containerElement.offsetWidth) {
+    fontSize--;
+    messageElement.style.fontSize = fontSize + 'px';
+  }
+}
+
+// Call the function initially and on window resize
+adjustFontSize();
+window.addEventListener('resize', adjustFontSize);
+
     </script>
 </body>
 
