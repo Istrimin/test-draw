@@ -9,6 +9,13 @@
 const canvas = document.getElementById('drawingCanvas');
 const ctx = canvas.getContext('2d');
 
+
+if (window.PointerEvent) {
+    console.log('Pointer events are supported');
+} else {
+    console.log('Pointer events are not supported');
+}
+
 // from tools import *
 ctx.imageSmoothingEnabled = false;
 
@@ -166,9 +173,15 @@ function startDrawing(e) {
 }
 
 function draw(e) {
+    console.log('Event type:', e.type);
+    console.log('Pointer type:', e.pointerType);
     console.log('Pressure:', e.pressure);
-
+    console.log('tangentialPressure:', e.tangentialPressure);
+    console.log('tiltX:', e.tiltX);
+    console.log('tiltY:', e.tiltY);
     if (!isDrawing) return;
+
+
     let pressure = 1;
     if (e.pointerType === 'pen') {
         pressure = e.pressure !== undefined ? e.pressure : 1;
