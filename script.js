@@ -189,7 +189,7 @@ function resizeCanvas() {
 
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
-// add end 
+// add end  
 
 let lastDrawTime = 0;
 let points = [];
