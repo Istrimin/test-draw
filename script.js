@@ -167,16 +167,32 @@ function handleImageUpload(event) {
 }
 
 // Drawing Functions
+// Drawing Functions
 function startDrawing(e) {
     e.preventDefault();
     isDrawing = true;
     [lastX, lastY] = [e.offsetX, e.offsetY];
     saveState();
-    
+   
     // Захват указателя
     e.target.setPointerCapture(e.pointerId);
 }
 
+
+// add 
+function resizeCanvas() {
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * devicePixelRatio;
+    canvas.height = rect.height * devicePixelRatio;
+    ctx.scale(devicePixelRatio, devicePixelRatio);
+}
+
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+// add end 
+
+let lastDrawTime = 0;
+let points = [];
 
 function draw(e) {
     console.log('Event type:', e.type);
@@ -185,41 +201,45 @@ function draw(e) {
     console.log('tangentialPressure:', e.tangentialPressure);
     console.log('tiltX:', e.tiltX);
     console.log('tiltY:', e.tiltY);
+
     if (!isDrawing) return;
 
+    requestAnimationFrame(() => {
+        const currentTime = Date.now();
+        if (currentTime - lastDrawTime < 16) return; // Ограничение до ~60 FPS
+        lastDrawTime = currentTime;
 
-    let pressure = 1;
-    if (e.pointerType === 'pen') {
-        pressure = e.pressure !== undefined ? e.pressure : 1;
-    }
-    // const pressure = e.pressure || e.webkitForce || 1; 
-    // ctx.lineWidth = brushSizeInput.value * pressure * 2; 
-ctx.lineWidth = brushSizeInput.value * (e.pressure * e.pressure) * 2;
+        let pressure = 1;
+        if (e.pointerType === 'pen') {
+            pressure = e.pressure !== undefined ? e.pressure : 1;
+        }
 
-    // Update the pressure bar
-    const pressureBar = document.getElementById('pressureBar');
-    pressureBar.style.width = (pressure * 100) + '%'; 
+        ctx.lineWidth = brushSizeInput.value * (pressure * pressure) * 2;
 
-    ctx.lineCap = 'round';
-    ctx.strokeStyle = isEraser ? backgroundPicker.value : colorPicker.value;
-    ctx.globalAlpha = opacityInput.value / 100; 
+        // Update the pressure bar
+        const pressureBar = document.getElementById('pressureBar');
+        pressureBar.style.width = (pressure * 100) + '%';
 
-    ctx.beginPath();
-    ctx.moveTo(lastX, lastY);
-    ctx.lineTo(e.offsetX, e.offsetY);
-    ctx.stroke();
-
-    if (symmetry) {
-        const centerX = canvas.width / 2;
-        const mirroredX = 2 * centerX - e.offsetX;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = isEraser ? backgroundPicker.value : colorPicker.value;
+        ctx.globalAlpha = opacityInput.value / 100;
 
         ctx.beginPath();
-        ctx.moveTo(2 * centerX - lastX, lastY);
-        ctx.lineTo(mirroredX, e.offsetY);
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(e.offsetX, e.offsetY);
         ctx.stroke();
-    }
 
-    [lastX, lastY] = [e.offsetX, e.offsetY];
+        if (symmetry) {
+            const centerX = canvas.width / 2;
+            const mirroredX = 2 * centerX - e.offsetX;
+            ctx.beginPath();
+            ctx.moveTo(2 * centerX - lastX, lastY);
+            ctx.lineTo(mirroredX, e.offsetY);
+            ctx.stroke();
+        }
+
+        [lastX, lastY] = [e.offsetX, e.offsetY];
+    });
 }
 
 function stopDrawing() {
