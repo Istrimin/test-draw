@@ -4,8 +4,8 @@ document.addEventListener('keydown', function(event) {
     document.getElementById('eyedropperBtn').click(); 
 
     // Immediately get color under cursor
-    const canvas = document.getElementById('drawingCanvas'); 
-    const ctx = canvas.getContext('2d');
+    // const canvas = document.getElementById('drawingCanvas'); 
+    // const ctx = canvas.getContext('2d');
     const rect = canvas.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
