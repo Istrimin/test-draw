@@ -5,17 +5,14 @@ body {
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: fixed;
-    /* font-family: Arial, sans-serif; */
-font-family: 'Roboto', sans-serif;
+    /* font-family: 'Roboto', sans-serif; */
 
     margin: 0;
     padding: 0;
     min-height: 100vh;
     display: flex;
     align-items: flex-start;
-    
-    /* align-items: center; */
-    justify-content: center;
+    /* justify-content: center; */
 }
 
 .drawingCursor {
@@ -29,16 +26,7 @@ font-family: 'Roboto', sans-serif;
 :root {
     --button-color: rgb(25, 25, 25);
     --button-text-color: rgb(211, 116, 255);
-}
-
-
-#floodFillButton.active {
-    background-color: lightblue;
-}
-
-#symmetry.active {
-    background-color: rgb(0, 42, 4);
-    color: rgb(164, 255, 154);
+    --button-active-color: rgb(9, 95, 0);
 }
 
 button {
@@ -61,108 +49,84 @@ button:hover {
     background-color: rgb(61, 61, 61);
 }
 
-/* меняем именно канвас и слайдеры */
+#fillModeBtn.active {
+    background-color: var(--button-active-color);
+}
+
+#symmetry.active {
+    background-color: var(--button-active-color);
+}
+#eyedropperBtn.active {
+    background-color: var(--button-active-color);
+}
+
 .parent-container {
     display: flex;
-    flex-direction: row; 
+    flex-direction: row;
     height: 100vh;
 }
 
+.button-column {
+    display: flex;
+    flex-direction: column;
+    max-height: 600px;
+    margin-bottom: 5px;
+    overflow-y: auto; 
+}
+.tools-column {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.color-picker-group{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 .tools {
-    /* width: 10%; */
     color: var(--button-text-color);
-    /* display: flex; */
     flex-direction: column;
     align-items: center;
     margin-right: 10px;
 }
 
-.tools-column {
-    display: flex;
-    flex-direction: column; 
-}
-.tools-column input[type="color"] {
-     margin-bottom: 10px; 
-} 
 
-.customUploadButton{
+
+.opacity {
+    width: 200px;
+    height: 20px;
+}
+
+
+
+.tools-column input[type="range"] {
+    width: 60%;
+}
+
+.UploadButton {
     margin-bottom: 10px;
     flex-direction: column;
     align-items: center;
 }
 
-
-.button-column button {
-    width: 60px; 
-    /* height: 40px;  */
-    text-align: center;
-    margin: 5px; /* Добавляем margin со всех сторон */
-}
-
-
-.button-column {
-    display: flex;
-    flex-direction: column;
-    /* align-items: flex-start;  */
-    margin-bottom: 5px;
-}
-
-
-
-
-
-/* .canvas-and-sliders {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-} */
-
-
-
-input[type="range"] {
-    width: 50%;
-    -webkit-appearance: none;
-    appearance: none;
-    height: 10px;
-    background: #363535;
-    outline: none;
-    opacity: 0.7;
-    -webkit-transition: .2s;
-    transition: opacity .2s;
-}
-
-input[type="range"]:hover {
-    opacity: 50;
-}
-
-input[type="range"] {
-    width: 100%;
-}
-
-input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 10px;
-    height: 10px;
-    background: #a204aa;
-    cursor: pointer;
-    border-radius: 50%;
-}
-
-input[type="range"]::-moz-range-thumb {
-    width: 10px;
-    height: 10px;
-    background: #04AA6D;
-    cursor: pointer;
-    border-radius: 50%;
-}
-
-
-/* don't toch */
 canvas {
     border-radius: 20px;
-    /* width: 100%;
-    height: 100%; */
 }
+.canvas-and-sliders {
+    display: flex;
+    flex-direction: column;
+    /* flex-grow: 1; */
+}
+/* 
+.container {
+    border-radius: 20px;
+    margin: 0;
+    padding: 0;
+    flex-grow: 1;
+    width: 80%;
+    height: 80%;
+} */
 
 .custom-file-upload {
     background-color: var(--button-color);
@@ -190,36 +154,51 @@ canvas {
     margin: 0 5px;
 }
 
-
-
-.canvas-and-sliders {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    /* height: 100%; */
-    /* width: auto; */
-
+input[type="range"] {
+    width: 50%;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 10px;
+    background: #363535;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
 }
 
+input[type="range"]:hover {
+    opacity: 50;
+}
 
-.container {
-    border-radius: 20px;
-    margin: 0; 
-    padding: 0;
-    flex-grow: 1; 
-    width: 100%;
-    height: 100%;
-} 
+input[type="range"] {
+    width: 100%; 
+}
 
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 10px;
+    height: 10px;
+    background: #a204aa;
+    cursor: pointer;
+    border-radius: 50%;
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 10px;
+    height: 10px;
+    background: #04AA6D;
+    cursor: pointer;
+    border-radius: 50%;
+}
 
 .cursor-panel {
     position: absolute;
     top: 50px;
     right: 10px;
-    background-color: rgb(255, 0, 0);
-    border: 1px solid #00ffe5;
+    background-color: rgb(0, 0, 0);
+    border: 1px solid #00ffe500;
     padding: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     max-height: 300px;
     overflow-y: auto;
 }
@@ -233,10 +212,29 @@ canvas {
 .cursor-preview {
     width: 32px;
     height: 32px;
-    border: 1px solid #00cc41;
+    border: 1px solid #00cc4100;
     padding: 2px;
 }
 
 .cursor-item:hover .cursor-preview {
     border-color: hsl(69, 100%, 52%);
+}
+
+
+::-webkit-scrollbar {
+    width: 5px;
+} 
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: black;
+    color:bisque;
+    border-radius: 2.5px;
+}
+
+.input-value {
+    color: red;
 }
