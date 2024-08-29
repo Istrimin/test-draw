@@ -265,7 +265,6 @@ body {
 }
 
 
-/* ... your existing CSS ... */
 
 .pressure-indicator {
   width: 200px; /* Adjust width as needed */
@@ -286,4 +285,14 @@ body {
 /* add */
 #drawingCanvas {
     touch-action: none;
+}
+
+#message-container {
+  background-color: #3d0000; /* Цвет фона сообщения */
+  padding: 10px;
+  border-radius: 5px;
+}
+
+#message-container p {
+  color: #80ff8f; /* Цвет текста сообщения */
 }
