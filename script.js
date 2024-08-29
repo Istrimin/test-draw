@@ -75,10 +75,14 @@ eraserBtn.addEventListener('click', setEraserCursor); // If this is needed, cons
 setDrawingCursor(); // Set initial cursor
 fillModeBtn.addEventListener('click', toggleFillMode);
 // Canvas Interactions
-canvas.addEventListener('mousedown', startDrawing);
-canvas.addEventListener('mousemove', draw);
-canvas.addEventListener('mouseup', stopDrawing);
-canvas.addEventListener('mouseout', stopDrawing);
+// canvas.addEventListener('mousedown', startDrawing);
+// canvas.addEventListener('mousemove', draw);
+// canvas.addEventListener('mouseup', stopDrawing);
+// canvas.addEventListener('mouseout', stopDrawing);
+canvas.addEventListener('pointerdown', startDrawing);
+canvas.addEventListener('pointermove', draw);
+canvas.addEventListener('pointerup', stopDrawing);
+canvas.addEventListener('pointerout', stopDrawing);
 
 // Modify the event listener for floodFill
 canvas.addEventListener('click', (e) => {
@@ -162,10 +166,14 @@ function startDrawing(e) {
 }
 
 function draw(e) {
-    if (!isDrawing) return;
+    console.log('Pressure:', e.pressure);
 
-    // Pressure Sensitivity and Progress Bar Update
-    const pressure = e.pressure || e.webkitForce || 1; 
+    if (!isDrawing) return;
+    let pressure = 1;
+    if (e.pointerType === 'pen') {
+        pressure = e.pressure !== undefined ? e.pressure : 1;
+    }
+    // const pressure = e.pressure || e.webkitForce || 1; 
     ctx.lineWidth = brushSizeInput.value * pressure * 2; 
 
     // Update the pressure bar
