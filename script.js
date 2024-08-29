@@ -147,18 +147,7 @@ function resizeCanvas() {
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 // add end  
-function startDrawing(e) {
-    e.preventDefault();
-    isDrawing = true;
-    points = [];
-    points.push({
-        x: e.offsetX,
-        y: e.offsetY,
-        pressure: e.pressure || 1
-    });
-    saveState();
-    e.target.setPointerCapture(e.pointerId);
-}
+
 // // let lastDrawTime = 0;
 // let lastX, lastY;
 // function draw(e) {
