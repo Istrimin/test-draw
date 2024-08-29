@@ -196,7 +196,6 @@ function startDrawing(e) {
 
 // let lastDrawTime = 0;
 
-let lastX, lastY;
 
 function draw(e) {
     if (!isDrawing) return;
