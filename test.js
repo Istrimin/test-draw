@@ -1,6 +1,6 @@
-
 let lastX = 0;
 let lastY = 0;
+let isDrawing = false;
 
 canvas.addEventListener('pointerdown', startDrawing, { passive: false });
 canvas.addEventListener('pointermove', draw);
@@ -21,7 +21,6 @@ canvas.addEventListener('touchmove', (e) => {
 }, { passive: false });
 
 canvas.addEventListener('touchend', stopDrawing);
-
 
 function startDrawing(e) {
     isDrawing = true;
@@ -62,8 +61,6 @@ function draw(e) {
     [lastX, lastY] = [x, y];
 }
 
-
 function stopDrawing() {
     isDrawing = false;
-    console.log("Stop Drawing");
 }
