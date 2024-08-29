@@ -166,18 +166,6 @@ function handleImageUpload(event) {
   reader.readAsDataURL(file);
 }
 
-// Drawing Functions
-// Drawing Functions
-function startDrawing(e) {
-    e.preventDefault();
-    isDrawing = true;
-    [lastX, lastY] = [e.offsetX, e.offsetY];
-    saveState();
-   
-    // Захват указателя
-    e.target.setPointerCapture(e.pointerId);
-}
-
 
 // add 
 function resizeCanvas() {
@@ -191,56 +179,91 @@ window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 // add end  
 
+function startDrawing(e) {
+    e.preventDefault();
+    isDrawing = true;
+    points = [];
+    points.push({
+        x: e.offsetX,
+        y: e.offsetY,
+        pressure: e.pressure || 1
+    });
+    saveState();
+    e.target.setPointerCapture(e.pointerId);
+}
+
+
+
 let lastDrawTime = 0;
+
 let points = [];
 
 function draw(e) {
-    console.log('Event type:', e.type);
-    console.log('Pointer type:', e.pointerType);
-    console.log('Pressure:', e.pressure);
-    console.log('tangentialPressure:', e.tangentialPressure);
-    console.log('tiltX:', e.tiltX);
-    console.log('tiltY:', e.tiltY);
-
     if (!isDrawing) return;
 
-    requestAnimationFrame(() => {
-        const currentTime = Date.now();
-        if (currentTime - lastDrawTime < 16) return; // Ограничение до ~60 FPS
-        lastDrawTime = currentTime;
+    e.preventDefault(); // Предотвращаем стандартное поведение браузера
 
-        let pressure = 1;
-        if (e.pointerType === 'pen') {
-            pressure = e.pressure !== undefined ? e.pressure : 1;
-        }
-
-        ctx.lineWidth = brushSizeInput.value * (pressure * pressure) * 2;
-
-        // Update the pressure bar
-        const pressureBar = document.getElementById('pressureBar');
-        pressureBar.style.width = (pressure * 100) + '%';
-
-        ctx.lineCap = 'round';
-        ctx.strokeStyle = isEraser ? backgroundPicker.value : colorPicker.value;
-        ctx.globalAlpha = opacityInput.value / 100;
-
-        ctx.beginPath();
-        ctx.moveTo(lastX, lastY);
-        ctx.lineTo(e.offsetX, e.offsetY);
-        ctx.stroke();
-
-        if (symmetry) {
-            const centerX = canvas.width / 2;
-            const mirroredX = 2 * centerX - e.offsetX;
-            ctx.beginPath();
-            ctx.moveTo(2 * centerX - lastX, lastY);
-            ctx.lineTo(mirroredX, e.offsetY);
-            ctx.stroke();
-        }
-
-        [lastX, lastY] = [e.offsetX, e.offsetY];
+    points.push({
+        x: e.offsetX,
+        y: e.offsetY,
+        pressure: e.pressure || 1
     });
+
+    ctx.lineWidth = brushSizeInput.value * ((e.pressure || 1) * (e.pressure || 1)) * 2;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = isEraser ? backgroundPicker.value : colorPicker.value;
+    ctx.globalAlpha = opacityInput.value / 100;
+
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, points[0].y);
+
+    for (let i = 1; i < points.length - 2; i++) {
+        const xc = (points[i].x + points[i + 1].x) / 2;
+        const yc = (points[i].y + points[i + 1].y) / 2;
+        ctx.quadraticCurveTo(points[i].x, points[i].y, xc, yc);
+    }
+
+    if (points.length > 2) {
+        ctx.quadraticCurveTo(
+            points[points.length - 2].x,
+            points[points.length - 2].y,
+            points[points.length - 1].x,
+            points[points.length - 1].y
+        );
+    }
+
+    ctx.stroke();
+
+    if (symmetry) {
+        // Рисуем симметричную линию
+        const centerX = canvas.width / 2;
+        ctx.save();
+        ctx.scale(-1, 1);
+        ctx.translate(-canvas.width, 0);
+        ctx.beginPath();
+        ctx.moveTo(2 * centerX - points[0].x, points[0].y);
+
+        for (let i = 1; i < points.length - 2; i++) {
+            const xc = 2 * centerX - ((points[i].x + points[i + 1].x) / 2);
+            const yc = (points[i].y + points[i + 1].y) / 2;
+            ctx.quadraticCurveTo(2 * centerX - points[i].x, points[i].y, xc, yc);
+        }
+
+        if (points.length > 2) {
+            ctx.quadraticCurveTo(
+                2 * centerX - points[points.length - 2].x,
+                points[points.length - 2].y,
+                2 * centerX - points[points.length - 1].x,
+                points[points.length - 1].y
+            );
+        }
+
+        ctx.stroke();
+        ctx.restore();
+    }
 }
+
 
 function stopDrawing() {
     isDrawing = false;
