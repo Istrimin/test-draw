@@ -196,72 +196,41 @@ function startDrawing(e) {
 
 // let lastDrawTime = 0;
 
-let points = [];
+let lastX, lastY;
 
 function draw(e) {
     if (!isDrawing) return;
+    e.preventDefault();
 
-    e.preventDefault(); // Предотвращаем стандартное поведение браузера
+    const x = e.offsetX;
+    const y = e.offsetY;
+    const pressure = e.pressure || 1;
 
-    points.push({
-        x: e.offsetX,
-        y: e.offsetY,
-        pressure: e.pressure || 1
-    });
-
-    ctx.lineWidth = brushSizeInput.value * ((e.pressure || 1) * (e.pressure || 1)) * 2;
+    ctx.lineWidth = brushSizeInput.value * pressure;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     ctx.strokeStyle = isEraser ? backgroundPicker.value : colorPicker.value;
     ctx.globalAlpha = opacityInput.value / 100;
 
     ctx.beginPath();
-    ctx.moveTo(points[0].x, points[0].y);
-
-    for (let i = 1; i < points.length - 2; i++) {
-        const xc = (points[i].x + points[i + 1].x) / 2;
-        const yc = (points[i].y + points[i + 1].y) / 2;
-        ctx.quadraticCurveTo(points[i].x, points[i].y, xc, yc);
-    }
-
-    if (points.length > 2) {
-        ctx.quadraticCurveTo(
-            points[points.length - 2].x,
-            points[points.length - 2].y,
-            points[points.length - 1].x,
-            points[points.length - 1].y
-        );
-    }
-
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(x, y);
     ctx.stroke();
 
     if (symmetry) {
-        // Рисуем симметричную линию
         const centerX = canvas.width / 2;
         ctx.save();
         ctx.scale(-1, 1);
         ctx.translate(-canvas.width, 0);
         ctx.beginPath();
-        ctx.moveTo(2 * centerX - points[0].x, points[0].y);
-
-        for (let i = 1; i < points.length - 2; i++) {
-            const xc = 2 * centerX - ((points[i].x + points[i + 1].x) / 2);
-            const yc = (points[i].y + points[i + 1].y) / 2;
-            ctx.quadraticCurveTo(2 * centerX - points[i].x, points[i].y, xc, yc);
-        }
-
-        if (points.length > 2) {
-            ctx.quadraticCurveTo(
-                2 * centerX - points[points.length - 2].x,
-                points[points.length - 2].y,
-                2 * centerX - points[points.length - 1].x,
-                points[points.length - 1].y
-            );
-        }
-
+        ctx.moveTo(2 * centerX - lastX, lastY);
+        ctx.lineTo(2 * centerX - x, y);
         ctx.stroke();
         ctx.restore();
     }
+
+    lastX = x;
+    lastY = y;
 }
 
 
@@ -292,7 +261,7 @@ function clearCanvas() {
 
 // Tool Functions
 
-// Function to toggle fill mode
+// Functions to toggle mode
 function toggleFillMode() {
   isFillMode = !isFillMode;
   // Optionally add visual indication of fill mode being active or inactive
