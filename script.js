@@ -155,48 +155,23 @@ function handleImageUpload(event) {
 
 // Drawing Functions
 function startDrawing(e) {
-    e.preventDefault(); // <-- добавьте эту строку
-
+    e.preventDefault(); 
     isDrawing = true;
-    lastX = e.offsetX; 
-    lastY = e.offsetY;
+    [lastX, lastY] = [e.offsetX, e.offsetY];
     saveState(); 
 }
 
-// function draw(e) {
-//     if (!isDrawing) return;
-
-//     ctx.lineWidth = brushSizeInput.value; // Use brushSizeInput here
-//     ctx.lineCap = 'round';
-//     ctx.strokeStyle = isEraser ? backgroundPicker.value : colorPicker.value;
-//     ctx.globalAlpha = opacityInput.value / 100; // Use opacityInput here
-
-//     ctx.beginPath();
-//     ctx.moveTo(lastX, lastY);
-//     ctx.lineTo(e.offsetX, e.offsetY);
-//     ctx.stroke();
-
-//     if (symmetry) {
-//         const centerX = canvas.width / 2;
-//         const mirroredX = 2 * centerX - e.offsetX;
-
-//         ctx.beginPath();
-//         ctx.moveTo(2 * centerX - lastX, lastY);
-//         ctx.lineTo(mirroredX, e.offsetY);
-//         ctx.stroke();
-//     }
-
-//     lastX = e.offsetX;
-//     lastY = e.offsetY;
-// }
-
-// function stopDrawing() {
-//     isDrawing = false;
-// }
 function draw(e) {
     if (!isDrawing) return;
 
-    ctx.lineWidth = brushSizeInput.value * (e.pressure || e.webkitForce || 1) * 2; 
+    // Pressure Sensitivity and Progress Bar Update
+    const pressure = e.pressure || e.webkitForce || 1; 
+    ctx.lineWidth = brushSizeInput.value * pressure * 2; 
+
+    // Update the pressure bar
+    const pressureBar = document.getElementById('pressureBar');
+    pressureBar.style.width = (pressure * 100) + '%'; 
+
     ctx.lineCap = 'round';
     ctx.strokeStyle = isEraser ? backgroundPicker.value : colorPicker.value;
     ctx.globalAlpha = opacityInput.value / 100; 
@@ -222,6 +197,8 @@ function draw(e) {
 function stopDrawing() {
     isDrawing = false;
 }
+
+
 // Canvas Manipulation
 function redrawCanvas() {
     ctx.fillStyle = backgroundPicker.value;
