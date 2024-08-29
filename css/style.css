@@ -249,3 +249,17 @@ input[type="range"]::-moz-range-thumb {
   font-size: 10vw; /* Start with a large font size (10% of viewport width) */
   white-space: nowrap; /* Prevent text from wrapping */
 }
+
+#drawingCanvas {
+  user-select: none;
+  -webkit-user-select: none; /* Для Safari */
+  -moz-user-select: none; /* Для Firefox */
+  -ms-user-select: none; /* Для IE/Edge */
+}
+
+body {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}

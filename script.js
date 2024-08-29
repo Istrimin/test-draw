@@ -155,6 +155,8 @@ function handleImageUpload(event) {
 
 // Drawing Functions
 function startDrawing(e) {
+    e.preventDefault(); // <-- добавьте эту строку
+
     isDrawing = true;
     lastX = e.offsetX; 
     lastY = e.offsetY;
