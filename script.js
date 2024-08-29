@@ -50,8 +50,8 @@ opacityValue.classList.add('input-value');
 // ---------- Drawing State ----------
 let symmetry = true;
 let isDrawing = false;
-let lastX = 0;
-let lastY = 0;
+// let lastX = 0;
+// let lastY = 0;
 let history = [];
 let redoHistory = [];
 let isEraser = false;
@@ -196,6 +196,7 @@ function startDrawing(e) {
 
 // let lastDrawTime = 0;
 
+let lastX, lastY;
 
 function draw(e) {
     if (!isDrawing) return;
