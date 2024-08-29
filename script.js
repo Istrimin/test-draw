@@ -86,10 +86,12 @@ fillModeBtn.addEventListener('click', toggleFillMode);
 // canvas.addEventListener('mousemove', draw);
 // canvas.addEventListener('mouseup', stopDrawing);
 // canvas.addEventListener('mouseout', stopDrawing);
-canvas.addEventListener('pointerdown', startDrawing);
+canvas.addEventListener('pointerdown', startDrawing, { passive: false });
 canvas.addEventListener('pointermove', draw);
 canvas.addEventListener('pointerup', stopDrawing);
 canvas.addEventListener('pointerout', stopDrawing);
+canvas.addEventListener('pointercancel', stopDrawing);
+
 
 // Modify the event listener for floodFill
 canvas.addEventListener('click', (e) => {
@@ -166,11 +168,15 @@ function handleImageUpload(event) {
 
 // Drawing Functions
 function startDrawing(e) {
-    e.preventDefault(); 
+    e.preventDefault();
     isDrawing = true;
     [lastX, lastY] = [e.offsetX, e.offsetY];
-    saveState(); 
+    saveState();
+    
+    // Захват указателя
+    e.target.setPointerCapture(e.pointerId);
 }
+
 
 function draw(e) {
     console.log('Event type:', e.type);
@@ -187,7 +193,8 @@ function draw(e) {
         pressure = e.pressure !== undefined ? e.pressure : 1;
     }
     // const pressure = e.pressure || e.webkitForce || 1; 
-    ctx.lineWidth = brushSizeInput.value * pressure * 2; 
+    // ctx.lineWidth = brushSizeInput.value * pressure * 2; 
+ctx.lineWidth = brushSizeInput.value * (e.pressure * e.pressure) * 2;
 
     // Update the pressure bar
     const pressureBar = document.getElementById('pressureBar');
