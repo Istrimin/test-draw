@@ -23,6 +23,10 @@
     <div class="parent-container">
         <div class="container">
             <div class="button-column" style="overflow-y: auto;">
+<button id="myBtn">✉️ </button>
+
+<p id="message" style="display:none;">Это сообщение!</p>
+
                 <label for="imageInput">
                     <button id="UploadButton" title="Загрузить изображение">🌺</button>
                 </label>
@@ -75,7 +79,9 @@
     <script>
         vkBridge.send('VKWebAppInit');
         
-        
+        document.getElementById("myBtn").addEventListener("click", function() {
+  document.getElementById("message").style.display = "block";
+});
     </script>
 </body>
 
