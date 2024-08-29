@@ -282,3 +282,8 @@ body {
   border-radius: 5px;
   transition: width 0.1s ease; /* Smooth transition for width changes */
 }
+
+/* add */
+#drawingCanvas {
+    touch-action: none;
+}
