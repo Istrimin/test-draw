@@ -23,12 +23,10 @@
     <div class="parent-container">
         <div class="container">
             <div class="button-column" style="overflow-y: auto;">
-<button id="myBtn">✉️ </button>
-
-  <div id="message-container">
-    <p id="message">Это сообщение</p>
-  </div>
-
+                <button id="myBtn">✉️ </button>
+                <div id="message-container" style="display: none;"> 
+                    <p id="message">Это сообщение</p>
+                </div>
 
                 <label for="imageInput">
                     <button id="UploadButton" title="Загрузить изображение">🌺</button>
@@ -81,23 +79,30 @@
     </div>
     <script>
         vkBridge.send('VKWebAppInit');
-const messageElement = document.getElementById('message');
-const containerElement = document.getElementById('message-container');
 
-function adjustFontSize() {
-  let fontSize = parseInt(window.getComputedStyle(messageElement).fontSize, 10);
+        const messageElement = document.getElementById('message');
+        const containerElement = document.getElementById('message-container');
+        const messageBtn = document.getElementById('myBtn');
 
-  // Reduce font size until it fits within the container
-  while (messageElement.offsetWidth > containerElement.offsetWidth) {
-    fontSize--;
-    messageElement.style.fontSize = fontSize + 'px';
-  }
-}
+        messageBtn.addEventListener('click', () => {
+            if (containerElement.style.display === 'none') {
+                containerElement.style.display = 'block';
+                adjustFontSize(); // Вызываем функцию для установки размера шрифта
+            } else {
+                containerElement.style.display = 'none';
+            }
+        });
 
-// Call the function initially and on window resize
-adjustFontSize();
-window.addEventListener('resize', adjustFontSize);
+        function adjustFontSize() {
+            let fontSize = parseInt(window.getComputedStyle(messageElement).fontSize, 10);
 
+            while (messageElement.offsetWidth > containerElement.offsetWidth) {
+                fontSize--;
+                messageElement.style.fontSize = fontSize + 'px';
+            }
+        }
+
+        window.addEventListener('resize', adjustFontSize);
     </script>
 </body>
 
