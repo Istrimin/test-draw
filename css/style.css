@@ -288,11 +288,12 @@ body {
 }
 
 #message-container {
-  background-color: #3d0000; /* Цвет фона сообщения */
+  background-color: transparent;
   padding: 10px;
   border-radius: 5px;
 }
 
+
 #message-container p {
-  color: #80ff8f; /* Цвет текста сообщения */
+  color: #80ff8f;
 }
