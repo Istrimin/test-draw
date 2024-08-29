@@ -16,6 +16,25 @@ let lastY=0;
 //     saveState();
 //     e.target.setPointerCapture(e.pointerId);
 // }
+canvas.addEventListener('pointerdown', startDrawing, { passive: false });
+canvas.addEventListener('pointermove', draw);
+canvas.addEventListener('pointerup', stopDrawing);
+canvas.addEventListener('pointerout', stopDrawing);
+canvas.addEventListener('pointercancel', stopDrawing);
+
+// Для поддержки сенсорных устройств
+canvas.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    startDrawing({offsetX: touch.clientX - canvas.offsetLeft, offsetY: touch.clientY - canvas.offsetTop});
+});
+canvas.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    draw({offsetX: touch.clientX - canvas.offsetLeft, offsetY: touch.clientY - canvas.offsetTop});
+});
+canvas.addEventListener('touchend', stopDrawing);
+
 
 function startDrawing(e) {
     isDrawing = true;
@@ -55,30 +74,15 @@ function draw(e) {
     [lastX, lastY] = [x, y];
 }
 
+
+// function stopDrawing() {
+//     isDrawing = false;
+// }
 // canvas.addEventListener('mousedown', startDrawing);
 // canvas.addEventListener('mousemove', draw);
 // canvas.addEventListener('mouseup', stopDrawing);
 // canvas.addEventListener('mouseout', stopDrawing);
 
-
-canvas.addEventListener('pointerdown', startDrawing, { passive: false });
-canvas.addEventListener('pointermove', draw);
-canvas.addEventListener('pointerup', stopDrawing);
-canvas.addEventListener('pointerout', stopDrawing);
-canvas.addEventListener('pointercancel', stopDrawing);
-
-// Для поддержки сенсорных устройств
-canvas.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    const touch = e.touches[0];
-    startDrawing({offsetX: touch.clientX - canvas.offsetLeft, offsetY: touch.clientY - canvas.offsetTop});
-});
-canvas.addEventListener('touchmove', (e) => {
-    e.preventDefault();
-    const touch = e.touches[0];
-    draw({offsetX: touch.clientX - canvas.offsetLeft, offsetY: touch.clientY - canvas.offsetTop});
-});
-canvas.addEventListener('touchend', stopDrawing);
 
 
 
