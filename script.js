@@ -70,11 +70,7 @@ fillModeBtn.addEventListener('click', toggleFillMode);
 // canvas.addEventListener('mousemove', draw);
 // canvas.addEventListener('mouseup', stopDrawing);
 // canvas.addEventListener('mouseout', stopDrawing);
-canvas.addEventListener('pointerdown', startDrawing, { passive: false });
-canvas.addEventListener('pointermove', draw);
-canvas.addEventListener('pointerup', stopDrawing);
-canvas.addEventListener('pointerout', stopDrawing);
-canvas.addEventListener('pointercancel', stopDrawing);
+
 // Modify the event listener for floodFill
 canvas.addEventListener('click', (e) => {
   if (isFillMode) {

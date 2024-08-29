@@ -60,6 +60,13 @@ function draw(e) {
 // canvas.addEventListener('mouseup', stopDrawing);
 // canvas.addEventListener('mouseout', stopDrawing);
 
+
+canvas.addEventListener('pointerdown', startDrawing, { passive: false });
+canvas.addEventListener('pointermove', draw);
+canvas.addEventListener('pointerup', stopDrawing);
+canvas.addEventListener('pointerout', stopDrawing);
+canvas.addEventListener('pointercancel', stopDrawing);
+
 // Для поддержки сенсорных устройств
 canvas.addEventListener('touchstart', (e) => {
     e.preventDefault();
