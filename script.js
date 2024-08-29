@@ -521,28 +521,28 @@ document.addEventListener('DOMContentLoaded', function() {
 );
 
 
-canvas.addEventListener('contextmenu', (e) => {
-    e.preventDefault();
-});
+// canvas.addEventListener('contextmenu', (e) => {
+//     e.preventDefault();
+// });
 
 
-canvas.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-}, { passive: false });
+// canvas.addEventListener('touchstart', (e) => {
+//     e.preventDefault();
+// }, { passive: false });
 
-canvas.addEventListener('touchmove', (e) => {
-    e.preventDefault();
-}, { passive: false });
+// canvas.addEventListener('touchmove', (e) => {
+//     e.preventDefault();
+// }, { passive: false });
 
-canvas.addEventListener('touchend', (e) => {
-    e.preventDefault();
-}, { passive: false });
+// canvas.addEventListener('touchend', (e) => {
+//     e.preventDefault();
+// }, { passive: false });
 
 
 // test
-canvas.addEventListener('touchcancel', (e) => {
-    e.preventDefault();
-}, { passive: false });
+// canvas.addEventListener('touchcancel', (e) => {
+//     e.preventDefault();
+// }, { passive: false });
 
 
 // });
