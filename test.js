@@ -75,9 +75,9 @@ function draw(e) {
 }
 
 
-// function stopDrawing() {
-//     isDrawing = false;
-// }
+function stopDrawing() {
+    isDrawing = false;
+}
 // canvas.addEventListener('mousedown', startDrawing);
 // canvas.addEventListener('mousemove', draw);
 // canvas.addEventListener('mouseup', stopDrawing);
