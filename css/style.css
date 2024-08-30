@@ -259,6 +259,9 @@ body {
 }
 
 
+#drawingCanvas {
+    touch-action: none;
+}
 
 .pressure-indicator {
   width: 600px; /* Adjust width as needed */
@@ -277,21 +280,18 @@ body {
 }
 
 
-#drawingCanvas {
-    touch-action: none;
-}
 
 
 #message-container p {
 color: #80ff8f;
-word-break: break-word; 
+/* word-break: break-word;  */
 width: 20%; /* Установи нужную ширину */
  text-align: center; /* Center the text */
 }
 
-#message {
+/* #message {
   word-break: break-word;
-}
+} */
 
 #message-container {
   background-color: transparent;
