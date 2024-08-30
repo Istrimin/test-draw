@@ -223,7 +223,7 @@ input[type="range"]::-moz-range-thumb {
 
 ::-webkit-scrollbar {
     width: 5px;
-    background-color: rgb(255, 0, 255);
+    background-color: transparent;
 } 
 
 ::-webkit-scrollbar-track {
