@@ -118,15 +118,6 @@ canvas {
     flex-direction: column;
     /* flex-grow: 1; */
 }
-/* 
-.container {
-    border-radius: 20px;
-    margin: 0;
-    padding: 0;
-    flex-grow: 1;
-    width: 80%;
-    height: 80%;
-} */
 
 .custom-file-upload {
     background-color: var(--button-color);
@@ -284,14 +275,13 @@ body {
 
 #message-container p {
 color: #80ff8f;
-/* word-break: break-word;  */
-width: 20%; /* Установи нужную ширину */
+width: 100%; /* Установи нужную ширину */
  text-align: center; /* Center the text */
 }
 
-/* #message {
-  word-break: break-word;
-} */
+#message {
+  font-size: 5vw; 
+}
 
 #message-container {
   background-color: transparent;
