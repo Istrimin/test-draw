@@ -268,10 +268,10 @@ body {
 
 
 .pressure-indicator {
-  width: 400px; /* Adjust width as needed */
+  width: 600px; /* Adjust width as needed */
   height: 10px;
   /* border: 1px solid #ccc; */
-  border-radius: 5px;
+  border-radius: 20px;
   margin-bottom: 10px; /* Add some spacing */
 }
 
@@ -302,4 +302,7 @@ body {
 #message-container {
   /* Другие стили для контейнера */
   word-break: break-word; /* Разрешаем перенос слов */
+width: 80%; /* Установи нужную ширину */
+
+
 }
