@@ -1,3 +1,5 @@
-version 0.0.231102 
+version 0.0.231103 
+
+фикс сообщения и прогресс бара 
 
 symmetry fixing

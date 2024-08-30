@@ -268,9 +268,9 @@ body {
 
 
 .pressure-indicator {
-  width: 200px; /* Adjust width as needed */
-  height: 20px;
-  border: 1px solid #ccc;
+  width: 400px; /* Adjust width as needed */
+  height: 10px;
+  /* border: 1px solid #ccc; */
   border-radius: 5px;
   margin-bottom: 10px; /* Add some spacing */
 }
@@ -283,7 +283,7 @@ body {
   transition: width 0.1s ease; /* Smooth transition for width changes */
 }
 
-/* add */
+
 #drawingCanvas {
     touch-action: none;
 }
@@ -297,4 +297,9 @@ body {
 
 #message-container p {
   color: #80ff8f;
+}
+
+#message-container {
+  /* Другие стили для контейнера */
+  word-break: break-word; /* Разрешаем перенос слов */
 }
