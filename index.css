@@ -24,8 +24,9 @@ h1 {
 }
 
 h2 {
-  color: red;
-  text-decoration: underline;
+  color: rgb(255, 255, 255);
+  text-decoration: none; /* Убираем подчеркивание */
+
 }
 
 a[title="Играть"] { /* Выбираем ссылку по атрибуту title */
@@ -38,21 +39,27 @@ a[title="Играть"] { /* Выбираем ссылку по атрибуту
   font-size: 20px; /* Размер шрифта */
 }
 
-a[title="Играть"]:hover { /* Стили при наведении */
-  background-color: #3e8e41; /* Меняем цвет фона при наведении */
-  cursor: pointer; /* Меняем курсор на указатель */
+a[title="Рисовать"]:hover {
+  /* background-color: #3e8e41; */
+  cursor: pointer;
+  text-decoration: none; /* Убираем подчеркивание */
+font-size: 110px;
 }
 
-/* В файле style.css */
+a[title="Рисовать"] {
+font-size: 100px;
+  padding: 20px;
+  text-decoration: none; /* Убираем подчеркивание */
+
+}
+
 .header-container {
-    text-align: center; /* Выравниваем элементы по центру */
+    text-align: center;
 }
 
 .header-container a {
-    display: block; /* Делаем ссылку блочной */
-    margin-top: 20px; /* Добавляем отступ сверху */
+    display: block;
+    margin-top: 20px;
 }
 
-a[title="На главную"] {
-  padding: 20px; /* Добавляем отступы со всех сторон */
-}
+
