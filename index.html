@@ -32,13 +32,13 @@
     </div> 
 
     <script>
-        // vkBridge.send('VKWebAppInit');
+        vkBridge.send('VKWebAppInit');
 
         const showCursorsBtn = document.getElementById('showCursorsBtn');
         const cursorList = document.getElementById('cursorList');
-
-        showCursorsBtn.addEventListener('click', () => {
             // fetch('get-cursors.py')
+        showCursorsBtn.addEventListener('click', () => {
+
             fetch('get-cursors.php')
                 .then(response => {
                     if (!response.ok) {
