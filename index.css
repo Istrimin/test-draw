@@ -1,0 +1,44 @@
+body {
+    background-image: url('../images/logo.jpg');
+    background-color: black;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    /* font-family: 'Roboto', sans-serif; */
+
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center; /* Центрируем по вертикали */
+    justify-content: center; /* Центрируем по горизонтали */
+}
+
+
+h1 {
+  color: rgb(255, 255, 255);
+  font-size: 2em;
+  text-align: center; /* Center the text */
+  text-transform: uppercase; /* Make the text uppercase */
+}
+
+h2 {
+  color: red;
+  text-decoration: underline;
+}
+
+a[title="Играть"] { /* Выбираем ссылку по атрибуту title */
+  display: inline-block; /* Делаем ссылку блочной, чтобы задать padding */
+  padding: 10px 20px;  /* Добавляем отступы */
+  background-color: #4CAF50; /* Цвет фона */
+  color: white; /* Цвет текста */
+  text-decoration: none; /* Убираем подчеркивание */
+  border-radius: 5px; /* Скругление углов */
+  font-size: 20px; /* Размер шрифта */
+}
+
+a[title="Играть"]:hover { /* Стили при наведении */
+  background-color: #3e8e41; /* Меняем цвет фона при наведении */
+  cursor: pointer; /* Меняем курсор на указатель */
+}

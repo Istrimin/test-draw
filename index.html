@@ -1,150 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Draw</title>
-    <link rel="stylesheet" href="css/style.css">
-    <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
-<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
-
-    <script src="cursors.js"></script>
-    <!-- <script src ="canvas.js"></script> -->
-    <script src="script.js" defer></script>
-<script type="module" src="tools.js" defer></script> 
-<script type="module" src="hotkey.js" defer></script> 
-<script type="module" src="test.js" defer></script> "
-    <!-- <script src="tools.js" defer></script> -->
-    
-    
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
 </head>
-
 <body>
+	<h1>Привет художник!</h1>
+    <a href="main.html" target="_self" title="Играть"> 🖌️</a>
+    <h2 id="Играть"></h2>
+<link rel="stylesheet" href="index.css">
 
-    <div class="parent-container">
-        <div class="container">
-            <div class="button-column" style="overflow-y: auto;">
-                <button id="myBtn">✉️ </button>
-                <div id="message-container" style="display: none;"> 
-<p id="message"></p>
-<p id="Quizz"></p>
-
-
-
-
-                </div>
-
-                <label for="imageInput">
-                    <button id="UploadButton" title="Загрузить изображение">🌺</button>
-                </label>
-                <input type="file" id="imageInput" accept="image/*" style="display: none;">
-                <button id="saveImageBtn" title="Сохранить изображение">🎬 </button>
-                <button id="eraser" title="Ластик">💩</button>
-                <button id="undo" title="Отменить">⟲ </button>
-                <button id="redo" title="Повторить">⟳ </button>
-                <button id="clear" title="Очистить">💀</button>
-                <button id="symmetry" title="Симметрия" class="active">🦋</button>
-                <button id="fillModeBtn" title="Заливка">🌊</button> 
-                
-                <button id="floodFillBtn" title="Залить цветом">✨</button> 
-                <button id="eyedropperBtn" title="Пипетка">💧</button>
-                <div class="tools">
-                    <div class="color-picker-group">
-                        <input type="color" id="backgroundPicker" value="#ffffff" title="Цвет фона">
-                        <input type="color" id="colorPicker" value="#000000" title="Цвет кисти">
-                    </div>
-                </div>
-                <button id="changeCursorBtn" title="Сменить курсор">🎨</button>
-                <button id="inviteFriends" title="Пригласить друзей"> 👥</button>
-                <button id="addToFavorites" title="Добавить в избранное">📌</button>
-                <button id="settings" title="Настройки">⚙️</button>
-            </div>
-        </div>
-        <div class="canvas-and-sliders">
-            <div class="pressure-indicator">
-            <div class="pressure-bar" id="pressureBar"></div>
-            </div>
-            <div class="container">
-                <p id="Quizz"></p>
-                <canvas id="drawingCanvas" width="820" height="500"></canvas>
-            </div>
-            <div class="slider-group">
-                <div class="tools-column">
-                    <label for="opacity" title="Прозрачность">👻</label>
-                    <input type="range" id="opacity" min="1" max="100" value="100">
-                </div>
-                <div class="tools-column">
-                    <label for="brushSize" title="Размер кисти">🖌️</label>
-                    <input type="range" id="brushSize" min="1" max="100" value="1">
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Добавляем вкладку с курсорами -->
-    <div id="cursorPanel" class="cursor-panel" style="display: none;">
-        <h3>Выберите курсор</h3>
-        <div id="cursorList">
-            <!-- Здесь будут отображаться доступные курсоры -->
-        </div>
-    </div>
-    <script>
-        vkBridge.send('VKWebAppInit');
-
-
-
-$(function() {
-  $("#message-container").resizable();
-});
-
-
-fetch('quizz.txt')
-    .then(response => response.text())
-    .then(text => {
-        const words = text.split(/\s+/); // Разделяем текст на слова
-        const randomWord = words[Math.floor(Math.random() * words.length)];
-        document.getElementById('Quizz').textContent = randomWord;
-    })
-    .catch(error => console.error('Ошибка при загрузке слова:', error));
-
-
-
-        fetch('messages.txt')
-            .then(response => response.text())
-            .then(message => {
-                document.getElementById('message').textContent = message;
-            })
-            .catch(error => console.error('Ошибка при загрузке сообщения:', error));
-
-
-
-
-        const messageElement = document.getElementById('message');
-        const containerElement = document.getElementById('message-container');
-        const messageBtn = document.getElementById('myBtn');
-
-        messageBtn.addEventListener('click', () => {
-            if (containerElement.style.display === 'none') {
-                containerElement.style.display = 'block';
-                adjustFontSize(); // Вызываем функцию для установки размера шрифта
-            } else {
-                containerElement.style.display = 'none';
-            }
-        });
-
-        function adjustFontSize() {
-            let fontSize = parseInt(window.getComputedStyle(messageElement).fontSize, 10);
-
-            while (messageElement.offsetWidth > containerElement.offsetWidth) {
-                fontSize--;
-                messageElement.style.fontSize = fontSize + 'px';
-            }
-        }
-
-        window.addEventListener('resize', adjustFontSize);
-    </script>
 </body>
-
 </html>
