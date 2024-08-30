@@ -66,10 +66,9 @@
         <div class="canvas-and-sliders">
             <div class="pressure-indicator">
             <div class="pressure-bar" id="pressureBar"></div>
-                <div id="message-container"> 
-                <p id="Quizz"></p>
             </div>
             <div class="container">
+                <p id="Quizz"></p>
                 <canvas id="drawingCanvas" width="820" height="500"></canvas>
             </div>
             <div class="slider-group">
@@ -100,7 +99,6 @@ $(function() {
   $("#message-container").resizable();
 });
 
-// ... (Your existing code) ...
 
 fetch('quizz.txt')
     .then(response => response.text())
