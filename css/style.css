@@ -264,10 +264,10 @@ body {
 }
 
 .pressure-indicator {
-  width: 600px; /* Adjust width as needed */
-  height: 10px;
+  width: 400px; /* Adjust width as needed */
+  height: 20px;
   /* border: 1px solid #ccc; */
-  border-radius: 20px;
+  border-radius: 10px;
   margin-bottom: 10px; /* Add some spacing */
 }
 
