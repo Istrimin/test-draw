@@ -283,10 +283,10 @@ width: 100%; /* Установи нужную ширину */
   font-size: 5vw; 
 }
 
-#message-container {
+/* #message-container {
   background-color: transparent;
   padding: 10px;
   height: 200px; 
 
   border-radius: 20px;
-}
+} */
