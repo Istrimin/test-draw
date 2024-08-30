@@ -63,3 +63,23 @@ font-size: 100px;
 }
 
 
+#cursorList {
+  background-color: #004019; /* Светло-серый фон */
+  border: 1px solid #ccc; /* Тонкая серая рамка */
+  padding: 10px;
+  margin-top: 5px; /* Отступ сверху */
+  max-height: 200px; /* Максимальная высота контейнера */
+  overflow-y: auto; /* Добавляем прокрутку, если контент не помещается */
+}
+
+#cursorList div { /* Стили для каждого элемента списка курсоров */
+  padding: 5px;
+  margin-bottom: 2px;
+  border: 1px solid transparent; /* Прозрачная рамка для эффекта при наведении */
+  cursor: pointer; /* Меняем курсор на "указатель" */
+}
+
+#cursorList div:hover {
+  background-color: #560000; /* Светло-серый фон при наведении */
+  border-color: #999; /* Серая рамка при наведении */
+}

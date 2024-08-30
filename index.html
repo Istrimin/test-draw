@@ -1,26 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Document</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
     <link rel="stylesheet" href="css/index.css"> 
     <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
 </head>
 <body>
-	<div class="header-container">
+    <div class="header-container">
         <h1>🖼️  </h1> 
-<audio controls autoplay loop>
+        <audio controls autoplay loop title= "Virago">
             <source src="music/Virago.mp3"> </audio>
+        <a href="download.php">Скачать Virago.mp3</a>
+
         <h1>Привет художник!</h1> 
         <a href="main.html" target="_self" title="Рисовать">🖍️</a> 
         <h2>Рисовать</h2>
+
+        <button id="showCursorsBtn">Показать курсоры</button> <div id="cursorList"></div> 
     </div>
-<!-- <script src="script.js"> -->
-<script>
-        vkBridge.send('VKWebAppInit');
-</script>
+
+    <div class="button-column" style="overflow-y: auto;">
+        <button id="myBtn">✉️ </button>
+        <div id="message-container" style="display: none;"> 
+            <p id="message"></p>
+            <p id="Quizz"></p>
+        </div>
+    </div> 
+
+    <script>
+        // vkBridge.send('VKWebAppInit');
+
+        const showCursorsBtn = document.getElementById('showCursorsBtn');
+        const cursorList = document.getElementById('cursorList');
+
+        showCursorsBtn.addEventListener('click', () => {
+            // fetch('get-cursors.py')
+            fetch('get-cursors.php')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(cursors => {
+                    cursorList.innerHTML = ''; // Clear previous list
+
+                    if (cursors.error) {
+                        cursorList.textContent = cursors.error;
+                        return;
+                    }
+
+                    cursors.forEach(cursor => {
+                        const listItem = document.createElement('div');
+                        listItem.textContent = cursor;
+                        listItem.addEventListener('click', () => {
+                                console.log("Selected cursor:", cursor); 
+                        });
+                        cursorList.appendChild(listItem);
+                    });
+                })
+                .catch(error => {
+                    console.error('There has been a problem with your fetch operation:', error);
+                    cursorList.textContent = 'Ошибка при загрузке курсоров';
+                });
+        });
+    </script>
 </body>
 </html>
