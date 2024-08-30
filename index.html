@@ -4,12 +4,15 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Document</title>
+    <link rel="stylesheet" href="index.css"> 
 </head>
 <body>
-	<h1>Привет художник!</h1>
-    <a href="main.html" target="_self" title="Играть"> 🖌️</a>
-    <h2 id="Играть"></h2>
-<link rel="stylesheet" href="index.css">
-
+	<div class="header-container">
+        <h1>Привет художник!</h1> 
+        <a href="main.html" target="_self" title="На главную"> 🏠</a> 
+    </div>
+<script src="script.js">
+        vkBridge.send('VKWebAppInit');
+</script>
 </body>
 </html>

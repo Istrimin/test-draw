@@ -42,3 +42,17 @@ a[title="Играть"]:hover { /* Стили при наведении */
   background-color: #3e8e41; /* Меняем цвет фона при наведении */
   cursor: pointer; /* Меняем курсор на указатель */
 }
+
+/* В файле style.css */
+.header-container {
+    text-align: center; /* Выравниваем элементы по центру */
+}
+
+.header-container a {
+    display: block; /* Делаем ссылку блочной */
+    margin-top: 20px; /* Добавляем отступ сверху */
+}
+
+a[title="На главную"] {
+  padding: 20px; /* Добавляем отступы со всех сторон */
+}
