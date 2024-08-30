@@ -247,8 +247,28 @@ input[type="range"]::-moz-range-thumb {
 }
 
 #message {
-  font-size: 10vw; /* Start with a large font size (10% of viewport width) */
+  font-size: 5vw; /* Start with a large font size (10% of viewport width) */
 }
+
+#message-container {
+  background-color: transparent;
+  padding: 10px;
+  border-radius: 20px;
+}
+
+
+#message-container p {
+  color: #80ff8f;
+}
+
+#message-container {
+  /* Другие стили для контейнера */
+  word-break: break-word; /* Разрешаем перенос слов */
+width: 20%; /* Установи нужную ширину */
+
+
+}
+
 
 #drawingCanvas {
   user-select: none;
@@ -287,21 +307,3 @@ body {
     touch-action: none;
 }
 
-#message-container {
-  background-color: transparent;
-  padding: 10px;
-  border-radius: 5px;
-}
-
-
-#message-container p {
-  color: #80ff8f;
-}
-
-#message-container {
-  /* Другие стили для контейнера */
-  word-break: break-word; /* Разрешаем перенос слов */
-width: 20%; /* Установи нужную ширину */
-
-
-}
