@@ -408,8 +408,15 @@ function stopDrawing() {
 }
 
 
+// Обработаем изменение размера окна
+window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight - 60;
+});
+
 document.addEventListener('DOMContentLoaded', function() {
     window.initCursors();
     // window.initEyedropper();
 }
 );
+
