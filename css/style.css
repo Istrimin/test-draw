@@ -30,7 +30,8 @@ body {
 }
 
 button {
-    background-color: var(--button-color);
+    /* background-color: var(--button-color); */
+    background-color: transparent;
     color: var(--button-text-color);
     font-style: bold;
     font-size: 30px;
@@ -40,14 +41,13 @@ button:hover,
 .custom-file-upload:hover,
 input[type="color"]:hover,
 input[type="range"]:hover {
-    opacity: 0.8;
-    cursor: pointer;
+    /* opacity: 1; */
+    cursor: none;
     color: rgb(0, 255, 13);
+    font-size: 40px;
 }
 
-button:hover {
-    background-color: rgb(61, 61, 61);
-}
+
 
 #fillModeBtn.active {
     background-color: var(--button-active-color);
@@ -124,6 +124,7 @@ canvas {
     color: var(--button-text-color);
     padding: 10px;
     cursor: pointer;
+    align-content: center;
 }
 
 #saveImageButton {

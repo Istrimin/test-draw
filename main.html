@@ -6,20 +6,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Draw</title>
     <link rel="stylesheet" href="css/style.css">
-    <!-- <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script> -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
-<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 
-    <script src="cursors.js"></script>
-    <!-- <script src ="canvas.js"></script> -->
+    <script>
+        const jqueryScript = document.createElement('script');
+        jqueryScript.src = 'https://code.jquery.com/jquery-3.6.0.min.js';
+        jqueryScript.onload = function() {
+            // Load jQuery UI after jQuery is loaded
+            const jqueryUIScript = document.createElement('script');
+            jqueryUIScript.src = 'https://code.jquery.com/ui/1.13.2/jquery-ui.js';
+            jqueryUIScript.onload = function() {
+                // Your jQuery code that depends on both jQuery and jQuery UI
+                $(function() {
+                    $("#message-container").resizable();
+                });
+            };
+            document.head.appendChild(jqueryUIScript);
+        };
+        document.head.appendChild(jqueryScript);
+    </script>
+
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+
+    <script src="cursors.js" defer></script>
     <script src="script.js" defer></script>
-<script type="module" src="tools.js" defer></script> 
-<script type="module" src="hotkey.js" defer></script> 
-<script type="module" src="test.js" defer></script> "
-    <!-- <script src="tools.js" defer></script> -->
-    
-    
+    <script type="module" src="tools.js" defer></script> 
+    <script type="module" src="hotkey.js" defer></script> 
+    <script type="module" src="test.js" defer></script> 
 </head> 
 
 <body>
@@ -29,12 +41,8 @@
             <div class="button-column" style="overflow-y: auto;">
                 <button id="myBtn">✉️ </button>
                 <div id="message-container" style="display: none;"> 
-<p id="message"></p>
-<p id="Quizz"></p>
-
-
-
-
+                    <p id="message"></p>
+                    <p id="Quizz"></p>
                 </div>
 
                 <label for="imageInput">
@@ -90,61 +98,55 @@
             <!-- Здесь будут отображаться доступные курсоры -->
         </div>
     </div>
-    <script>
-        // vkBridge.send('VKWebAppInit');
+
+
+<script>
+    // This code will run after jQuery and jQuery UI are loaded
+    fetch('quizz.txt')
+        .then(response => response.text())
+        .then(text => {
+            const words = text.split(/\s+/); // Разделяем текст на слова
+            const randomWord = words[Math.floor(Math.random() * words.length)];
+            document.getElementById('Quizz').textContent = randomWord;
+        })
+        .catch(error => console.error('Ошибка при загрузке слова:', error));
 
 
 
-$(function() {
-  $("#message-container").resizable();
-});
-
-
-fetch('quizz.txt')
-    .then(response => response.text())
-    .then(text => {
-        const words = text.split(/\s+/); // Разделяем текст на слова
-        const randomWord = words[Math.floor(Math.random() * words.length)];
-        document.getElementById('Quizz').textContent = randomWord;
-    })
-    .catch(error => console.error('Ошибка при загрузке слова:', error));
-
-
-
-        fetch('messages.txt')
-            .then(response => response.text())
-            .then(message => {
-                document.getElementById('message').textContent = message;
-            })
-            .catch(error => console.error('Ошибка при загрузке сообщения:', error));
+    fetch('messages.txt')
+        .then(response => response.text())
+        .then(message => {
+            document.getElementById('message').textContent = message;
+        })
+        .catch(error => console.error('Ошибка при загрузке сообщения:', error));
 
 
 
 
-        const messageElement = document.getElementById('message');
-        const containerElement = document.getElementById('message-container');
-        const messageBtn = document.getElementById('myBtn');
+    const messageElement = document.getElementById('message');
+    const containerElement = document.getElementById('message-container');
+    const messageBtn = document.getElementById('myBtn');
 
-        messageBtn.addEventListener('click', () => {
-            if (containerElement.style.display === 'none') {
-                containerElement.style.display = 'block';
-                adjustFontSize(); // Вызываем функцию для установки размера шрифта
-            } else {
-                containerElement.style.display = 'none';
-            }
-        });
-
-        function adjustFontSize() {
-            let fontSize = parseInt(window.getComputedStyle(messageElement).fontSize, 10);
-
-            while (messageElement.offsetWidth > containerElement.offsetWidth) {
-                fontSize--;
-                messageElement.style.fontSize = fontSize + 'px';
-            }
+    messageBtn.addEventListener('click', () => {
+        if (containerElement.style.display === 'none') {
+            containerElement.style.display = 'block';
+            adjustFontSize(); // Вызываем функцию для установки размера шрифта
+        } else {
+            containerElement.style.display = 'none';
         }
+    });
 
-        window.addEventListener('resize', adjustFontSize);
-    </script>
+    function adjustFontSize() {
+        let fontSize = parseInt(window.getComputedStyle(messageElement).fontSize, 10);
+
+        while (messageElement.offsetWidth > containerElement.offsetWidth) {
+            fontSize--;
+            messageElement.style.fontSize = fontSize + 'px';
+        }
+    }
+
+    window.addEventListener('resize', adjustFontSize);
+</script>
 </body>
 
 </html>

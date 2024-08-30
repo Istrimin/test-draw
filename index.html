@@ -34,40 +34,52 @@
     <script>
         vkBridge.send('VKWebAppInit');
 
-        const showCursorsBtn = document.getElementById('showCursorsBtn');
-        const cursorList = document.getElementById('cursorList');
-            // fetch('get-cursors.py')
-        showCursorsBtn.addEventListener('click', () => {
+// ... (previous JavaScript code)
 
-            fetch('get-cursors.php')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(cursors => {
-                    cursorList.innerHTML = ''; // Clear previous list
+showCursorsBtn.addEventListener('click', () => {
+    fetch('get-cursors.php')
+        .then(response => {
+            // ... (error handling)
+            return response.json();
+        })
+        .then(cursors => {
+            cursorList.innerHTML = ''; // Clear previous list
 
-                    if (cursors.error) {
-                        cursorList.textContent = cursors.error;
-                        return;
-                    }
+            if (cursors.error) {
+                // ... (error handling)
+                return;
+            }
 
-                    cursors.forEach(cursor => {
-                        const listItem = document.createElement('div');
-                        listItem.textContent = cursor;
-                        listItem.addEventListener('click', () => {
-                                console.log("Selected cursor:", cursor); 
-                        });
-                        cursorList.appendChild(listItem);
-                    });
-                })
-                .catch(error => {
-                    console.error('There has been a problem with your fetch operation:', error);
-                    cursorList.textContent = 'Ошибка при загрузке курсоров';
+            cursors.forEach(cursor => {
+                // Create a div to hold the image and name
+                const listItem = document.createElement('div');
+
+                // Create an image element
+                const image = document.createElement('img');
+                image.src = cursor.image;
+                image.alt = cursor.name;
+                image.style.width = '32px'; // Set image width as needed
+                image.style.height = '32px'; // Set image height as needed
+
+                // Add the image and name to the list item
+                listItem.appendChild(image);
+                listItem.appendChild(document.createTextNode(cursor.name));
+
+                // Add an event listener to the list item (if needed)
+                listItem.addEventListener('click', () => {
+                    console.log("Selected cursor:", cursor.name);
                 });
+
+                // Append the list item to the cursor list
+                cursorList.appendChild(listItem);
+            });
+        })
+        .catch(error => {
+            // ... (error handling)
         });
+});
+
+
     </script>
 </body>
 </html>
