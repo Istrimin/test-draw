@@ -27,7 +27,7 @@
             <div class="button-column" style="overflow-y: auto;">
                 <button id="myBtn">✉️ </button>
                 <div id="message-container" style="display: none;"> 
-                    <p id="message">version 0.0.231100 symmetry fixing</p>
+                    <p id="message">version 0.0.231101 symmetry fixing</p>
                     <!-- <p id="message">горячие клавиши zxa</p> -->
     <p id="message"><a href="messages.txt" target="_blank">Click here to see the message</a></p> 
 
@@ -88,6 +88,13 @@
     </div>
     <script>
         vkBridge.send('VKWebAppInit');
+
+        fetch('messages.txt')
+            .then(response => response.text())
+            .then(message => {
+                document.getElementById('message').textContent = message;
+            })
+            .catch(error => console.error('Ошибка при загрузке сообщения:', error));
 
         const messageElement = document.getElementById('message');
         const containerElement = document.getElementById('message-container');
