@@ -172,8 +172,9 @@ function startDrawing(e) {
 function draw(e) {
     if (!isDrawing) return;
     e.preventDefault();
-    const x = e.offsetX;
-    const y = e.offsetY;
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
     const pressure = e.pressure || 1;
     ctx.lineWidth = brushSizeInput.value * pressure;
     ctx.lineCap = 'round';

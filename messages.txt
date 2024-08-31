@@ -1,5 +1,14 @@
 version 0.0.243
 
+
+горячие клавиши 
+z отмена
+x повтор
+c цвет кисти
+b цвет канваса
+a пипетка 
+
+
 remove default  
 
 picture on center woman and flowers

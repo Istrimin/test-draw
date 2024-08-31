@@ -54,7 +54,7 @@ input[type="range"]:hover {
     display: flex;
     /* flex-direction: row; */
     height: 100vh;
-    width: 100%;
+    /* width: 100%; */
 }
 .canvas-container{
     display: flex;
@@ -63,7 +63,7 @@ input[type="range"]:hover {
     font-size: 10px;
     margin: 0;
     padding: 0;
-    width: 100%;
+    /* width: 100%; */
 }
 
 #fillModeBtn.active {
@@ -135,7 +135,7 @@ canvas {
 }
 .canvas-and-sliders {
     flex-direction: column;
-    width: 100%;
+    /* width: 100%; */
 }
 
 .canvas-container { 

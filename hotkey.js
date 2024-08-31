@@ -22,3 +22,37 @@ document.addEventListener('keydown', (event) => {
     redo();
   }
 });
+
+
+// colorpicker
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'b' || event.code === 'KeyB') { // Проверяем и 'b', и 'KeyB'
+    event.preventDefault();
+    const backgroundPicker = document.getElementById('backgroundPicker');
+    backgroundPicker.click(); 
+
+    // Эмулируем нажатие Esc
+    const escEvent = new KeyboardEvent('keydown', {
+      bubbles: true, // Позволяем событию всплывать
+      cancelable: true, // Позволяем отменить действие по умолчанию
+      key: 'Escape', // Устанавливаем клавишу Esc
+      code: 'Escape' // Устанавливаем код клавиши Esc
+    });
+    backgroundPicker.dispatchEvent(escEvent); // Отправляем событие
+
+  } else if (event.key === 'c' || event.code === 'KeyC') { // Проверяем и 'c', и 'KeyC'
+    event.preventDefault();
+    const colorPicker = document.getElementById('colorPicker');
+    colorPicker.click();
+
+    // Эмулируем нажатие Esc
+    const escEvent = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      key: 'Escape',
+      code: 'Escape'
+    });
+    colorPicker.dispatchEvent(escEvent); 
+  }
+});
+
