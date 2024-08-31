@@ -1,9 +1,6 @@
 // tools.js
 
 // Пипетка
-const canvas = document.getElementById('drawingCanvas');
-const ctx = canvas.getContext('2d');
-const colorPicker = document.getElementById('colorPicker');
 const eyedropperBtn = document.getElementById('eyedropperBtn');
 
 let isEyedropperActive = false;
@@ -38,32 +35,6 @@ canvas.addEventListener('click', (e) => {
 
 function rgbToHex(r, g, b) {
     return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-}
-
-// eraser
-eraserBtn.addEventListener('click', toggleEraser); 
-function toggleEraser() {
-    isEraser = !isEraser;
-    eraserBtn.textContent = isEraser ? '🖌️' : '💩';
-    if (isEraser) {
-        setEraserCursor();
-    } else {
-        setDrawingCursor();
-    }
-}
-
-
-eraserBtn.addEventListener('click', setEraserCursor); // If this is needed, consider renaming for clarity
-setDrawingCursor(); // Set initial cursor
-
-
-function setDrawingCursor() {
-    canvas.classList.add('drawingCursor');
-    canvas.classList.remove('eraserCursor');
-}
-function setEraserCursor() {
-    canvas.classList.add('eraserCursor');
-    canvas.classList.remove('drawingCursor');
 }
 
 
@@ -169,29 +140,6 @@ function shouldFillPixel(x, y, data, width, height, fillColor) {
   return filledNeighbors >= 5; // Заполняем, если большинство соседей уже заполнены
 }
 
-
-// // Helper function to check if a pixel is part of the contour
-// function isContourPixel(x, y, data, width, height, targetColor, tolerance) {
-//   const directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
-//   const currentIndex = (y * width + x) * 4;
-//   const currentColor = data.slice(currentIndex, currentIndex + 4);
-//   if (colorMatch(currentColor, targetColor, tolerance)) {
-//     return false;
-//   }
-//   for (const [dx, dy] of directions) {
-//     const nx = x + dx;
-//     const ny = y + dy;
-//     if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
-//       const neighborIndex = (ny * width + nx) * 4;
-//       const neighborColor = data.slice(neighborIndex, neighborIndex + 4);
-//       if (colorMatch(neighborColor, targetColor, tolerance)) {
-//         return true;
-//       }
-//     }
-//   }
-//   return false;
-// }
-// Helper function to convert hex to RGBA
 function hexToRgba(hex) {
   const r = parseInt(hex.slice(1, 3), 16);
   const g = parseInt(hex.slice(3, 5), 16);

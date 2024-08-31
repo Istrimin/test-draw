@@ -27,3 +27,25 @@ function inviteFriends() {
             console.error("Error sending invitation:", error);
         });
 }
+
+
+// test
+    function createAlbum(callback){
+        var o = {
+            privacy_view:['nobody'],
+            'title': 'РИУ',
+            description:'Это скрытый альбом для рисунков созданных в игре Рисуй и Угадывай.'
+        }
+
+        VK.api('photos.createAlbum', o, function(data) {
+            console.log("datanewalbum", data);
+            if(typeof callback == 'function') callback(data.response);
+        });
+    }
+    function getAlbums(callback){
+
+        VK.api('photos.getAlbums',  function(data) {
+             console.log("getAlbums", data);
+            if(typeof callback == 'function') callback(data.response);
+        });
+    }

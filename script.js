@@ -13,6 +13,8 @@ ctx.willReadFrequently = true;
 // ---------- UI Elements ----------
 const backgroundPicker = document.getElementById('backgroundPicker');
 const colorPicker = document.getElementById('colorPicker');
+const colorPicker2 = document.getElementById('colorPicker2');
+const colorPicker3 = document.getElementById('colorPicker3');
 const brushSizeInput = document.getElementById('brushSize');
 const opacityInput = document.getElementById('opacity');
 const eraserBtn = document.getElementById('eraser');

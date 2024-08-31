@@ -15,4 +15,25 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('dragend', () => {
     document.body.style.cursor = 'auto'; // Reset cursor to default
   });
+
+
+// !блокировка контекстного меню
+
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+        $(function () {
+            $("#message-container").resizable();
+        });
+
+        // function adjustFontSize() {
+        //     let fontSize = parseInt(window.getComputedStyle(messageElement).fontSize, 10);
+        //     while (messageElement.offsetWidth > containerElement.offsetWidth) {
+        //         fontSize--;
+        //         messageElement.style.fontSize = fontSize + 'px';
+        //     }
+        // }
+
+        // window.addEventListener('resize', adjustFontSize);
+
+
 });

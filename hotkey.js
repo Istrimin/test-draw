@@ -12,18 +12,27 @@ document.addEventListener('keydown', function(event) {
       break;
     case 'KeyB': // Background color
       event.preventDefault();
-      triggerColorPicker('backgroundPicker');
+      document.getElementById('backgroundPicker').click();
       break;
     case 'KeyC': // Drawing color
       event.preventDefault();
       document.getElementById('colorPicker').click();
-      triggerColorPicker('colorPicker');
+
       break;
     case 'KeyE': // Eraser
       event.preventDefault();
       document.getElementById('eraser').click();
       break;
-    case 'KeyS': // Symmetry
+    case 'KeyS': // Save
+      event.preventDefault();
+      document.getElementById('saveImageBtn').click();
+      break;
+    case 'KeyR': // Clear
+      event.preventDefault();
+      document.getElementById('clear').click();
+      break;
+
+    case 'KeyQ': // Symmetry
       event.preventDefault();
       document.getElementById('symmetry').click();
       break;
@@ -38,39 +47,3 @@ document.addEventListener('keydown', function(event) {
 
   }
 });
-
-// function triggerColorPicker(pickerId) {
-//   const picker = document.getElementById(pickerId);
-
-//   // // Check if the picker is already open
-//   if (document.activeElement === picker)
-
-
-//  {
-//     // Picker is open, so close it by blurring
-//     picker.blur();
-//   } 
-
-// {
-//     // Picker is closed, so open it
-//     picker.click()
-
-// ;
-
-// }
-
-    // // Create a temporary element to click on (for reliable closing)
-    // const tempElement = document.createElement('div');
-    // tempElement.style.position = 'absolute'; 
-    // tempElement.style.top = '-9999px';
-    // tempElement.style.left = '-9999px';
-    // document.body.appendChild(tempElement);
-
-    // // Simulate a click on the temporary element to ensure closure
-    // tempElement.click();
-
-    // // Remove the temporary element
-    // document.body.removeChild(tempElement);
-  // }
-// }
-
