@@ -39,6 +39,23 @@
         .word-navigation button {
             margin: 0 10px;
         }
+
+/* Стили для колорпикеров */
+.color-picker-group {
+    display: flex;
+    flex-direction: row; /* Изменено с 'column' на 'row' */
+    justify-content: space-around;
+    margin-bottom: 10px;
+}
+
+
+        .color-picker-group input[type="color"] {
+            width: 50px;
+            height: 30px;
+            padding: 0;
+            border: 2px solid black;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
@@ -49,13 +66,6 @@
     </div>
     <div class="base-container">
         <div class="sidebar">
-            <div class="color-picker-group">
-                <input type="color" id="backgroundPicker" value="#ffffff" title="Цвет фона (B)">
-                <input type="color" id="colorPicker" value="#000000" title="Цвет кисти (C)">
-                <input type="color" id="colorPicker2" value="#ff0000" title="Цвет кисти 2"> 
-                <input type="color" id="colorPicker3" value="#0000ff" title="Цвет кисти 3"> 
-                <input type="color" id="colorPicker4" value="#00ff00" title="Цвет кисти 4"> 
-            </div>
             <a href="index.html" target="_self" title="Выйти из команты">🚪</a>
             <button id="myBtn" title="Сообщение">✉️</button>
             <div id="message-container" style="display: none;">
@@ -72,9 +82,6 @@
             <button id="fillModeBtn" title="Заливка (F)">🌊</button>
             <button id="floodFillBtn" title="Залить цветом">✨</button>
             <button id="eyedropperBtn" title="Пипетка (A)">💧</button>
-            <div class="color-picker-group">
-                <input type="color" id="backgroundPicker" value="#ffffff" title="Цвет фона (B)">
-            </div>
             <button id="changeCursorBtn" title="Сменить курсор">🎨</button>
             <div id="cursorPanel" class="cursor-panel" style="display: none;">
                 <h3>Выберите курсор</h3>
@@ -91,10 +98,18 @@
                     <p id="Quizz"></p>
                     <button id="nextWord" title="Следующее слово">&gt;</button>
                 </div>
+                <div class="color-picker-group"> 
+                    <input type="color" id="backgroundPicker" value="#ffffff" title="Цвет фона (B)">
+                    <input type="color" id="colorPicker" value="#000000" title="Цвет кисти (C)">
+                    <input type="color" id="colorPicker2" value="#ff0000" title="Цвет кисти 2"> 
+                    <input type="color" id="colorPicker3" value="#0000ff" title="Цвет кисти 3"> 
+                    <input type="color" id="colorPicker4" value="#00ff00" title="Цвет кисти 4"> 
+                </div>
 
-<canvas id="drawingCanvas" 
-width="700" height="500" style=width:700px;height:500px>
-</canvas>
+
+                <canvas id="drawingCanvas" 
+                        width="700" height="500" style=width:700px;height:500px>
+                </canvas>
             </div>
             <div class="slider-group">
                 <div class="tools-column">
@@ -112,30 +127,47 @@ width="700" height="500" style=width:700px;height:500px>
     </div>
 
     <script>
+        // Получаем все элементы input type="color"
+        const colorPickers = document.querySelectorAll('input[type="color"]');
 
-// Функция для установки цвета рисования
-function setDrawingColor(color) {
-    ctx.strokeStyle = color; 
-}
 
-// Добавляем обработчики событий для всех колорпикеров
-colorPicker.addEventListener('change', (event) => {
-    setDrawingColor(event.target.value);
-});
+        // Добавляем обработчики событий для всех колорпикеров
+        colorPickers.forEach(picker => {
+            // При клике на колорпикер, устанавливаем цвет рисования
+            picker.addEventListener('click', (event) => {
+                setDrawingColor(event.target.value);
+            });
 
-colorPicker2.addEventListener('change', (event) => {
-    setDrawingColor(event.target.value);
-});
+            // Также обновляем цвет рисования при изменении значения колорпикера
+            picker.addEventListener('change', (event) => {
+                setDrawingColor(event.target.value);
+            });
+        });
 
-colorPicker3.addEventListener('change', (event) => {
-    setDrawingColor(event.target.value);
-});
 
-colorPicker4.addEventListener("change", (event) => [
-    setDrawingColor(event.target.value)
-]);
+    // Функция для установки цвета рисования
+    function setDrawingColor(color) {
+        ctx.strokeStyle = color;
+    }
 
-    </script>
+    // Добавляем обработчики событий для всех колорпикеров
+    colorPickers.forEach(picker => {
+        picker.addEventListener('input', (event) => {
+            setDrawingColor(event.target.value);
+        });
+    });
+
+    // Добавляем обработчик клавиатуры для горячих клавиш
+    document.addEventListener('keydown', (event) => {
+        if (event.key >= '1' && event.key <= '4') {
+            const index = parseInt(event.key) - 1;
+            if (index < colorPickers.length) {
+                const color = colorPickers[index].value;
+                setDrawingColor(color);
+            }
+        }
+    });
+</script>
+
 </body>
 </html>
-
