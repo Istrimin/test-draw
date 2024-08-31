@@ -335,3 +335,8 @@ width: 100%;
             margin: 0;
             padding: 0;
         }
+
+/* Optional: Add a "no-drop" cursor style for better visual feedback */
+body.no-drop {
+  cursor: not-allowed; 
+}

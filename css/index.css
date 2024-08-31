@@ -14,7 +14,12 @@ body {
     align-items: center; /* Центрируем по вертикали */
     justify-content: center; /* Центрируем по горизонтали */
 }
-
+body {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
 
 h1 {
   color: rgb(255, 255, 255);
@@ -98,3 +103,8 @@ font-size: 100px;
             margin: 0;
             padding: 0;
         }
+
+/* Optional: Add a "no-drop" cursor style for better visual feedback */
+body.no-drop {
+  cursor: not-allowed; 
+}
