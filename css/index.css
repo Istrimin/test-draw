@@ -18,8 +18,10 @@ body {
 
 h1 {
   color: rgb(255, 255, 255);
-  font-size: 2em;
+  font-size: 400px;
   text-align: center; /* Center the text */
+  padding: 0;
+  margin: 0;
   text-transform: uppercase; /* Make the text uppercase */
 }
 
@@ -83,3 +85,12 @@ font-size: 100px;
   background-color: #560000; /* Светло-серый фон при наведении */
   border-color: #999; /* Серая рамка при наведении */
 }
+
+        .python-output {
+            background-color: transparent; /* Светло-серый фон */
+            color: #ffffff; /* Белый текст */
+            font-family: monospace; /* Моноширинный шрифт */
+            font-size: 10px;
+            margin: 0;
+            padding: 0;
+        }

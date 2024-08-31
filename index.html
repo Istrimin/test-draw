@@ -10,17 +10,36 @@
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
 </head>
 <body>
+    <script defer src="https://pyscript.net/latest/pyscript.js"></script> 
     <div class="header-container">
+    <div id="python-output" class="python-output"></div>
+    <div class="python-code">
+        <script type="py">
+from pyscript import display
+from datetime import datetime
+import asyncio
+
+async def update_time():
+  while True:
+    now = datetime.now()
+    display(now.strftime("%H:%M:%S"), target="python-output", append=False)
+    await asyncio.sleep(1)
+    
+asyncio.ensure_future(update_time())
+        </script>
+    </div>
         <h1>🖼️  </h1> 
         <audio controls autoplay loop title= "Virago">
             <source src="music/Virago.mp3"> </audio>
         <a href="download.php">Скачать Virago.mp3</a>
 
-        <h1>Привет художник!</h1> 
+        <h2>Привет художник!</h2> 
         <a href="main.html" target="_self" title="Рисовать">🖍️</a> 
-        <h2>Рисовать</h2>
 
-        <button id="showCursorsBtn">Показать курсоры</button> <div id="cursorList"></div> 
+        <!-- <h2>Рисовать</h2> -->
+
+        <!-- <button id="showCursorsBtn">Показать курсоры</button>  -->
+        <div id="cursorList"></div> 
     </div>
 
     <div class="button-column" style="overflow-y: auto;">
@@ -34,50 +53,51 @@
     <script>
         vkBridge.send('VKWebAppInit');
 
-// ... (previous JavaScript code)
+  document.addEventListener('contextmenu', event => event.preventDefault());
 
-showCursorsBtn.addEventListener('click', () => {
-    fetch('get-cursors.php')
-        .then(response => {
-            // ... (error handling)
-            return response.json();
-        })
-        .then(cursors => {
-            cursorList.innerHTML = ''; // Clear previous list
 
-            if (cursors.error) {
-                // ... (error handling)
-                return;
-            }
+// showCursorsBtn.addEventListener('click', () => {
+//     fetch('get-cursors.php')
+//         .then(response => {
+//             // ... (error handling)
+//             return response.json();
+//         })
+//         .then(cursors => {
+//             cursorList.innerHTML = ''; // Clear previous list
 
-            cursors.forEach(cursor => {
-                // Create a div to hold the image and name
-                const listItem = document.createElement('div');
+//             if (cursors.error) {
+//                 // ... (error handling)
+//                 return;
+//             }
 
-                // Create an image element
-                const image = document.createElement('img');
-                image.src = cursor.image;
-                image.alt = cursor.name;
-                image.style.width = '32px'; // Set image width as needed
-                image.style.height = '32px'; // Set image height as needed
+//             cursors.forEach(cursor => {
+//                 // Create a div to hold the image and name
+//                 const listItem = document.createElement('div');
 
-                // Add the image and name to the list item
-                listItem.appendChild(image);
-                listItem.appendChild(document.createTextNode(cursor.name));
+//                 // Create an image element
+//                 const image = document.createElement('img');
+//                 image.src = cursor.image;
+//                 image.alt = cursor.name;
+//                 image.style.width = '32px'; // Set image width as needed
+//                 image.style.height = '32px'; // Set image height as needed
 
-                // Add an event listener to the list item (if needed)
-                listItem.addEventListener('click', () => {
-                    console.log("Selected cursor:", cursor.name);
-                });
+//                 // Add the image and name to the list item
+//                 listItem.appendChild(image);
+//                 listItem.appendChild(document.createTextNode(cursor.name));
 
-                // Append the list item to the cursor list
-                cursorList.appendChild(listItem);
-            });
-        })
-        .catch(error => {
-            // ... (error handling)
-        });
-});
+//                 // Add an event listener to the list item (if needed)
+//                 listItem.addEventListener('click', () => {
+//                     console.log("Selected cursor:", cursor.name);
+//                 });
+
+//                 // Append the list item to the cursor list
+//                 cursorList.appendChild(listItem);
+//             });
+//         })
+//         .catch(error => {
+//             // ... (error handling)
+//         });
+// });
 
 
     </script>

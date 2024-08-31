@@ -14,6 +14,12 @@ body {
     align-items: flex-start;
     /* justify-content: center; */
 }
+body {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
 
 .drawingCursor {
     cursor: url('../cursors/pencil.png'), auto;
@@ -66,7 +72,7 @@ input[type="range"]:hover {
     height: 100vh;
 }
 
-.button-column {
+.sidebar {
     display: flex;
     flex-direction: column;
     max-height: 600px;
@@ -114,9 +120,7 @@ canvas {
     border-radius: 20px;
 }
 .canvas-and-sliders {
-    display: flex;
     flex-direction: column;
-    /* flex-grow: 1; */
 }
 
 .custom-file-upload {
@@ -241,19 +245,10 @@ input[type="range"]::-moz-range-thumb {
   -webkit-user-select: none; /* Для Safari */
   -moz-user-select: none; /* Для Firefox */
   -ms-user-select: none; /* Для IE/Edge */
-}
-
-body {
-  user-select: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-}
-
-
-#drawingCanvas {
     touch-action: none;
 }
+
+
 
 .pressure-indicator {
   width: 400px; /* Adjust width as needed */
@@ -281,7 +276,7 @@ width: 100%; /* Установи нужную ширину */
 }
 
 #message {
-  font-size: 5vw; 
+  font-size: 20px; 
 }
 
 
