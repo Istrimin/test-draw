@@ -47,3 +47,12 @@ function initChangeCursorButton() {
 
 // Экспортируем функцию для использования в основном файле
 window.initCursors = initChangeCursorButton;
+
+
+    window.initCursors();
+
+// document.addEventListener('DOMContentLoaded', function() {
+//     window.initCursors();
+//     // window.initEyedropper();
+// }
+// );

@@ -1,22 +1,20 @@
-// document.addEventListener('DOMContentLoaded', function() {
-    // Весь ваш JavaScript-код здесь
-// function initializeApp() {
-//     // Весь ваш код инициализации здесь
-// ---------- Canvas and Context ----------
 const canvas = document.getElementById('drawingCanvas');
 const ctx = canvas.getContext('2d');
+
 if (window.PointerEvent) {
     console.log('Pointer events are supported');
 } else {
     console.log('Pointer events are not supported');
 }
-// from tools import *
+
 ctx.imageSmoothingEnabled = false;
+ctx.willReadFrequently = true;
+
 // ---------- UI Elements ----------
 const backgroundPicker = document.getElementById('backgroundPicker');
 const colorPicker = document.getElementById('colorPicker');
-const brushSizeInput = document.getElementById('brushSize'); // Use more descriptive name
-const opacityInput = document.getElementById('opacity'); // Use more descriptive name
+const brushSizeInput = document.getElementById('brushSize');
+const opacityInput = document.getElementById('opacity');
 const eraserBtn = document.getElementById('eraser');
 const undoBtn = document.getElementById('undo');
 const redoBtn = document.getElementById('redo');
@@ -26,16 +24,20 @@ const saveImageBtn = document.getElementById('saveImageBtn');
 const imageInput = document.getElementById('imageInput');
 const UploadButton = document.getElementById('UploadButton');
 const symmetryButton = document.getElementById('symmetry');
-const fillModeBtn = document.getElementById('fillModeBtn'); // Assuming you have a button with this ID
+const fillModeBtn = document.getElementById('fillModeBtn');
+
 // Create elements to display brush size and opacity values
 const brushSizeValue = document.createElement('span');
 const opacityValue = document.createElement('span');
+
 // Add the new elements to the DOM
 brushSizeInput.parentNode.appendChild(brushSizeValue);
 opacityInput.parentNode.appendChild(opacityValue);
+
 // Optionally add classes for styling
 brushSizeValue.classList.add('input-value');
 opacityValue.classList.add('input-value');
+
 // ---------- Drawing State ----------
 let symmetry = true;
 let isDrawing = false;
@@ -45,77 +47,40 @@ let history = [];
 let redoHistory = [];
 let isEraser = false;
 let uploadedImage = null;
-let clearedCanvasState = null; // Variable to store the cleared state
+let clearedCanvasState = null;
 let isFillMode = false;
+
 // ---------- Initialization ----------
 ctx.fillStyle = '#' + Math.floor(Math.random() * 16777215).toString(16);
 ctx.fillRect(0, 0, canvas.width, canvas.height);
-brushSizeInput.value = 3; // Set initial value for brushSizeInput
-brushSizeValue.textContent = brushSizeInput.value; // Update the display for brush size
-opacityValue.textContent = opacityInput.value; // Update the display for opacity
+brushSizeInput.value = 3;
+brushSizeValue.textContent = brushSizeInput.value;
+opacityValue.textContent = opacityInput.value;
+
 // ---------- Event Listeners ----------
-// VK API Interactions
-inviteFriendsBtn.addEventListener('click', inviteFriends);
-// Image Upload
 UploadButton.addEventListener('click', () => imageInput.click());
 imageInput.addEventListener('change', handleImageUpload);
-// Drawing Tools
 symmetryButton.addEventListener('click', toggleSymmetry);
-eraserBtn.addEventListener('click', toggleEraser); 
-eraserBtn.addEventListener('click', setEraserCursor); // If this is needed, consider renaming for clarity
-setDrawingCursor(); // Set initial cursor
-fillModeBtn.addEventListener('click', toggleFillMode);
-
-// Modify the event listener for floodFill
-canvas.addEventListener('click', (e) => {
-  if (isFillMode) {
-    floodFill(e);
-  }
-});
-document.addEventListener('keydown', (event) => {
-  if (event.code === 'KeyZ') { 
-    undo();
-  } else if (event.code === 'KeyX') { 
-    redo();
-  }
-});
-// Control Buttons
 saveImageBtn.addEventListener('click', downloadImage);
 undoBtn.addEventListener('click', undo);
 redoBtn.addEventListener('click', redo);
 clearBtn.addEventListener('click', clearCanvas);
-// Background and Color
+
 backgroundPicker.addEventListener('input', (event) => {
     canvas.style.backgroundColor = event.target.value;
     redrawCanvas();
 });
-// Update values when input changes
+
 brushSizeInput.addEventListener('input', () => {
   brushSizeValue.textContent = brushSizeInput.value;
 });
+
 opacityInput.addEventListener('input', () => {
   opacityValue.textContent = opacityInput.value;
-  ctx.globalAlpha = opacityInput.value / 100; 
+  ctx.globalAlpha = opacityInput.value / 100;
 });
+
 // ---------- Functions ----------
-// VK API Functions
-function addToFavorits() {
-    vkBridge.send("VKWebAppAddToFavorites", {});
-}
-function inviteFriends() {
-    vkBridge.send("VKWebAppInvite", {})
-        .then(data => {
-            if (data.success) {
-                console.log("Invitation sent successfully!");
-            } else {
-                console.error("Invitation failed:", data.error);
-            }
-        })
-        .catch(error => {
-            console.error("Error sending invitation:", error);
-        });
-}
-// Image Handling
 function handleImageUpload(event) {
   const file = event.target.files[0];
   const reader = new FileReader();
@@ -128,19 +93,17 @@ function handleImageUpload(event) {
   };
   reader.readAsDataURL(file);
 }
-// add 
+
 function resizeCanvas() {
     const rect = canvas.getBoundingClientRect();
     canvas.width = rect.width * devicePixelRatio;
     canvas.height = rect.height * devicePixelRatio;
     ctx.scale(devicePixelRatio, devicePixelRatio);
 }
+
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
-// add end  
 
-
-// Canvas Manipulation
 function redrawCanvas() {
     ctx.fillStyle = backgroundPicker.value;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -149,231 +112,69 @@ function redrawCanvas() {
     }
     history.forEach(imageData => ctx.putImageData(imageData, 0, 0));
 }
+
 function clearCanvas() {
     clearedCanvasState = ctx.getImageData(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = backgroundPicker.value;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    history.push(clearedCanvasState); 
-    redoHistory = []; 
+    history.push(clearedCanvasState);
+    redoHistory = [];
 }
-// Tool Functions
-// Functions to toggle mode
-function toggleFillMode() {
-  isFillMode = !isFillMode;
-  // Optionally add visual indication of fill mode being active or inactive
-  fillModeBtn.classList.toggle('active', isFillMode); 
-}
+
 function toggleSymmetry() {
     symmetry = !symmetry;
     symmetryButton.classList.toggle('active', symmetry);
 }
-function toggleEraser() {
-    isEraser = !isEraser;
-    eraserBtn.textContent = isEraser ? '🖌️' : '💩';
-    if (isEraser) {
-        setEraserCursor();
-    } else {
-        setDrawingCursor();
-    }
-}
-function setDrawingCursor() {
-    canvas.classList.add('drawingCursor');
-    canvas.classList.remove('eraserCursor');
-}
-function setEraserCursor() {
-    canvas.classList.add('eraserCursor');
-    canvas.classList.remove('drawingCursor');
-}
+
 function undo() {
-    if (history.length > 1) { 
+    if (history.length > 1) {
         redoHistory.push(history.pop());
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         if (history.length === 0 && clearedCanvasState) {
             ctx.putImageData(clearedCanvasState, 0, 0);
         } else {
-            redrawCanvas(); 
+            redrawCanvas();
         }
     }
 }
+
 function redo() {
     if (redoHistory.length > 0) {
         history.push(redoHistory.pop());
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        redrawCanvas(); 
+        redrawCanvas();
     }
 }
+
 function saveState() {
     history.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
-    redoHistory = []; 
+    redoHistory = [];
 }
-// Download Image
+
 function downloadImage() {
   const link = document.createElement('a');
-  link.download = 'my-drawing.png'; 
+  link.download = 'my-drawing.png';
   link.href = canvas.toDataURL('image/png');
   link.click();
 }
-// 
-// Flood Fill Functionality
-// Flood Fill Functionality
-function floodFill(e) {
-  const startX = e.offsetX;
-  const startY = e.offsetY;
-  const targetColor = ctx.getImageData(startX, startY, 1, 1).data;
-  const fillColor = hexToRgba(colorPicker.value);
-  const tolerance = 30; // Уменьшим толерантность
-  if (!colorMatch(targetColor, fillColor, tolerance)) {
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const data = imageData.data;
-    const width = imageData.width;
-    const height = imageData.height;
-    const stack = [[startX, startY]];
-    const visited = new Uint8Array(width * height);
-    while (stack.length) {
-      const [x, y] = stack.pop();
-      const index = y * width + x;
-      if (visited[index]) continue;
-      visited[index] = 1;
-      const pixelIndex = index * 4;
-      const currentColor = data.slice(pixelIndex, pixelIndex + 4);
-      if (colorMatch(currentColor, targetColor, tolerance) || isContourPixel(x, y, data, width, height, targetColor, tolerance)) {
-        // Заливаем текущий пиксель
-        data[pixelIndex] = fillColor[0];
-        data[pixelIndex + 1] = fillColor[1];
-        data[pixelIndex + 2] = fillColor[2];
-        data[pixelIndex + 3] = fillColor[3];
-        // Проверяем соседние пиксели
-        if (x > 0) stack.push([x - 1, y]);
-        if (x < width - 1) stack.push([x + 1, y]);
-        if (y > 0) stack.push([x, y - 1]);
-        if (y < height - 1) stack.push([x, y + 1]);
-      }
-    }
-    // Дополнительный проход для заполнения пропущенных пикселей
-    for (let y = 0; y < height; y++) {
-      for (let x = 0; x < width; x++) {
-        const index = y * width + x;
-        const pixelIndex = index * 4;
-        if (!colorMatch(data.slice(pixelIndex, pixelIndex + 4), fillColor, 0)) {
-          if (shouldFillPixel(x, y, data, width, height, fillColor)) {
-            data[pixelIndex] = fillColor[0];
-            data[pixelIndex + 1] = fillColor[1];
-            data[pixelIndex + 2] = fillColor[2];
-            data[pixelIndex + 3] = fillColor[3];
-          }
-        }
-      }
-    }
-    ctx.putImageData(imageData, 0, 0);
-    saveState();
-  }
-}
-function isContourPixel(x, y, data, width, height, targetColor, tolerance) {
-  const directions = [[-1, 0], [1, 0], [0, -1], [0, 1], [-1, -1], [-1, 1], [1, -1], [1, 1]];
-  const currentIndex = (y * width + x) * 4;
-  const currentColor = data.slice(currentIndex, currentIndex + 4);
-  if (colorMatch(currentColor, targetColor, tolerance)) {
-    return false;
-  }
-  for (const [dx, dy] of directions) {
-    const nx = x + dx;
-    const ny = y + dy;
-    if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
-      const neighborIndex = (ny * width + nx) * 4;
-      const neighborColor = data.slice(neighborIndex, neighborIndex + 4);
-      if (colorMatch(neighborColor, targetColor, tolerance)) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
-function shouldFillPixel(x, y, data, width, height, fillColor) {
-  const directions = [[-1, 0], [1, 0], [0, -1], [0, 1], [-1, -1], [-1, 1], [1, -1], [1, 1]];
-  let filledNeighbors = 0;
-  for (const [dx, dy] of directions) {
-    const nx = x + dx;
-    const ny = y + dy;
-    if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
-      const neighborIndex = (ny * width + nx) * 4;
-      const neighborColor = data.slice(neighborIndex, neighborIndex + 4);
-      if (colorMatch(neighborColor, fillColor, 0)) {
-        filledNeighbors++;
-      }
-    }
-  }
-  return filledNeighbors >= 5; // Заполняем, если большинство соседей уже заполнены
-}
-// Helper function to check if a pixel is part of the contour
-function isContourPixel(x, y, data, width, height, targetColor, tolerance) {
-  const directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
-  const currentIndex = (y * width + x) * 4;
-  const currentColor = data.slice(currentIndex, currentIndex + 4);
-  if (colorMatch(currentColor, targetColor, tolerance)) {
-    return false;
-  }
-  for (const [dx, dy] of directions) {
-    const nx = x + dx;
-    const ny = y + dy;
-    if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
-      const neighborIndex = (ny * width + nx) * 4;
-      const neighborColor = data.slice(neighborIndex, neighborIndex + 4);
-      if (colorMatch(neighborColor, targetColor, tolerance)) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
-// Helper function to convert hex to RGBA
-function hexToRgba(hex) {
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  return [r, g, b, 255];
-}
-// Helper function to compare colors with tolerance
-function colorMatch(a, b, tolerance) {
-  return Math.abs(a[0] - b[0]) <= tolerance &&
-         Math.abs(a[1] - b[1]) <= tolerance &&
-         Math.abs(a[2] - b[2]) <= tolerance &&
-         Math.abs(a[3] - b[3]) <= tolerance;
-}
-// Initialize cursors after DOM is fully loaded
 
-
-canvas.addEventListener('pointerdown', startDrawing, { passive: false });
+canvas.addEventListener('pointerdown', startDrawing);
 canvas.addEventListener('pointermove', draw);
 canvas.addEventListener('pointerup', stopDrawing);
 canvas.addEventListener('pointerout', stopDrawing);
 canvas.addEventListener('pointercancel', stopDrawing);
 
-canvas.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    const touch = e.touches[0];
-    startDrawing({offsetX: touch.clientX - canvas.offsetLeft, offsetY: touch.clientY - canvas.offsetTop});
-}, { passive: false });
-
-canvas.addEventListener('touchmove', (e) => {
-    e.preventDefault();
-    const touch = e.touches[0];
-    draw({offsetX: touch.clientX - canvas.offsetLeft, offsetY: touch.clientY - canvas.offsetTop});
-}, { passive: false });
-
-canvas.addEventListener('touchend', stopDrawing);
-
 function startDrawing(e) {
     isDrawing = true;
     [lastX, lastY] = [e.offsetX, e.offsetY];
 }
+
 function draw(e) {
     if (!isDrawing) return;
     e.preventDefault();
-
     const x = e.offsetX;
     const y = e.offsetY;
     const pressure = e.pressure || 1;
-
     ctx.lineWidth = brushSizeInput.value * pressure;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
@@ -391,32 +192,18 @@ function draw(e) {
         ctx.scale(-1, 1);
         ctx.translate(-canvas.width, 0);
         ctx.beginPath();
-        // Use the original lastX, lastY for the symmetrical line
-        ctx.moveTo(2 * centerX - lastX, lastY); 
+        ctx.moveTo(2 * centerX - lastX, lastY);
         ctx.lineTo(2 * centerX - x, y);
         ctx.stroke();
         ctx.restore();
     }
 
-    // Update lastX and lastY only after both lines are drawn
-    [lastX, lastY] = [x, y]; 
+    [lastX, lastY] = [x, y];
 }
-
 
 function stopDrawing() {
-    isDrawing = false;
+    if (isDrawing) {
+        isDrawing = false;
+        saveState();
+    }
 }
-
-
-// Обработаем изменение размера окна
-// window.addEventListener('resize', () => {
-//     canvas.width = window.innerWidth;
-//     canvas.height = window.innerHeight - 60;
-// });
-
-document.addEventListener('DOMContentLoaded', function() {
-    window.initCursors();
-    // window.initEyedropper();
-}
-);
-
