@@ -2,3 +2,17 @@
 
 <a href="download.php">Скачать Virago.mp3</a>
  <a href="music/Virago.mp3" download="Virago.mp3">Скачать Virago.mp3</a>
+
+
+            <!-- <audio controls autoplay loop title="Virago"> -->
+                <!-- <source src="music/Virago.mp3"> </audio> -->
+            <!-- <a href="download.php">Скачать Virago.mp3</a> -->
+
+
+    <!-- <div class="button-column">
+        <button id="myBtn">✉️ </button>
+        <div id="message-container" style="display: none;"> 
+            <p id="message"></p>
+            <p id="Quizz"></p>
+        </div>
+    </div>  -->
