@@ -1,47 +1,9 @@
-                // function updateTime() {
-                //     const now = new Date();
-                //     const hours = now.getHours().toString().padStart(2, '0');
-                //     const minutes = now.getMinutes().toString().padStart(2, '0');
-                //     const seconds = now.getSeconds().toString().padStart(2, '0');
-                //     const timeString = `${hours}:${minutes}:${seconds}`;
-                //     document.getElementById('time').textContent = timeString;
-                // }
-        
-                // setInterval(updateTime, 1000); 
+// !блокировка контекстного меню
 
         document.addEventListener('contextmenu', event => event.preventDefault());
 
         $(function () {
             $("#message-container").resizable();
-        });
-
-fetch('quizz.txt')
-    .then(response => response.text())
-    .then(text => {
-        const words = text.split(/\s+/); 
-        const randomWord = words[Math.floor(Math.random() * words.length)];
-
-        const cleanedWord = randomWord.replace(/,$/, ''); 
-
-        document.getElementById('Quizz').textContent = cleanedWord.toUpperCase(); 
-
-    })
-    .catch(error => console.error('Ошибка при загрузке слова:', error));
-
-        fetch('messages.txt')
-            .then(response => response.text())
-            .then(message => {
-                document.getElementById('message').textContent = message;
-            })
-            .catch(error => console.error('Ошибка при загрузке сообщения:', error));
-
-        const messageElement = document.getElementById('message');
-        const containerElement = document.getElementById('message-container');
-        const messageBtn = document.getElementById('myBtn');
-
-        messageBtn.addEventListener('click', () => {
-            containerElement.style.display = containerElement.style.display === 'none' ? 'block' : 'none';
-            adjustFontSize();
         });
 
         function adjustFontSize() {
@@ -54,6 +16,8 @@ fetch('quizz.txt')
 
         window.addEventListener('resize', adjustFontSize);
 
+
+// ! время
 
 function updateTime() {
         const now = new Date();
@@ -82,3 +46,59 @@ function updateTime() {
     setInterval(updateTime, 1000); 
 
     setInterval(updateElapsedTime, 1000); 
+
+
+
+// ! слово наверху канвас
+
+        async function fetchWords() {
+            try {
+                const response = await fetch('quizz.txt');
+                const text = await response.text();
+                // Разделяем текст на слова по любым пробелам или запятым
+                return text.split(/[\s,]+/).map(word => word.trim()); 
+            } catch (error) {
+                console.error('Error loading words:', error);
+                return []; 
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Word navigation
+            const wordList = await fetchWords(); 
+            let currentWordIndex = 0;
+            const wordElement = document.getElementById("Quizz");
+            const previousWordButton = document.getElementById("previousWord");
+            const nextWordButton = document.getElementById("nextWord");
+
+            function updateWord() {
+                // Выбираем случайное слово из списка
+                const randomIndex = Math.floor(Math.random() * wordList.length);
+                wordElement.textContent = wordList[randomIndex];
+            }
+
+            previousWordButton.addEventListener("click", () => {
+                currentWordIndex = (currentWordIndex - 1 + wordList.length) % wordList.length;
+                updateWord();
+            });
+
+            nextWordButton.addEventListener("click", () => {
+                currentWordIndex = (currentWordIndex + 1) % wordList.length;
+                updateWord();
+            });
+
+            updateWord();
+
+            // Initialize jscolor on the input fields
+            jscolor.install();
+
+            // Ensure color palette is created
+            if (typeof createColorPalette === 'function') {
+                createColorPalette();
+            } else {
+                console.error('createColorPalette function is not defined');
+            }
+        });
+
+
+// !

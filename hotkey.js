@@ -16,6 +16,7 @@ document.addEventListener('keydown', function(event) {
       break;
     case 'KeyC': // Drawing color
       event.preventDefault();
+      document.getElementById('colorPicker').click();
       triggerColorPicker('colorPicker');
       break;
     case 'KeyE': // Eraser
@@ -38,29 +39,38 @@ document.addEventListener('keydown', function(event) {
   }
 });
 
-function triggerColorPicker(pickerId) {
-  const picker = document.getElementById(pickerId);
+// function triggerColorPicker(pickerId) {
+//   const picker = document.getElementById(pickerId);
 
-  // Check if the picker is already open
-  if (document.activeElement === picker) {
-    // Picker is open, so close it by blurring
-    picker.blur();
-  } else {
-    // Picker is closed, so open it
-    picker.click();
+//   // // Check if the picker is already open
+//   if (document.activeElement === picker)
 
-    // Create a temporary element to click on (for reliable closing)
-    const tempElement = document.createElement('div');
-    tempElement.style.position = 'absolute'; 
-    tempElement.style.top = '-9999px';
-    tempElement.style.left = '-9999px';
-    document.body.appendChild(tempElement);
 
-    // Simulate a click on the temporary element to ensure closure
-    tempElement.click();
+//  {
+//     // Picker is open, so close it by blurring
+//     picker.blur();
+//   } 
 
-    // Remove the temporary element
-    document.body.removeChild(tempElement);
-  }
-}
+// {
+//     // Picker is closed, so open it
+//     picker.click()
+
+// ;
+
+// }
+
+    // // Create a temporary element to click on (for reliable closing)
+    // const tempElement = document.createElement('div');
+    // tempElement.style.position = 'absolute'; 
+    // tempElement.style.top = '-9999px';
+    // tempElement.style.left = '-9999px';
+    // document.body.appendChild(tempElement);
+
+    // // Simulate a click on the temporary element to ensure closure
+    // tempElement.click();
+
+    // // Remove the temporary element
+    // document.body.removeChild(tempElement);
+  // }
+// }
 

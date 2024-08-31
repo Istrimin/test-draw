@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,9 +8,7 @@
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jscolor/2.4.5/jscolor.min.js"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jscolor/2.4.5/jscolor.min.js"></script>
     <script src="cursors.js" defer></script>
     <script src="script.js" defer></script>
     <script type="module" src="tools.js" defer></script>
@@ -32,59 +29,62 @@
             cursor: pointer;
             border: 1px solid black;
         }
+        .word-navigation {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            z-index: 10;
+        }
+        .word-navigation button {
+            margin: 0 10px;
+        }
     </style>
 </head>
-
 <body>
-
     <div class="header-container">
         <div id="time" class="time"></div>
-    <div id="startTime" class="time"></div> <div id="elapsedTime" class="time"></div> 
-
+        <div id="startTime" class="time"></div>
+        <div id="elapsedTime" class="time"></div>
+    </div>
     <div class="base-container">
         <div class="sidebar">
-    <a href="index.html" target="_self" title="Выйти из команты">🚪</a>
+            <a href="index.html" target="_self" title="Выйти из команты">🚪</a>
             <button id="myBtn" title="Сообщение">✉️</button>
             <div id="message-container" style="display: none;">
                 <p id="message"></p>
-
             </div>
-
             <input type="file" id="imageInput" accept="image/*" style="display: none;">
             <button id="UploadButton" title="Загрузить изображение (U)">🌺</button>
             <button id="saveImageBtn" title="Сохранить изображение">🎬</button>
-
             <button id="eraser" title="Ластик (E)">💩</button>
             <button id="undo" title="Отменить (Z)">⟲</button>
             <button id="redo" title="Повторить (X)">⟳</button>
             <button id="clear" title="Очистить">💀</button>
-
             <button id="symmetry" title="Симметрия (S)">🦋</button>
             <button id="fillModeBtn" title="Заливка (F)">🌊</button>
             <button id="floodFillBtn" title="Залить цветом">✨</button>
             <button id="eyedropperBtn" title="Пипетка (A)">💧</button>
-
             <div class="color-picker-group">
                 <input type="color" id="backgroundPicker" value="#ffffff" title="Цвет фона (B)">
                 <input type="color" id="colorPicker" value="#000000" title="Цвет кисти (C)">
             </div>
-
             <button id="changeCursorBtn" title="Сменить курсор">🎨</button>
             <div id="cursorPanel" class="cursor-panel" style="display: none;">
                 <h3>Выберите курсор</h3>
-                <div id="cursorList">
-                </div>
+                <div id="cursorList"></div>
             </div>
-
             <button id="inviteFriends" title="Пригласить друзей">👥</button>
             <button id="addToFavorites" title="Добавить в избранное">📌</button>
             <button id="settings" title="Настройки">⚙️</button>
         </div>
         <div class="canvas-and-sliders">
-
             <div class="canvas-container">
-
-                <p id="Quizz"></p>
+                <div class="word-navigation">
+                    <button id="previousWord" title="Предыдущее слово">&lt;</button>
+                    <p id="Quizz"></p>
+                    <button id="nextWord" title="Следующее слово">&gt;</button>
+                </div>
                 <canvas id="drawingCanvas" width="700" height="500"></canvas>
             </div>
             <div class="slider-group">
@@ -93,21 +93,18 @@
                     <input type="range" id="opacity" min="1" max="100" value="100">
                 </div>
                 <div class="tools-column">
-                <div class="pressure-bar" id="pressureBar"></div>
+                    <div class="pressure-bar" id="pressureBar"></div>
                     <label for="brushSize" title="Размер кисти">🖌️</label>
                     <input type="range" id="brushSize" min="1" max="100" value="1">
                 </div>
-                <div class="color-palette" id="colorPalette">
-                    </div>
+                <div class="color-palette" id="colorPalette"></div>
             </div>
         </div>
     </div>
-            <script>
-// Initialize jscolor on the input fields
-new jscolor("backgroundPicker"); 
-new jscolor("colorPicker");
+
+    <script>
 
     </script>
 </body>
-
 </html>
+
