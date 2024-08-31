@@ -9,18 +9,37 @@
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jscolor/2.4.5/jscolor.min.js"></script>
+
     <script src="cursors.js" defer></script>
     <script src="script.js" defer></script>
     <script type="module" src="tools.js" defer></script>
     <script type="module" src="hotkey.js" defer></script>
     <script type="module" src="test.js" defer></script>
-    <script type="module" src="settings.js" defer"></script>
+    <script type="module" src="settings.js" defer></script>
+    <script type="module" src="helperFunction.js" defer></script>
+    <style>
+        .color-palette {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .color-circle {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 1px solid black;
+        }
+    </style>
 </head>
 
 <body>
 
     <div class="header-container">
         <div id="time" class="time"></div>
+    <div id="startTime" class="time"></div> <div id="elapsedTime" class="time"></div> 
 
     <div class="base-container">
         <div class="sidebar">
@@ -32,22 +51,22 @@
             </div>
 
             <input type="file" id="imageInput" accept="image/*" style="display: none;">
-            <button id="UploadButton" title="Загрузить изображение">🌺</button>
+            <button id="UploadButton" title="Загрузить изображение (U)">🌺</button>
             <button id="saveImageBtn" title="Сохранить изображение">🎬</button>
 
-            <button id="eraser" title="Ластик">💩</button>
-            <button id="undo" title="Отменить">⟲</button>
-            <button id="redo" title="Повторить">⟳</button>
+            <button id="eraser" title="Ластик (E)">💩</button>
+            <button id="undo" title="Отменить (Z)">⟲</button>
+            <button id="redo" title="Повторить (X)">⟳</button>
             <button id="clear" title="Очистить">💀</button>
 
-            <button id="symmetry" title="Симметрия" class="active">🦋</button>
-            <button id="fillModeBtn" title="Заливка">🌊</button>
+            <button id="symmetry" title="Симметрия (S)">🦋</button>
+            <button id="fillModeBtn" title="Заливка (F)">🌊</button>
             <button id="floodFillBtn" title="Залить цветом">✨</button>
-            <button id="eyedropperBtn" title="Пипетка">💧</button>
+            <button id="eyedropperBtn" title="Пипетка (A)">💧</button>
 
             <div class="color-picker-group">
-                <input type="color" id="backgroundPicker" value="#ffffff" title="Цвет фона">
-                <input type="color" id="colorPicker" value="#000000" title="Цвет кисти">
+                <input type="color" id="backgroundPicker" value="#ffffff" title="Цвет фона (B)">
+                <input type="color" id="colorPicker" value="#000000" title="Цвет кисти (C)">
             </div>
 
             <button id="changeCursorBtn" title="Сменить курсор">🎨</button>
@@ -78,70 +97,17 @@
                     <label for="brushSize" title="Размер кисти">🖌️</label>
                     <input type="range" id="brushSize" min="1" max="100" value="1">
                 </div>
+                <div class="color-palette" id="colorPalette">
+                    </div>
             </div>
         </div>
     </div>
             <script>
-                // JavaScript code to update the time
-                function updateTime() {
-                    const now = new Date();
-                    const hours = now.getHours().toString().padStart(2, '0');
-                    const minutes = now.getMinutes().toString().padStart(2, '0');
-                    const seconds = now.getSeconds().toString().padStart(2, '0');
-                    const timeString = `${hours}:${minutes}:${seconds}`;
-                    document.getElementById('time').textContent = timeString;
-                }
-        
-                // Update the time every second
-                setInterval(updateTime, 1000); 
-            </script>
-    <script>
-        document.addEventListener('contextmenu', event => event.preventDefault());
+// Initialize jscolor on the input fields
+new jscolor("backgroundPicker"); 
+new jscolor("colorPicker");
 
-        $(function () {
-            $("#message-container").resizable();
-        });
-
-fetch('quizz.txt')
-    .then(response => response.text())
-    .then(text => {
-        const words = text.split(/\s+/); 
-        const randomWord = words[Math.floor(Math.random() * words.length)];
-
-        const cleanedWord = randomWord.replace(/,$/, ''); 
-
-        document.getElementById('Quizz').textContent = cleanedWord.toUpperCase(); 
-
-    })
-    .catch(error => console.error('Ошибка при загрузке слова:', error));
-
-        fetch('messages.txt')
-            .then(response => response.text())
-            .then(message => {
-                document.getElementById('message').textContent = message;
-            })
-            .catch(error => console.error('Ошибка при загрузке сообщения:', error));
-
-        const messageElement = document.getElementById('message');
-        const containerElement = document.getElementById('message-container');
-        const messageBtn = document.getElementById('myBtn');
-
-        messageBtn.addEventListener('click', () => {
-            containerElement.style.display = containerElement.style.display === 'none' ? 'block' : 'none';
-            adjustFontSize();
-        });
-
-        function adjustFontSize() {
-            let fontSize = parseInt(window.getComputedStyle(messageElement).fontSize, 10);
-            while (messageElement.offsetWidth > containerElement.offsetWidth) {
-                fontSize--;
-                messageElement.style.fontSize = fontSize + 'px';
-            }
-        }
-
-        window.addEventListener('resize', adjustFontSize);
     </script>
 </body>
 
 </html>
-

@@ -1,4 +1,4 @@
-version 0.0.243
+version 0.0.244
 
 
 горячие клавиши 
@@ -8,6 +8,7 @@ c цвет кисти
 b цвет канваса
 a пипетка 
 
+add 3 times
 
 remove default  
 

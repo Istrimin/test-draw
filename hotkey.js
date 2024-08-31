@@ -1,58 +1,66 @@
 document.addEventListener('keydown', function(event) {
-  if (event.key === 'a') {
-    // Activate the eyedropper tool (assuming your existing code handles this)
-    document.getElementById('eyedropperBtn').click(); 
+  // Use a single switch for better organization
+  switch (event.code) {
+    case 'KeyA':
+      document.getElementById('eyedropperBtn').click();
+      break;
+    case 'KeyZ':
+      undo();
+      break;
+    case 'KeyX':
+      redo();
+      break;
+    case 'KeyB': // Background color
+      event.preventDefault();
+      triggerColorPicker('backgroundPicker');
+      break;
+    case 'KeyC': // Drawing color
+      event.preventDefault();
+      triggerColorPicker('colorPicker');
+      break;
+    case 'KeyE': // Eraser
+      event.preventDefault();
+      document.getElementById('eraser').click();
+      break;
+    case 'KeyS': // Symmetry
+      event.preventDefault();
+      document.getElementById('symmetry').click();
+      break;
+    case 'KeyF': // Fill Mode
+      event.preventDefault();
+      document.getElementById('fillModeBtn').click();
+      break;
+    case 'KeyU': // Upload Image
+      event.preventDefault();
+      document.getElementById('UploadButton').click();
+      break;
 
-    const rect = canvas.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
-    // const pixelData = ctx.getImageData(x, y, 1, 1).data; 
-    // const color = `rgb(${pixelData[0]}, ${pixelData[1]}, ${pixelData[2]})`;
-
-    // Set the picked color to your color input
-    // document.getElementById('colorPicker').value = color; 
   }
 });
 
+function triggerColorPicker(pickerId) {
+  const picker = document.getElementById(pickerId);
 
-document.addEventListener('keydown', (event) => {
-  if (event.code === 'KeyZ') { 
-    undo();
-  } else if (event.code === 'KeyX') { 
-    redo();
+  // Check if the picker is already open
+  if (document.activeElement === picker) {
+    // Picker is open, so close it by blurring
+    picker.blur();
+  } else {
+    // Picker is closed, so open it
+    picker.click();
+
+    // Create a temporary element to click on (for reliable closing)
+    const tempElement = document.createElement('div');
+    tempElement.style.position = 'absolute'; 
+    tempElement.style.top = '-9999px';
+    tempElement.style.left = '-9999px';
+    document.body.appendChild(tempElement);
+
+    // Simulate a click on the temporary element to ensure closure
+    tempElement.click();
+
+    // Remove the temporary element
+    document.body.removeChild(tempElement);
   }
-});
-
-
-// colorpicker
-document.addEventListener('keydown', (event) => {
-  if (event.key === 'b' || event.code === 'KeyB') { // Проверяем и 'b', и 'KeyB'
-    event.preventDefault();
-    const backgroundPicker = document.getElementById('backgroundPicker');
-    backgroundPicker.click(); 
-
-    // Эмулируем нажатие Esc
-    const escEvent = new KeyboardEvent('keydown', {
-      bubbles: true, // Позволяем событию всплывать
-      cancelable: true, // Позволяем отменить действие по умолчанию
-      key: 'Escape', // Устанавливаем клавишу Esc
-      code: 'Escape' // Устанавливаем код клавиши Esc
-    });
-    backgroundPicker.dispatchEvent(escEvent); // Отправляем событие
-
-  } else if (event.key === 'c' || event.code === 'KeyC') { // Проверяем и 'c', и 'KeyC'
-    event.preventDefault();
-    const colorPicker = document.getElementById('colorPicker');
-    colorPicker.click();
-
-    // Эмулируем нажатие Esc
-    const escEvent = new KeyboardEvent('keydown', {
-      bubbles: true,
-      cancelable: true,
-      key: 'Escape',
-      code: 'Escape'
-    });
-    colorPicker.dispatchEvent(escEvent); 
-  }
-});
+}
 
