@@ -14,7 +14,7 @@
 </head>
 <body>
     <div class="header-container">
-        <div id="python-output" class="python-output"></div> <div class="column-container">
+        <div id="time" class="time"></div> <div class="column-container">
             <img src="images/dream.jpg" width="200" alt="Рисуйка">
         </div>
 
@@ -34,7 +34,7 @@
             const minutes = now.getMinutes().toString().padStart(2, '0');
             const seconds = now.getSeconds().toString().padStart(2, '0');
             const timeString = `${hours}:${minutes}:${seconds}`;
-            document.getElementById('python-output').textContent = timeString;
+            document.getElementById('time').textContent = timeString;
         }
 
         // Update the time every second

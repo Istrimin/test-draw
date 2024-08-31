@@ -90,7 +90,7 @@ font-size: 100px;
   border-color: #999; /* Серая рамка при наведении */
 }
 
-        .python-output {
+        .time {
             background-color: transparent; /* Светло-серый фон */
             color: #ffffff; /* Белый текст */
             font-family: monospace; /* Моноширинный шрифт */
