@@ -287,3 +287,11 @@ width: 100%; /* Установи нужную ширину */
     z-index: 10; /* Чтобы элемент был поверх других */
 }
 
+        .python-output {
+            background-color: transparent; /* Светло-серый фон */
+            color: #ffffff; /* Белый текст */
+            font-family: monospace; /* Моноширинный шрифт */
+            font-size: 10px;
+            margin: 0;
+            padding: 0;
+        }

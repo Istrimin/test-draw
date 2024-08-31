@@ -17,6 +17,11 @@
 </head>
 
 <body>
+
+    <script defer src="https://pyscript.net/latest/pyscript.js"></script> 
+    <div class="header-container">
+        <div id="python-output" class="python-output"></div>
+        <div class="python-code">
     <a href="index.html" target="_self" title="На главную">🏠</a>
     <div class="parent-container">
         <div class="sidebar">
@@ -75,7 +80,19 @@
             </div>
         </div>
     </div>
+            <script type="py">
+from pyscript import display
+from datetime import datetime
+import asyncio
 
+async def update_time():
+  while True:
+    now = datetime.now()
+    display(now.strftime("%H:%M:%S"), target="python-output", append=False)
+    await asyncio.sleep(1)
+    
+asyncio.ensure_future(update_time())
+            </script>
     <script>
         document.addEventListener('contextmenu', event => event.preventDefault());
 
