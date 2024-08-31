@@ -1,3 +1,19 @@
+2. Using Other Font Files:
+
+Download a font: Find a free or paid font you like from sites like https://www.dafont.com/ or https://fonts.google.com/.
+Include in your project: Add the font files (.ttf, .woff, etc.) to your project folder.
+Use @font-face: Define the font in your CSS:
+@font-face {
+  font-family: 'MyFancyFont';
+  src: url('path/to/your/font.woff2') format('woff2'),
+       url('path/to/your/font.woff') format('woff'); 
+}
+#Quizz {
+  font-family: 'MyFancyFont', cursive; 
+  /* ...rest of your styles */
+}
+
+
 Способы скачки
 
 <a href="download.php">Скачать Virago.mp3</a>

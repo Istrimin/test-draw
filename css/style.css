@@ -54,6 +54,7 @@ input[type="range"]:hover {
     display: flex;
     /* flex-direction: row; */
     height: 100vh;
+    width: 100%;
 }
 .canvas-container{
     display: flex;
@@ -62,6 +63,7 @@ input[type="range"]:hover {
     font-size: 10px;
     margin: 0;
     padding: 0;
+    width: 100%;
 }
 
 #fillModeBtn.active {
@@ -133,6 +135,7 @@ canvas {
 }
 .canvas-and-sliders {
     flex-direction: column;
+    width: 100%;
 }
 
 .canvas-container { 
@@ -144,7 +147,27 @@ canvas {
     color: #ffffff;
     margin: 0;
 }
+@import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
 
+#Quizz {
+  font-family: 'Lobster', cursive; 
+  font-size: 24px;
+  font-weight: bold;
+}
+
+/* @import url('https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap');
+#Quizz {
+  font-family: 'Dancing Script', cursive;
+  font-size: 24px;
+  font-weight: bold;
+} */
+
+/* @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+#Quizz {
+  font-family: 'Pacifico', cursive;
+  font-size: 24px;
+  font-weight: bold;
+} */
 
 .custom-file-upload {
     background-color: var(--button-color);
