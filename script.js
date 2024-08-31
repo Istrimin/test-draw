@@ -213,3 +213,31 @@ function stopDrawing() {
         saveState();
     }
 }
+
+
+
+    canvas.addEventListener('click', (event) => {
+        if (isEyedropperActive || isBrushEyedropperActive) {
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            const pixelData = ctx.getImageData(x, y, 1, 1).data;
+            const color = `rgb(${pixelData[0]}, ${pixelData[1]}, ${pixelData[2]})`;
+            
+            if (isEyedropperActive) {
+                setFillColor(color);
+                document.getElementById('colorPicker').value = rgbToHex(pixelData[0], pixelData[1], pixelData[2]);
+            } else if (isBrushEyedropperActive) {
+                setDrawingColor(color);
+                document.getElementById('colorPicker2').value = rgbToHex(pixelData[0], pixelData[1], pixelData[2]);
+            }
+            
+            isEyedropperActive = false;
+            isBrushEyedropperActive = false;
+            canvas.style.cursor = 'default';
+        }
+    });
+
+    function rgbToHex(r, g, b) {
+        return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+    }
