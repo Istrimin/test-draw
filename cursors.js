@@ -51,8 +51,3 @@ window.initCursors = initChangeCursorButton;
 
     window.initCursors();
 
-// document.addEventListener('DOMContentLoaded', function() {
-//     window.initCursors();
-//     // window.initEyedropper();
-// }
-// );

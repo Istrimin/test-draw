@@ -1,4 +1,4 @@
-version 0.0.2451
+version 0.0.2461
 
 
 
@@ -10,7 +10,9 @@ b цвет канваса
 a пипетка 
 
 
-test version 0.0.2451
+fix fill and other functions
+
+test version 0.0.2461
 
 Normal word processor version 0.0.245
 
