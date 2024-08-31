@@ -18,17 +18,16 @@
 
 <body>
 
-    <script defer src="https://pyscript.net/latest/pyscript.js"></script> 
     <div class="header-container">
         <div id="python-output" class="python-output"></div>
         <div class="python-code">
-    <a href="index.html" target="_self" title="На главную">🏠</a>
-    <div class="parent-container">
+    <a href="index.html" target="_self" title="Выйти из команты">Exit</a>
+    <div class="base-container">
         <div class="sidebar">
             <button id="myBtn" title="Сообщение">✉️</button>
             <div id="message-container" style="display: none;">
                 <p id="message"></p>
-                <p id="Quizz"></p>
+
             </div>
 
             <input type="file" id="imageInput" accept="image/*" style="display: none;">
@@ -66,6 +65,7 @@
                 <div class="pressure-bar" id="pressureBar"></div>
             </div>
             <div class="canvas-container">
+                <p id="Quizz"></p>
                 <canvas id="drawingCanvas" width="700" height="500"></canvas>
             </div>
             <div class="slider-group">
@@ -80,18 +80,19 @@
             </div>
         </div>
     </div>
-            <script type="py">
-from pyscript import display
-from datetime import datetime
-import asyncio
-
-async def update_time():
-  while True:
-    now = datetime.now()
-    display(now.strftime("%H:%M:%S"), target="python-output", append=False)
-    await asyncio.sleep(1)
-    
-asyncio.ensure_future(update_time())
+            <script>
+                // JavaScript code to update the time
+                function updateTime() {
+                    const now = new Date();
+                    const hours = now.getHours().toString().padStart(2, '0');
+                    const minutes = now.getMinutes().toString().padStart(2, '0');
+                    const seconds = now.getSeconds().toString().padStart(2, '0');
+                    const timeString = `${hours}:${minutes}:${seconds}`;
+                    document.getElementById('python-output').textContent = timeString;
+                }
+        
+                // Update the time every second
+                setInterval(updateTime, 1000); 
             </script>
     <script>
         document.addEventListener('contextmenu', event => event.preventDefault());
