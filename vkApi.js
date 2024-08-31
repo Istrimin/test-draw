@@ -28,6 +28,10 @@ function inviteFriends() {
         });
 }
 
+// VK API Interactions
+inviteFriendsBtn.addEventListener('click', inviteFriends);
+
+
 
 // test
     function createAlbum(callback){

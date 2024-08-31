@@ -15,9 +15,9 @@ const backgroundPicker = document.getElementById('backgroundPicker');
 const colorPicker = document.getElementById('colorPicker');
 const colorPicker2 = document.getElementById('colorPicker2');
 const colorPicker3 = document.getElementById('colorPicker3');
+const colorPicker4 = document.getElementById('colorPicker4');
 const brushSizeInput = document.getElementById('brushSize');
 const opacityInput = document.getElementById('opacity');
-const eraserBtn = document.getElementById('eraser');
 const undoBtn = document.getElementById('undo');
 const redoBtn = document.getElementById('redo');
 const clearBtn = document.getElementById('clear');
@@ -47,7 +47,6 @@ let lastX = 0;
 let lastY = 0;
 let history = [];
 let redoHistory = [];
-let isEraser = false;
 let uploadedImage = null;
 let clearedCanvasState = null;
 let isFillMode = false;
@@ -170,39 +169,53 @@ function startDrawing(e) {
     isDrawing = true;
     [lastX, lastY] = [e.offsetX, e.offsetY];
 }
-
 function draw(e) {
-    if (!isDrawing) return;
-    e.preventDefault();
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const pressure = e.pressure || 1;
-    ctx.lineWidth = brushSizeInput.value * pressure;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.strokeStyle = isEraser ? backgroundPicker.value : colorPicker.value;
-    ctx.globalAlpha = opacityInput.value / 100;
+  if (!isDrawing) return;
 
+  e.preventDefault(); // Prevent default touch actions for smoother drawing
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  const pressure = e.pressure || 1; // For pen pressure sensitivity
+
+  ctx.lineWidth = brushSizeInput.value * pressure;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.globalAlpha = opacityInput.value / 100;
+
+  // Determine which color picker is active
+  if (colorPicker.checked) { // Assuming you're using radio buttons
+    ctx.strokeStyle = colorPicker.value;
+  } else if (colorPicker2.checked) {
+    ctx.strokeStyle = colorPicker2.value;
+  } else if (colorPicker3.checked) {
+    ctx.strokeStyle = colorPicker3.value;
+  } else if(colorPicker4.checked) {
+    ctx.strokeStyle = colorPicker4.value;
+  }
+
+
+
+  ctx.beginPath();
+  ctx.moveTo(lastX, lastY);
+  ctx.lineTo(x, y);
+  ctx.stroke();
+
+  if (symmetry) {
+    const centerX = canvas.width / 2;
+    ctx.save();
+    ctx.scale(-1, 1);
+    ctx.translate(-canvas.width, 0);
     ctx.beginPath();
-    ctx.moveTo(lastX, lastY);
-    ctx.lineTo(x, y);
+    ctx.moveTo(2 * centerX - lastX, lastY);
+    ctx.lineTo(2 * centerX - x, y);
     ctx.stroke();
+    ctx.restore();
+  }
 
-    if (symmetry) {
-        const centerX = canvas.width / 2;
-        ctx.save();
-        ctx.scale(-1, 1);
-        ctx.translate(-canvas.width, 0);
-        ctx.beginPath();
-        ctx.moveTo(2 * centerX - lastX, lastY);
-        ctx.lineTo(2 * centerX - x, y);
-        ctx.stroke();
-        ctx.restore();
-    }
-
-    [lastX, lastY] = [x, y];
+  [lastX, lastY] = [x, y];
 }
+
 
 function stopDrawing() {
     if (isDrawing) {

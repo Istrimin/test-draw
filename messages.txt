@@ -1,4 +1,4 @@
-version 0.0.2461
+version 0.0.2462
 
 
 
@@ -9,6 +9,7 @@ c цвет кисти
 b цвет канваса
 a пипетка 
 
+fix colorPickers
 
 fix fill and other functions
 

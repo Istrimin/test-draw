@@ -54,6 +54,7 @@
                 <input type="color" id="colorPicker" value="#000000" title="Цвет кисти (C)">
                 <input type="color" id="colorPicker2" value="#ff0000" title="Цвет кисти 2"> 
                 <input type="color" id="colorPicker3" value="#0000ff" title="Цвет кисти 3"> 
+                <input type="color" id="colorPicker4" value="#00ff00" title="Цвет кисти 4"> 
             </div>
             <a href="index.html" target="_self" title="Выйти из команты">🚪</a>
             <button id="myBtn" title="Сообщение">✉️</button>
@@ -90,10 +91,9 @@
                     <p id="Quizz"></p>
                     <button id="nextWord" title="Следующее слово">&gt;</button>
                 </div>
-                <!-- <canvas id="drawingCanvas" width="700" height="500"></canvas> -->
+
 <canvas id="drawingCanvas" 
-<!-- width="700" height="500" -->
- <!-- style=width:700px;height:500px> -->
+width="700" height="500" style=width:700px;height:500px>
 </canvas>
             </div>
             <div class="slider-group">
@@ -113,23 +113,28 @@
 
     <script>
 
-        // Function to set the drawing color
-        function setDrawingColor(color) {
-            ctx.strokeStyle = color; 
-        }
+// Функция для установки цвета рисования
+function setDrawingColor(color) {
+    ctx.strokeStyle = color; 
+}
 
-        // // Event listeners for color pickers
-        // colorPicker.addEventListener('change', (event) => {
-        //     setDrawingColor(event.target.value);
-        // });
+// Добавляем обработчики событий для всех колорпикеров
+colorPicker.addEventListener('change', (event) => {
+    setDrawingColor(event.target.value);
+});
 
-        // colorPicker2.addEventListener('change', (event) => {
-        //     setDrawingColor(event.target.value);
-        // });
+colorPicker2.addEventListener('change', (event) => {
+    setDrawingColor(event.target.value);
+});
 
-        // colorPicker3.addEventListener('change', (event) => {
-        //     setDrawingColor(event.target.value);
-        // });
+colorPicker3.addEventListener('change', (event) => {
+    setDrawingColor(event.target.value);
+});
+
+colorPicker4.addEventListener("change", (event) => [
+    setDrawingColor(event.target.value)
+]);
+
     </script>
 </body>
 </html>

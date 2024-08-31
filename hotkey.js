@@ -47,3 +47,28 @@ document.addEventListener('keydown', function(event) {
 
   }
 });
+
+document.addEventListener('keydown', function(event) {
+  if (event.key === '1') {
+    // Активируем первый колорпикер
+    colorPicker.click(); 
+    setDrawingColor(colorPicker.value);
+  } else if (event.key === '2') {
+    // Активируем второй колорпикер
+    colorPicker2.click();
+    setDrawingColor(colorPicker2.value);
+  } else if (event.key === '3') {
+    // Активируем третий колорпикер
+    colorPicker3.click();
+    setDrawingColor(colorPicker3.value);
+  } else if (event.key === '4') {
+    // Активируем четвертый колорпикер
+    colorPicker4.click();
+    setDrawingColor(colorPicker4.value);
+  }
+});
+
+// Функция для установки цвета рисования
+function setDrawingColor(color) {
+  ctx.strokeStyle = color; 
+}
