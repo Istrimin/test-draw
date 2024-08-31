@@ -340,3 +340,22 @@ width: 100%;
 body.no-drop {
   cursor: not-allowed; 
 }
+/* 
+Стили для кнопок пипеток
+#eyedropperBtn, 
+#brushEyedropperBtn {
+  background-color: transparent;
+  border: none;
+  padding: 5px;
+  cursor: pointer;
+}
+
+#eyedropperBtn:hover,
+#brushEyedropperBtn:hover {
+  background-color: lightgray;
+}
+
+#eyedropperBtn.active,
+#brushEyedropperBtn.active {
+  background-color: #ccc;
+} */

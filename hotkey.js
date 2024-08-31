@@ -14,11 +14,11 @@ document.addEventListener('keydown', function(event) {
       event.preventDefault();
       document.getElementById('backgroundPicker').click();
       break;
-    case 'KeyC': // Drawing color
-      event.preventDefault();
-      document.getElementById('colorPicker').click();
+    // case 'KeyC': // Drawing color
+    //   event.preventDefault();
+    //   document.getElementById('colorPicker').click();
 
-      break;
+    //   break;
     case 'KeyE': // Eraser
       event.preventDefault();
       document.getElementById('eraser').click();
@@ -68,7 +68,7 @@ document.addEventListener('keydown', function(event) {
 //   }
 // });
 
-// Функция для установки цвета рисования
-function setDrawingColor(color) {
-  ctx.strokeStyle = color; 
-}
+// // Функция для установки цвета рисования
+// function setDrawingColor(color) {
+//   ctx.strokeStyle = color; 
+// }

@@ -11,7 +11,8 @@ ctx.imageSmoothingEnabled = false;
 ctx.willReadFrequently = true;
 
 // ---------- UI Elements ----------
-const backgroundPicker = document.getElementById('backgroundPicker');
+const 
+backgroundPicker = document.getElementById('backgroundPicker');
 const colorPicker = document.getElementById('colorPicker');
 const colorPicker2 = document.getElementById('colorPicker2');
 const colorPicker3 = document.getElementById('colorPicker3');
@@ -67,6 +68,7 @@ undoBtn.addEventListener('click', undo);
 redoBtn.addEventListener('click', redo);
 clearBtn.addEventListener('click', clearCanvas);
 
+
 backgroundPicker.addEventListener('input', (event) => {
     canvas.style.backgroundColor = event.target.value;
     redrawCanvas();
@@ -106,7 +108,8 @@ window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
 function redrawCanvas() {
-    ctx.fillStyle = backgroundPicker.value;
+    ctx.fillStyle = 
+backgroundPicker.value;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     if (uploadedImage) {
       ctx.drawImage(uploadedImage, 0, 0, canvas.width, canvas.height);
@@ -116,7 +119,8 @@ function redrawCanvas() {
 
 function clearCanvas() {
     clearedCanvasState = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = backgroundPicker.value;
+    ctx.fillStyle = 
+backgroundPicker.value;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     history.push(clearedCanvasState);
     redoHistory = [];
@@ -182,20 +186,6 @@ function draw(e) {
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
   ctx.globalAlpha = opacityInput.value / 100;
-
-  // Determine which color picker is active
-  if (colorPicker.checked) { // Assuming you're using radio buttons
-    ctx.strokeStyle = colorPicker.value;
-  } else if (colorPicker2.checked) {
-    ctx.strokeStyle = colorPicker2.value;
-  } else if (colorPicker3.checked) {
-    ctx.strokeStyle = colorPicker3.value;
-  } else if(colorPicker4.checked) {
-    ctx.strokeStyle = colorPicker4.value;
-  }
-
-
-
   ctx.beginPath();
   ctx.moveTo(lastX, lastY);
   ctx.lineTo(x, y);
