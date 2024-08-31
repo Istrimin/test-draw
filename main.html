@@ -99,11 +99,14 @@
                     <button id="nextWord" title="Следующее слово">&gt;</button>
                 </div>
                 <div class="color-picker-group"> 
+
+                    <input type="color" id="colorPicker" value="#000000" title="Цвет заливки (C)">
                     <input type="color" id="backgroundPicker" value="#ffffff" title="Цвет фона (B)">
-                    <input type="color" id="colorPicker" value="#000000" title="Цвет кисти (C)">
                     <input type="color" id="colorPicker2" value="#ff0000" title="Цвет кисти 2"> 
                     <input type="color" id="colorPicker3" value="#0000ff" title="Цвет кисти 3"> 
                     <input type="color" id="colorPicker4" value="#00ff00" title="Цвет кисти 4"> 
+                    <input type="color" id="colorPicker5" value="#ffff00" title="Цвет кисти 5">     
+                    <input type="color" id="colorPicker6" value="#ff00ff" title="Цвет кисти 6"> 
                 </div>
 
 
@@ -159,7 +162,7 @@
 
     // Добавляем обработчик клавиатуры для горячих клавиш
     document.addEventListener('keydown', (event) => {
-        if (event.key >= '1' && event.key <= '4') {
+        if (event.key >= '1' && event.key <= '7') {
             const index = parseInt(event.key) - 1;
             if (index < colorPickers.length) {
                 const color = colorPickers[index].value;
