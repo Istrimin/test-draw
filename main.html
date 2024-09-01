@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Draw</title>
+
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -73,8 +74,8 @@
             <button id="symmetry" title="Симметрия (S)">🦋</button>
             <button id="fillModeBtn" title="Заливка (F)">🌊</button>
             <button id="floodFillBtn" title="Залить цветом">✨</button>
-<button id="eyedropperBtn" title="Пипетка заливки (A)">💧</button>
-<button id="brushEyedropperBtn" title="Пипетка кисти (D)">🖌️</button>
+            <button id="eyedropperBtn" title="Пипетка заливки (A)">💧</button>
+            <button id="brushEyedropperBtn" title="Пипетка кисти (D)">🖌️</button>
 
 
             <div id="cursorPanel" class="cursor-panel" style="display: none;">
@@ -125,70 +126,79 @@
     </div>
 
 <script>
-const exitLink = document.getElementById('exitLink');
-const doorSound = new Howl({
-  src: ['sounds/door-close.wav'] 
-});
-
-exitLink.addEventListener('click', () => {
-  doorSound.play();
-
-  // Navigate after the sound finishes
-  doorSound.once('end', () => {
-    window.location.href = 'index.html';
-  });
-});
+const canvas = document.getElementById('drawingCanvas');
+const ctx = canvas.getContext('2d');
+ctx.imageSmoothingEnabled = false;
+ctx.willReadFrequently = true;
 
 
-// done  colorpickers
-    const colorPickers = document.querySelectorAll('input[type="color"]');
-    let isEyedropperActive = false;
-    let isBrushEyedropperActive = false;
 
-    function setDrawingColor(color) {
-        ctx.strokeStyle = color;
-    }
+// Eyedroppers
 
-    function setFillColor(color) {
-        // Здесь установите цвет заливки, если это необходимо
-        // Например: ctx.fillStyle = color;
-    }
+function toggleEyedropper() {
+  isEyedropperActive = !isEyedropperActive;
 
-    colorPickers.forEach(picker => {
-        picker.addEventListener('input', (event) => {
-            setDrawingColor(event.target.value);
-        });
-    });
+//   isBrushEyedropperActive = false;
+  canvas.style.cursor = isEyedropperActive ? 'url(cursors/pipette.png), auto' : 'default';
+}
 
-    document.addEventListener('keydown', (event) => {
-        if (event.key >= '1' && event.key <= '9') {
-            const index = parseInt(event.key) - 1;
-            if (index < colorPickers.length) {
-                const color = colorPickers[index].value;
-                setDrawingColor(color);
-            }
-        } else if (event.key.toLowerCase() === 'a') {
-            toggleEyedropper();
-        } else if (event.key.toLowerCase() === 'd') {
-            toggleBrushEyedropper();
-        }
-    });
+canvas.style.cursor = 'url(cursors/pipette.png), auto';
 
-    function toggleEyedropper() {
-        isEyedropperActive = !isEyedropperActive;
-        isBrushEyedropperActive = false;
-        canvas.style.cursor = isEyedropperActive ? 'crosshair' : 'default';
-    }
+function toggleEyedropper() {
+  isEyedropperActive = !isEyedropperActive;
+  isBrushEyedropperActive = false;
+  canvas.style.cursor = isEyedropperActive ? 'url(cursors/pipette.png), auto' : 'default';
+}
+    document.getElementById('eyedropperBtn').addEventListener('click', toggleEyedropper);
+    document.getElementById('brushEyedropperBtn').addEventListener('click', toggleBrushEyedropper);
 
     function toggleBrushEyedropper() {
         isBrushEyedropperActive = !isBrushEyedropperActive;
         isEyedropperActive = false;
-        canvas.style.cursor = isBrushEyedropperActive ? 'crosshair' : 'default';
+        canvas.style.cursor = isBrushEyedropperActive ? 'url(cursors/pipette.png), auto' : 'default';
     }
 
 
-    document.getElementById('eyedropperBtn').addEventListener('click', toggleEyedropper);
-    document.getElementById('brushEyedropperBtn').addEventListener('click', toggleBrushEyedropper);
+document.addEventListener('keydown', function(event) {
+    if (event.key.toLowerCase() === 'd') {
+        // Получаем текущую позицию курсора
+        var rect = canvas.getBoundingClientRect();
+var x = Math.floor(event.clientX - rect.left);
+var y = Math.floor(event.clientY - rect.top);
+
+// Now x and y will always be integers
+var imageData = ctx.getImageData(x, y, 1, 1);
+
+        // Получаем цвет пикселя под курсором
+        var imageData = ctx.getImageData(x, y, 1, 1);
+        var pixel = imageData.data;
+
+        // Преобразуем RGB в HEX
+        var color = "#" + ("000000" + rgbToHex(pixel[0], pixel[1], pixel[2])).slice(-6);
+
+        // Устанавливаем этот цвет для 3-го колорпикера
+        document.getElementById('colorPicker3').value = color;
+
+        // Устанавливаем этот цвет в качестве текущего цвета рисования
+        ctx.strokeStyle = color;
+        ctx.fillStyle = color;
+
+        // Визуальное подтверждение
+        console.log('Цвет кисти изменен на: ' + color);
+    }
+});
+
+// Вспомогательная функция для преобразования RGB в HEX
+function rgbToHex(r, g, b) {
+    if (r > 255 || g > 255 || b > 255)
+        throw "Invalid color component";
+    return ((r << 16) | (g << 8) | b).toString(16);
+}
+
+
+
+
+
 </script>
 
 </body>

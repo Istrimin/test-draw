@@ -193,9 +193,9 @@ saveImageBtn.addEventListener('click', () => {
 });
 
 // new
-canvas.style.cursor = 'url(cursor.png), auto';
+canvas.style.cursor = 'url(cursors/pipette.png), auto';
 function toggleEyedropper() {
   isEyedropperActive = !isEyedropperActive;
   isBrushEyedropperActive = false;
-  canvas.style.cursor = isEyedropperActive ? 'url(cursor.png), auto' : 'default';
+  canvas.style.cursor = isEyedropperActive ? 'url(cursors/pipette.png), auto' : 'default';
 }

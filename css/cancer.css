@@ -20,7 +20,7 @@ body {
 	-ms-user-select: none;
 }
 #canvas {
-  cursor: url('cursor.png'), auto;
+  cursor: url('cursors/pipette.png'), auto;
 }
 .drawingCursor {
 	cursor: url('../cursors/pencil.png'), auto;

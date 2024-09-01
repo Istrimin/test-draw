@@ -1,28 +1,19 @@
-const canvas = document.getElementById('drawingCanvas');
-const ctx = canvas.getContext('2d');
-
-if (window.PointerEvent) {
-    console.log('Pointer events are supported');
-} else {
-    console.log('Pointer events are not supported');
-}
-
-ctx.imageSmoothingEnabled = false;
-ctx.willReadFrequently = true;
 
 // ---------- UI Elements ----------
 const 
 backgroundPicker = document.getElementById('backgroundPicker');
-const colorPicker = document.getElementById('colorPicker');
-const colorPicker2 = document.getElementById('colorPicker2');
-const colorPicker3 = document.getElementById('colorPicker3');
-const colorPicker4 = document.getElementById('colorPicker4');
+
+// const colorPicker = document.getElementById('colorPicker');
+// const colorPicker2 = document.getElementById('colorPicker2');
+// const colorPicker3 = document.getElementById('colorPicker3');
+// const colorPicker4 = document.getElementById('colorPicker4');
+
 const brushSizeInput = document.getElementById('brushSize');
 const opacityInput = document.getElementById('opacity');
 const undoBtn = document.getElementById('undo');
 const redoBtn = document.getElementById('redo');
 const clearBtn = document.getElementById('clear');
-const inviteFriendsBtn = document.getElementById('inviteFriends');
+// const inviteFriendsBtn = document.getElementById('inviteFriends');
 const saveImageBtn = document.getElementById('saveImageBtn');
 const imageInput = document.getElementById('imageInput');
 const UploadButton = document.getElementById('UploadButton');
@@ -216,36 +207,65 @@ function stopDrawing() {
 
 
 
-    canvas.addEventListener('click', (event) => {
-        if (isEyedropperActive || isBrushEyedropperActive) {
-            const rect = canvas.getBoundingClientRect();
-            const x = event.clientX - rect.left;
-            const y = event.clientY - rect.top;
-            const pixelData = ctx.getImageData(x, y, 1, 1).data;
-            const color = `rgb(${pixelData[0]}, ${pixelData[1]}, ${pixelData[2]})`;
-            
-            if (isEyedropperActive) {
-                setFillColor(color);
-                document.getElementById('colorPicker').value = rgbToHex(pixelData[0], pixelData[1], pixelData[2]);
-            } else if (isBrushEyedropperActive) {
-                setDrawingColor(color);
-                document.getElementById('colorPicker2').value = rgbToHex(pixelData[0], pixelData[1], pixelData[2]);
-            }
-            
-            isEyedropperActive = false;
-            isBrushEyedropperActive = false;
-            canvas.style.cursor = 'default';
-        }
-    });
 
     function rgbToHex(r, g, b) {
         return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
     }
 // new
 
-// canvas.style.cursor = 'url(cursor.png), auto';
-// function toggleEyedropper() {
-//   isEyedropperActive = !isEyedropperActive;
-//   isBrushEyedropperActive = false;
-//   canvas.style.cursor = isEyedropperActive ? 'url(cursor.png), auto' : 'default';
-// }
+const exitLink = document.getElementById('exitLink');
+const doorSound = new Howl({
+  src: ['sounds/door-close.wav'] 
+});
+
+exitLink.addEventListener('click', () => {
+  doorSound.play();
+
+  // Navigate after the sound finishes
+  doorSound.once('end', () => {
+    window.location.href = 'index.html';
+  });
+});
+
+
+// colorpickers
+    const colorPickers = document.querySelectorAll('input[type="color"]');
+    let isEyedropperActive = false;
+    let isBrushEyedropperActive=false;  
+
+
+    function setDrawingColor(color) {
+        ctx.strokeStyle = color;
+    }
+
+    function setFillColor(color) {
+        // Здесь установите цвет заливки, если это необходимо
+        // Например: ctx.fillStyle = color;
+    }
+
+    colorPickers.forEach(picker => {
+        picker.addEventListener('input', (event) => {
+            setDrawingColor(event.target.value);
+        });
+    });
+
+// настройка по цифрам
+document.addEventListener('keydown', (event) => {
+  // Используем event.code вместо event.key для независимости от раскладки
+  if (event.code >= 'Digit1' && event.code <= 'Digit9') {
+    const index = parseInt(event.code.replace('Digit', '')) - 1;
+    if (index < colorPickers.length) {
+      const color = colorPickers[index].value;
+      setDrawingColor(color);
+    }
+
+
+  } else if (event.code === 'KeyA') { // 'A' key regardless of layout
+    toggleEyedropper();
+  } else if (event.code === 'KeyD') { // 'D' key regardless of layout
+    toggleBrushEyedropper();
+  }
+});
+
+
+
