@@ -39,6 +39,8 @@ button {
 	color: var(--button-text-color);
 	font-style: bold;
 	font-size: 30px;
+	border-radius: 20px;	
+	border: none;
 }
 
 button:hover,
@@ -335,7 +337,7 @@ input[type="range"]::-webkit-slider-runnable-track {
 		}
 
 		.word-navigation button {
-			margin: 0 10px;
+			/* margin: 0 10px; */
 		}
 
 		/* Стили для колорпикеров */
