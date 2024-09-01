@@ -74,7 +74,7 @@
             <input type="file" id="imageInput" accept="image/*" style="display: none;">
             <button id="UploadButton" title="Загрузить изображение (U)">🌺</button>
             <button id="saveImageBtn" title="Сохранить изображение">🎬</button>
-            <button id="eraser" title="Ластик (E)">💩</button>
+            <button id="changeCursorBtn" title="Сменить курсор">🎨</button>
             <button id="undo" title="Отменить (Z)">⟲</button>
             <button id="redo" title="Повторить (X)">⟳</button>
             <button id="clear" title="Очистить">💀</button>
@@ -84,13 +84,11 @@
 <button id="eyedropperBtn" title="Пипетка заливки (A)">💧</button>
 <button id="brushEyedropperBtn" title="Пипетка кисти (D)">🖌️</button>
 
-            <button id="changeCursorBtn" title="Сменить курсор">🎨</button>
+
             <div id="cursorPanel" class="cursor-panel" style="display: none;">
                 <h3>Выберите курсор</h3>
                 <div id="cursorList"></div>
             </div>
-            <button id="inviteFriends" title="Пригласить друзей">👥</button>
-            <button id="addToFavorites" title="Добавить в избранное">📌</button>
             <button id="settings" title="Настройки">⚙️</button>
         </div>
         <div class="canvas-and-sliders">
@@ -100,16 +98,20 @@
                     <p id="Quizz"></p>
                     <button id="nextWord" title="Следующее слово">&gt;</button>
                 </div>
-                <div class="color-picker-group"> 
+<div class="color-picker-group"> 
 
-                    <input type="color" id="colorPicker" value="#000000" title="Цвет заливки (C)">
-                    <input type="color" id="backgroundPicker" value="#ffffff" title="Цвет фона (B)">
-                    <input type="color" id="colorPicker3" value="#ff0000" title="Цвет кисти 3"> 
-                    <input type="color" id="colorPicker4" value="#ffff00" title="Цвет кисти 4"> 
-                    <input type="color" id="colorPicker5" value="#00ff00" title="Цвет кисти 5">     
-                    <input type="color" id="colorPicker6" value="#0000ff" title="Цвет кисти 6"> 
-                    <input type="color" id="colorPicker7" value="#ff00ff" title="Цвет кисти 7"> 
-                </div>
+    <input type="color" id="colorPicker" value="#000000" title="Цвет заливки (C)"> 
+    <input type="color" id="backgroundPicker" value="#eeaaff" title="Цвет фона (B)">
+
+    <input type="color" id="colorPicker3" value="#ff0000" title="Цвет кисти 3">  
+    <input type="color" id="colorPicker4" value="#ffa500" title="Цвет кисти 4"> 
+    <input type="color" id="colorPicker5" value="#ffff00" title="Цвет кисти 5">     
+    <input type="color" id="colorPicker6" value="#008000" title="Цвет кисти 6"> 
+    <input type="color" id="colorPicker7" value="#00ffff" title="Цвет кисти 7"> 
+    <input type="color" id="colorPicker8" value="#0000ff" title="Цвет кисти 8"> 
+    <input type="color" id="colorPicker9" value="#800080" title="Цвет кисти 9"> 
+</div>
+
 
 
                 <canvas id="drawingCanvas" 
@@ -155,7 +157,7 @@
     });
 
     document.addEventListener('keydown', (event) => {
-        if (event.key >= '1' && event.key <= '7') {
+        if (event.key >= '1' && event.key <= '9') {
             const index = parseInt(event.key) - 1;
             if (index < colorPickers.length) {
                 const color = colorPickers[index].value;
