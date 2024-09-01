@@ -1,19 +1,19 @@
 body {
-    background-image: url('../images/bg_index.jpg');
-    background-color: black;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    /* font-family: 'Roboto', sans-serif; */
+  background-image: url('../images/bg_index.jpg');
+  background-color: transparent;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 
-    margin: 0;  
-    padding: 0;
-    min-height: 100vh;
-    display: flex;
-    align-items: center; /* Центрируем по вертикали */
-    justify-content: center; /* Центрируем по горизонтали */
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
 body {
   user-select: none;
   -webkit-user-select: none;
@@ -25,87 +25,86 @@ body {
 h1 {
   color: rgb(255, 255, 255);
   font-size: 400px;
-  text-align: center; /* Center the text */
+  text-align: center;
   padding: 0;
   margin: 0;
-  text-transform: uppercase; /* Make the text uppercase */
+  text-transform: uppercase;
 }
 
 h2 {
   color: rgb(255, 255, 255);
-  text-decoration: none; /* Убираем подчеркивание */
+  text-decoration: none;
 
 }
 
-a[title="Играть"] { /* Выбираем ссылку по атрибуту title */
-  display: inline-block; /* Делаем ссылку блочной, чтобы задать padding */
-  padding: 10px 20px;  /* Добавляем отступы */
-  background-color: #4CAF50; /* Цвет фона */
-  color: white; /* Цвет текста */
-  text-decoration: none; /* Убираем подчеркивание */
-  border-radius: 5px; /* Скругление углов */
-  font-size: 20px; /* Размер шрифта */
+a[title="Играть"] {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  font-size: 20px;
 }
 
 a[title="Рисовать"]:hover {
-  /* background-color: #3e8e41; */
   cursor: pointer;
-  text-decoration: none; /* Убираем подчеркивание */
-font-size: 110px;
+  text-decoration: none;
+  font-size: 110px;
 }
 
 a[title="Рисовать"] {
-font-size: 100px;
+  font-size: 100px;
   padding: 20px;
-  text-decoration: none; /* Убираем подчеркивание */
+  text-decoration: none;
 
 }
 
 .header-container {
-    text-align: center;
+  text-align: center;
+  background-color: transparent;
 }
 
 .header-container a {
-    display: block;
-    margin-top: 20px;
+  display: block;
+  margin-top: 20px;
 }
 
-        .column-container {
-            display: flex;
-            flex-direction: column; /* Arrange items vertically */
-            align-items: center; /* Center items horizontally */
-        }
+.column-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 #cursorList {
-  background-color: transparent; /* Светло-серый фон */
-  /* border: 1px solid #ccc; Тонкая серая рамка */
+  background-color: transparent;
   padding: 10px;
-  margin-top: 5px; /* Отступ сверху */
-  max-height: 200px; /* Максимальная высота контейнера */
-  overflow-y: auto; /* Добавляем прокрутку, если контент не помещается */
+  margin-top: 5px;
+  max-height: 200px;
+  overflow-y: auto;
 }
 
-#cursorList div { /* Стили для каждого элемента списка курсоров */
+#cursorList div {
   padding: 5px;
   margin-bottom: 2px;
-  border: 1px solid transparent; /* Прозрачная рамка для эффекта при наведении */
-  cursor: pointer; /* Меняем курсор на "указатель" */
+  border: 1px solid transparent;
+  cursor: pointer;
 }
 
 #cursorList div:hover {
-  background-color: #560000; /* Светло-серый фон при наведении */
-  border-color: #999; /* Серая рамка при наведении */
+  background-color: #560000;
+  border-color: #999;
 }
 
-        .time {
-            background-color: transparent; /* Светло-серый фон */
-            color: #ffffff; /* Белый текст */
-            font-family: monospace; /* Моноширинный шрифт */
-            font-size: 10px;
-            margin: 0;
-            padding: 0;
-        }
+.time {
+  background-color: transparent;
+  color: #ffffff;
+  font-family: monospace;
+  font-size: 10px;
+  margin: 0;
+  padding: 0;
+}
 
-/* Optional: Add a "no-drop" cursor style for better visual feedback */
 body.no-drop {
-  cursor: not-allowed; 
+  cursor: not-allowed;
 }

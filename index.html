@@ -1,14 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<head>
+    <!-- ...
+    <link rel="preload" href="images/dream.jpg" as="image">
+    <link rel="preload" href="images/dream2.jpg" as="image">
+    <link rel="preload" href="images/dream3.jpg" as="image">
+    <link rel="preload" href="images/dream4.jpg" as="image">
+    <link rel="preload" href="images/cancer.png" as="image"> 
+    ... -->
+</head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Draw</title>
 
     <link rel="stylesheet" href="css/index.css"> 
     <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
     <script type="module" src="settings.js" defer"></script>
     <style>
 .image-row {
@@ -25,12 +33,13 @@
 </head>
 <body>
     <div class="header-container">
-        <div id="time" class="time"></div> <div class="column-container">
-            <img src="images/dream.jpg" width="200" alt="Рисуйка">
-        </div>
+        <div id="time" class="time"></div> <div 
+<div class="column-container">
+  <img src="" id="randomImage" width="200" alt="Рисуйка">
+</div>
         <h2>Привет художник!</h2> 
         <class class="image-row">
-        <!-- <a href="main.html" target="_self" title="Я про">  <img src="images/Cancer.png" width="100"></a>  -->
+
 <a href="main.html" target="_self" title="Я про" class="no-underline" style="font-size:6em;">🖍️</a> 
 
         <a href="cancer.html" target="_self" title="Я рак">
@@ -57,6 +66,24 @@
 
         // Update the time every second
         setInterval(updateTime, 1000); 
+
+
+
+  const images = [
+    'images/dream.jpg',
+    'images/dream2.jpg', 
+    'images/dream3.jpg',
+    "images/dream4.jpg"
+    // Добавьте сюда пути к другим изображениям
+  ];
+
+  function getRandomImage(images) {
+    const randomIndex = Math.floor(Math.random() * images.length);
+    return images[randomIndex];
+  }
+
+  const randomImageUrl = getRandomImage(images);
+  document.getElementById('randomImage').src = randomImageUrl;
     </script>
 </body>
 </html>
