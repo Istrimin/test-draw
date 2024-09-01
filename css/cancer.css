@@ -1,5 +1,5 @@
 body {
-	background-image: url('../images/logo.jpg');
+	background-image: url('../images/cancer.jpg');
 	background-color: black;
 	background-size: cover;
 	background-position: center;
@@ -249,60 +249,109 @@ input[type="range"] {
 	-webkit-appearance: none;
 	appearance: none;
 	width: 100%;
-	/* Ширина ползунка - 100% */
 	outline: none;
-	/* Убираем контур */
 	overflow: hidden;
-	/* Скрываем всё, что выходит за пределы ползунка */
 	touch-action: pan-y;
-	/* Разрешаем только вертикальное перетаскивание на сенсорных экранах */
+	border-radius: 20px;
 }
 
 input[type="range"]::-webkit-slider-thumb {
 	-webkit-appearance: none;
-	/* Убираем стандартный внешний вид */
 	appearance: none;
 	width: 20px;
-	/* Ширина ползунка */
 	height: 50px;
-	/* Высота ползунка */
 	background: #00ff08;
-	/* Зеленый цвет ползунка */
 	cursor: pointer;
-	/* Меняем курсор на "указатель" */
-	border-radius: 50%;
-	/* Делаем ползунок круглым */
-	box-shadow: -100vw 0 0 100vw dodgerblue;
-	/* Эффект заполнения слева */
-}
+	border-radius: 20px;
+
+	box-shadow: -100vw 0 0 100vw rgb(0, 93, 186);
+}	
 
 input[type="range"]::-moz-range-thumb {
 	width: 20px;
-	/* Ширина ползунка */
 	height: 50px;
-	/* Высота ползунка */
 	background: #4CAF50;
 	color: #00ff08;
-	/* Зеленый цвет ползунка */
-	cursor: pointer;
-	/* Меняем курсор на "указатель" */
+	cursor: progress;
 	border-radius: 50%;
-	/* Делаем ползунок круглым */
 	box-shadow: -100vw 0 0 100vw dodgerblue;
-	/* Эффект заполнения слева */
 }
 
 
-.color-palette {
-	display: flex;
-	flex-direction: column;
-	gap: 5px;
+input[type="range"]::-webkit-slider-runnable-track {
+    background: rgb(56, 93, 130); 
+    height: 100%; 
 }
 
-.color-circle {
-	width: 20px;
-	height: 20px;
-	border-radius: 50%;
-	cursor: pointer;
-	border: 1px solid black;
-}
+	/* Стили для панели курсоров */
+		#cursorPanel {
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background-color: transparent;
+			border-radius: 20px;
+			display: none;
+			z-index: 10;
+			padding: 10px;
+			box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+			overflow-y: auto;
+		}
+
+		.cursor-item {
+			display: inline-block;
+			margin: 5px;
+			cursor: pointer;
+		}
+
+		.cursor-preview {
+			width: 64px;
+			height: 64px;
+			border: 1px solid #00cc4100;
+			padding: 2px;
+		}
+
+		.cursor-item:hover .cursor-preview {
+			border-color: hsl(69, 100%, 52%);
+		}
+
+		.canvas-container {
+			position: relative;
+		}
+
+		.canv-container {
+			position: relative;
+		}
+
+
+
+		.word-navigation {
+			display: flex;
+			align-items: center;
+			/* justify-content: center; */
+			margin-bottom: 10px;
+			z-index: 10;
+		}
+
+		.word-navigation button {
+			margin: 0 10px;
+		}
+
+		/* Стили для колорпикеров */
+		.color-picker-group {
+			display: flex;
+			flex-direction: row;
+			justify-content: space-around;
+			margin-bottom: 10px;
+			align-items: center; /* Выравнивание по вертикали */
+		}
+
+
+		.color-picker-group input[type="color"] {
+			width: 50px;
+			/* height: 30px	; */
+			padding: 0;
+			/* border: 20px solid black; */
+			border-radius: 5px;
+		}
