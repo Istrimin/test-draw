@@ -66,7 +66,12 @@
     </div>
     <div class="base-container">
         <div class="sidebar">
-            <a href="index.html" target="_self" title="Выйти из команты">🚪</a>
+            <!-- <a href="index.html" target="_self" title="Выйти из команты">🚪</a> -->
+
+
+<a href="index.html" target="_self" title="Выйти из команты" id="exitLink">🚪</a>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+
             <button id="myBtn" title="Сообщение">✉️</button>
             <div id="message-container" style="display: none;">
                 <p id="message"></p>
@@ -134,10 +139,22 @@
     </div>
 
 <script>
-    const colorPickers = document.querySelectorAll('input[type="color"]');
-    // const canvas = document.getElementById('drawingCanvas');
-    // const ctx = canvas.getContext('2d');
+const exitLink = document.getElementById('exitLink');
+const doorSound = new Howl({
+  src: ['door.mp3'] 
+});
 
+exitLink.addEventListener('click', () => {
+  doorSound.play();
+  // Optional: Navigate after sound finishes
+  doorSound.once('end', () => {
+    window.location.href = 'index.html';
+  });
+});
+
+
+// done  colorpickers
+    const colorPickers = document.querySelectorAll('input[type="color"]');
     let isEyedropperActive = false;
     let isBrushEyedropperActive = false;
 
