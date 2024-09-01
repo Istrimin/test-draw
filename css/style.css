@@ -56,15 +56,6 @@ input[type="range"]:hover {
     height: 100vh;
     /* width: 100%; */
 }
-.canvas-container{
-    display: flex;
-    flex-direction: column;
-    /* align-items: center; */
-    font-size: 10px;
-    margin: 0;
-    padding: 0;
-    /* width: 100%; */
-}
 
 #fillModeBtn.active {
     background-color: var(--button-active-color);
@@ -98,11 +89,11 @@ a {
     flex-direction: row;
     align-items: center;
 }
-.color-picker-group{
+/* .color-picker-group{
     display: flex;
     flex-direction: column;
     align-items: center;
-}
+} */
 
 .tools {
     color: var(--button-text-color);
@@ -138,15 +129,7 @@ canvas {
     /* width: 100%; */
 }
 
-.canvas-container { 
-    /* position: relative; */
-    /* display: flex; */
-    justify-content: center;
-    align-items: center;
-    /* height: 100vh; */
-    color: #ffffff;
-    margin: 0;
-}
+
 @import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
 
 #Quizz {
@@ -186,7 +169,7 @@ canvas {
 }
 
 .color-picker {
-    display: flex;
+    /* display: flex; */
     background-color: gold;
     margin-bottom: 10px;
 }
@@ -232,35 +215,51 @@ input[type="range"]::-moz-range-thumb {
     cursor: pointer;
     border-radius: 50%;
 }
+		#cursorPanel {
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background-color: transparent;
+			border-radius: 20px;
+			display: none;
+			z-index: 10;
+			padding: 10px;
+			box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+			overflow-y: auto;
+		}
 
-.cursor-panel {
-    position: absolute;
-    top: 50px;
-    right: 10px;
-    background-color: rgb(0, 0, 0);
-    border: 1px solid #00ffe500;
-    padding: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    max-height: 300px;
-    overflow-y: auto;
-}
+		.cursor-item {
+			display: inline-block;
+			margin: 5px;
+			cursor: pointer;
+		}
 
-.cursor-item {
-    display: inline-block;
-    margin: 5px;
-    cursor: pointer;
-}
+		.cursor-preview {
+			width: 64px;
+			height: 64px;
+			border: 1px solid #00cc4100;
+			padding: 2px;
+		}
 
-.cursor-preview {
-    width: 32px;
-    height: 32px;
-    border: 1px solid #00cc4100;
-    padding: 2px;
-}
+		.cursor-item:hover .cursor-preview {
+			border-color: hsl(69, 100%, 52%);
+		}
 
-.cursor-item:hover .cursor-preview {
-    border-color: hsl(69, 100%, 52%);
+
+.canvas-container { 
+    position: relative;
+    /* display: flex; */
+    justify-content: center;
+    align-items: center;
+    /* height: 100vh; */
+    color: #ffffff;
+    margin: 0;
 }
+		.canv-container {
+			position: relative;
+		}
 
 
 ::-webkit-scrollbar {

@@ -10,6 +10,15 @@
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
     <script type="module" src="settings.js" defer"></script>
     <style>
+.image-row {
+  display: flex;
+  flex-direction: row;
+  gap: 30px; /*  Установите желаемый отступ */
+}
+
+.no-underline {
+  text-decoration: none;
+}
 
     </style>
 </head>
@@ -18,9 +27,16 @@
         <div id="time" class="time"></div> <div class="column-container">
             <img src="images/dream.jpg" width="200" alt="Рисуйка">
         </div>
-
         <h2>Привет художник!</h2> 
-        <a href="main.html" target="_self" title="Рисовать">🖍️</a> 
+        <class class="image-row">
+        <!-- <a href="main.html" target="_self" title="Я про">  <img src="images/Cancer.png" width="100"></a>  -->
+<a href="main.html" target="_self" title="Я про" class="no-underline" style="font-size:6em;">🖍️</a> 
+
+        <a href="cancer.html" target="_self" title="Я рак">
+        <img src="images/Cancer.png" width="100">
+        </a>
+</class>
+
     </div>
 
     <script>

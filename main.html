@@ -41,21 +41,8 @@
         }
 
 /* Стили для колорпикеров */
-.color-picker-group {
-    display: flex;
-    flex-direction: row; /* Изменено с 'column' на 'row' */
-    justify-content: space-around;
-    margin-bottom: 10px;
-}
 
 
-        .color-picker-group input[type="color"] {
-            width: 50px;
-            height: 30px;
-            padding: 0;
-            border: 2px solid black;
-            border-radius: 5px;
-        }
     </style>
 </head>
 <body>
@@ -115,14 +102,13 @@
     <input type="color" id="colorPicker7" value="#00ffff" title="Цвет кисти 7"> 
     <input type="color" id="colorPicker8" value="#0000ff" title="Цвет кисти 8"> 
     <input type="color" id="colorPicker9" value="#800080" title="Цвет кисти 9"> 
-</div>
-
-
-
-                <canvas id="drawingCanvas" 
-                        width="700" height="500" style=width:700px;height:500px>
-                </canvas>
-            </div>
+				<div class=" canv-container">
+					<canvas id="drawingCanvas" width="700" height="500" style=width:700px;height:500px>
+					</canvas>
+					<div id="cursorPanel" class="cursor-panel" style="display: none;">
+						<div id="cursorList"></div>
+					</div>
+				</div>
             <div class="slider-group">
                 <div class="tools-column">
                     <label for="opacity" title="Прозрачность">👻</label>
@@ -141,12 +127,13 @@
 <script>
 const exitLink = document.getElementById('exitLink');
 const doorSound = new Howl({
-  src: ['door.mp3'] 
+  src: ['sounds/door-close.wav'] 
 });
 
 exitLink.addEventListener('click', () => {
   doorSound.play();
-  // Optional: Navigate after sound finishes
+
+  // Navigate after the sound finishes
   doorSound.once('end', () => {
     window.location.href = 'index.html';
   });
