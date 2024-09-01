@@ -53,8 +53,11 @@
     </div>
     <div class="base-container">
         <div class="sidebar">
-            <a href="index.html" target="_self" title="Выйти из команты" id="exitLink">🚪</a>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+            <!-- <a href="index.html" target="_self" title="Выйти из команты">🚪</a> -->
+
+
+<a href="index.html" target="_self" title="Выйти из команты" id="exitLink">🚪</a>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
 
             <button id="myBtn" title="Сообщение">✉️</button>
             <div id="message-container" style="display: none;">
@@ -70,8 +73,8 @@
             <button id="symmetry" title="Симметрия (S)">🦋</button>
             <button id="fillModeBtn" title="Заливка (F)">🌊</button>
             <button id="floodFillBtn" title="Залить цветом">✨</button>
-            <button id="eyedropperBtn" title="Пипетка заливки (A)">💧</button>
-            <button id="brushEyedropperBtn" title="Пипетка кисти (D)">🖌️</button>
+<button id="eyedropperBtn" title="Пипетка заливки (A)">💧</button>
+<button id="brushEyedropperBtn" title="Пипетка кисти (D)">🖌️</button>
 
 
             <div id="cursorPanel" class="cursor-panel" style="display: none;">
@@ -87,130 +90,106 @@
                     <p id="Quizz"></p>
                     <button id="nextWord" title="Следующее слово">&gt;</button>
                 </div>
-                <div class="color-picker-group"> 
+<div class="color-picker-group"> 
 
-                    <input type="color" id="colorPicker" value="#000000" title="Цвет заливки (C)"> 
-                    <input type="color" id="backgroundPicker" value="#eeaaff" title="Цвет фона (B)">
+    <input type="color" id="colorPicker" value="#000000" title="Цвет заливки (C)"> 
+    <input type="color" id="backgroundPicker" value="#eeaaff" title="Цвет фона (B)">
 
-                    <input type="color" id="colorPicker3" value="#ff0000" title="Цвет кисти 3">  
-                    <input type="color" id="colorPicker4" value="#ffa500" title="Цвет кисти 4"> 
-                    <input type="color" id="colorPicker5" value="#ffff00" title="Цвет кисти 5">     
-                    <input type="color" id="colorPicker6" value="#008000" title="Цвет кисти 6"> 
-                    <input type="color" id="colorPicker7" value="#00ffff" title="Цвет кисти 7"> 
-                    <input type="color" id="colorPicker8" value="#0000ff" title="Цвет кисти 8"> 
-                    <input type="color" id="colorPicker9" value="#800080" title="Цвет кисти 9"> 
-                </div>
-                <div class=" canv-container">
+    <input type="color" id="colorPicker3" value="#ff0000" title="Цвет кисти 3">  
+    <input type="color" id="colorPicker4" value="#ffa500" title="Цвет кисти 4"> 
+    <input type="color" id="colorPicker5" value="#ffff00" title="Цвет кисти 5">     
+    <input type="color" id="colorPicker6" value="#008000" title="Цвет кисти 6"> 
+    <input type="color" id="colorPicker7" value="#00ffff" title="Цвет кисти 7"> 
+    <input type="color" id="colorPicker8" value="#0000ff" title="Цвет кисти 8"> 
+    <input type="color" id="colorPicker9" value="#800080" title="Цвет кисти 9"> 
+				<div class=" canv-container">
 					<canvas id="drawingCanvas" width="700" height="500" style=width:700px;height:500px>
 					</canvas>
 					<div id="cursorPanel" class="cursor-panel" style="display: none;">
 						<div id="cursorList"></div>
 					</div>
 				</div>
-                <div class="slider-group">
-                    <div class="tools-column">
-                        <label for="opacity" title="Прозрачность">👻</label>
-                        <input type="range" id="opacity" min="1" max="100" value="100">
-                    </div>
-                    <div class="tools-column">
-                        <div class="pressure-bar" id="pressureBar"></div>
-                        <label for="brushSize" title="Размер кисти">🖌️</label>
-                        <input type="range" id="brushSize" min="1" max="100" value="1">
-                    </div>
-                    <div class="color-palette" id="colorPalette"></div>
+            <div class="slider-group">
+                <div class="tools-column">
+                    <label for="opacity" title="Прозрачность">👻</label>
+                    <input type="range" id="opacity" min="1" max="100" value="100">
                 </div>
+                <div class="tools-column">
+                    <div class="pressure-bar" id="pressureBar"></div>
+                    <label for="brushSize" title="Размер кисти">🖌️</label>
+                    <input type="range" id="brushSize" min="1" max="100" value="1">
+                </div>
+                <div class="color-palette" id="colorPalette"></div>
             </div>
         </div>
     </div>
 
-    <script>
-        const exitLink = document.getElementById('exitLink');
-        const doorSound = new Howl({
-            src: ['sounds/door-close.wav'] 
+<script>
+const exitLink = document.getElementById('exitLink');
+const doorSound = new Howl({
+  src: ['sounds/door-close.wav'] 
+});
+
+exitLink.addEventListener('click', () => {
+  doorSound.play();
+
+  // Navigate after the sound finishes
+  doorSound.once('end', () => {
+    window.location.href = 'index.html';
+  });
+});
+
+
+// done  colorpickers
+    const colorPickers = document.querySelectorAll('input[type="color"]');
+    let isEyedropperActive = false;
+    let isBrushEyedropperActive = false;
+
+    function setDrawingColor(color) {
+        ctx.strokeStyle = color;
+    }
+
+    function setFillColor(color) {
+        // Здесь установите цвет заливки, если это необходимо
+        // Например: ctx.fillStyle = color;
+    }
+
+    colorPickers.forEach(picker => {
+        picker.addEventListener('input', (event) => {
+            setDrawingColor(event.target.value);
         });
+    });
 
-        exitLink.addEventListener('click', () => {
-            doorSound.play();
-
-            // Navigate after the sound finishes
-            doorSound.once('end', () => {
-                window.location.href = 'index.html';
-            });
-        });
-
-
-        //  colorpickers
-        const colorPickers = document.querySelectorAll('input[type="color"]');
-        let isEyedropperActive = false;
-        let isBrushEyedropperActive = false;
-
-        const canvas = document.getElementById('drawingCanvas');
-        const ctx = canvas.getContext('2d');
-
-        function setDrawingColor(color) {
-            ctx.strokeStyle = color;
-        }
-
-        function setFillColor(color) {
-            // Здесь установите цвет заливки, если это необходимо
-            // Например: ctx.fillStyle = color;
-        }
-
-        colorPickers.forEach(picker => {
-            picker.addEventListener('input', (event) => {
-                setDrawingColor(event.target.value);
-            });
-        });
-
-        document.addEventListener('keydown', (event) => {
-            if (event.key >= '1' && event.key <= '9') {
-                const index = parseInt(event.key) - 1;
-                if (index < colorPickers.length) {
-                    const color = colorPickers[index].value;
-                    setDrawingColor(color);
-                }
-} else if (event.code === 'KeyA') {
-    toggleEyedropper();
-} else if (event.code === 'KeyD') {
-    toggleBrushEyedropper();
-}
-        });
-
-        function toggleEyedropper() {
-            isEyedropperActive = !isEyedropperActive;
-            isBrushEyedropperActive = false;
-            canvas.style.cursor = isEyedropperActive ? 'crosshair' : 'default';
-        }
-
-        function toggleBrushEyedropper() {
-            isBrushEyedropperActive = !isBrushEyedropperActive;
-            isEyedropperActive = false;
-            canvas.style.cursor = isBrushEyedropperActive ? 'crosshair' : 'default';
-        }
-
-        canvas.addEventListener('click', (event) => {
-            if (isEyedropperActive) {
-                const rect = canvas.getBoundingClientRect();
-                const x = event.clientX - rect.left;
-                const y = event.clientY - rect.top;
-                const pixelData = ctx.getImageData(x, y, 1, 1).data;
-                const color = `rgb(${pixelData[0]}, ${pixelData[1]}, ${pixelData[2]})`;
-                colorPickers[0].value = color; // Устанавливаем цвет для первого colorPicker
-                setDrawingColor(color);
-            } else if (isBrushEyedropperActive) {
-                const rect = canvas.getBoundingClientRect();
-                const x = event.clientX - rect.left;
-                const y = event.clientY - rect.top;
-                const pixelData = ctx.getImageData(x, y, 1, 1).data;
-                const color = `rgb(${pixelData[0]}, ${pixelData[1]}, ${pixelData[2]})`;
-                colorPickers[2].value = color; // Устанавливаем цвет для третьего colorPicker (индекс 2)
+    document.addEventListener('keydown', (event) => {
+        if (event.key >= '1' && event.key <= '9') {
+            const index = parseInt(event.key) - 1;
+            if (index < colorPickers.length) {
+                const color = colorPickers[index].value;
                 setDrawingColor(color);
             }
-        });
+        } else if (event.key.toLowerCase() === 'a') {
+            toggleEyedropper();
+        } else if (event.key.toLowerCase() === 'd') {
+            toggleBrushEyedropper();
+        }
+    });
 
-        document.getElementById('eyedropperBtn').addEventListener('click', toggleEyedropper);
-        document.getElementById('brushEyedropperBtn').addEventListener('click', toggleBrushEyedropper);
-    </script>
+    function toggleEyedropper() {
+        isEyedropperActive = !isEyedropperActive;
+        isBrushEyedropperActive = false;
+        canvas.style.cursor = isEyedropperActive ? 'crosshair' : 'default';
+    }
+
+    function toggleBrushEyedropper() {
+        isBrushEyedropperActive = !isBrushEyedropperActive;
+        isEyedropperActive = false;
+        canvas.style.cursor = isBrushEyedropperActive ? 'crosshair' : 'default';
+    }
+
+
+    document.getElementById('eyedropperBtn').addEventListener('click', toggleEyedropper);
+    document.getElementById('brushEyedropperBtn').addEventListener('click', toggleBrushEyedropper);
+</script>
 
 </body>
 </html>

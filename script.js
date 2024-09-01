@@ -243,9 +243,9 @@ function stopDrawing() {
     }
 // new
 
-canvas.style.cursor = 'url(cursor.png), auto';
-function toggleEyedropper() {
-  isEyedropperActive = !isEyedropperActive;
-  isBrushEyedropperActive = false;
-  canvas.style.cursor = isEyedropperActive ? 'url(cursor.png), auto' : 'default';
-}
+// canvas.style.cursor = 'url(cursor.png), auto';
+// function toggleEyedropper() {
+//   isEyedropperActive = !isEyedropperActive;
+//   isBrushEyedropperActive = false;
+//   canvas.style.cursor = isEyedropperActive ? 'url(cursor.png), auto' : 'default';
+// }
