@@ -186,3 +186,12 @@ function stopDrawing() {
 }
 
 
+const saveImageBtn = document.getElementById('saveImageBtn');
+const canvas = document.getElementById('drawingCanvas');
+
+saveImageBtn.addEventListener('click', () => {
+  const link = document.createElement('a');
+  link.download = 'my-drawing.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+});

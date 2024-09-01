@@ -336,9 +336,6 @@ input[type="range"]::-webkit-slider-runnable-track {
 			z-index: 10;
 		}
 
-		.word-navigation button {
-			/* margin: 0 10px; */
-		}
 
 		/* Стили для колорпикеров */
 		.color-picker-group {
