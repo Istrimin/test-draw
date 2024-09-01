@@ -241,3 +241,11 @@ function stopDrawing() {
     function rgbToHex(r, g, b) {
         return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
     }
+// new
+
+canvas.style.cursor = 'url(cursor.png), auto';
+function toggleEyedropper() {
+  isEyedropperActive = !isEyedropperActive;
+  isBrushEyedropperActive = false;
+  canvas.style.cursor = isEyedropperActive ? 'url(cursor.png), auto' : 'default';
+}

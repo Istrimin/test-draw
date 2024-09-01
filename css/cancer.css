@@ -19,7 +19,9 @@ body {
 	-moz-user-select: none;
 	-ms-user-select: none;
 }
-
+#canvas {
+  cursor: url('cursor.png'), auto;
+}
 .drawingCursor {
 	cursor: url('../cursors/pencil.png'), auto;
 }

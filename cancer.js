@@ -191,3 +191,11 @@ saveImageBtn.addEventListener('click', () => {
   link.href = canvas.toDataURL('image/png');
   link.click();
 });
+
+// new
+canvas.style.cursor = 'url(cursor.png), auto';
+function toggleEyedropper() {
+  isEyedropperActive = !isEyedropperActive;
+  isBrushEyedropperActive = false;
+  canvas.style.cursor = isEyedropperActive ? 'url(cursor.png), auto' : 'default';
+}
