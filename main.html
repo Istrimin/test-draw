@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Draw</title>
+    <title>Настоящий Художник</title>
 
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
@@ -116,11 +116,12 @@
                     <input type="range" id="opacity" min="1" max="100" value="100">
                 </div>
                 <div class="tools-column">
-                    <div class="pressure-bar" id="pressureBar"></div>
+<progress id="pressureBar" value="0" max="100"></progress>
+
                     <label for="brushSize" title="Размер кисти">🖌️</label>
                     <input type="range" id="brushSize" min="1" max="100" value="1">
                 </div>
-                <div class="color-palette" id="colorPalette"></div>
+                <div class="color-palette" id="colorPalette">цветовая палитра</div>
             </div>
         </div>
     </div>
@@ -128,7 +129,7 @@
 <script>
 const canvas = document.getElementById('drawingCanvas');
 const ctx = canvas.getContext('2d');
-ctx.imageSmoothingEnabled = false;
+// ctx.imageSmoothingEnabled = false;
 ctx.willReadFrequently = true;
 
 
@@ -194,10 +195,6 @@ function rgbToHex(r, g, b) {
         throw "Invalid color component";
     return ((r << 16) | (g << 8) | b).toString(16);
 }
-
-
-
-
 
 </script>
 

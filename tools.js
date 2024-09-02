@@ -53,91 +53,97 @@ function toggleFillMode() {
 function floodFill(e) {
   const startX = e.offsetX;
   const startY = e.offsetY;
-  const targetColor = ctx.getImageData(startX, startY, 1, 1).data;
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const data = imageData.data;
+  const width = imageData.width;
+  const height = imageData.height;
+  
+  const targetColor = getPixelColor(data, startX, startY, width);
   const fillColor = hexToRgba(colorPicker.value);
-  const tolerance = 30; // Уменьшим толерантность
-  if (!colorMatch(targetColor, fillColor, tolerance)) {
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const data = imageData.data;
-    const width = imageData.width;
-    const height = imageData.height;
-    const stack = [[startX, startY]];
-    const visited = new Uint8Array(width * height);
-    while (stack.length) {
-      const [x, y] = stack.pop();
-      const index = y * width + x;
-      if (visited[index]) continue;
-      visited[index] = 1;
-      const pixelIndex = index * 4;
-      const currentColor = data.slice(pixelIndex, pixelIndex + 4);
-      if (colorMatch(currentColor, targetColor, tolerance) || isContourPixel(x, y, data, width, height, targetColor, tolerance)) {
-        // Заливаем текущий пиксель
-        data[pixelIndex] = fillColor[0];
-        data[pixelIndex + 1] = fillColor[1];
-        data[pixelIndex + 2] = fillColor[2];
-        data[pixelIndex + 3] = fillColor[3];
-        // Проверяем соседние пиксели
-        if (x > 0) stack.push([x - 1, y]);
-        if (x < width - 1) stack.push([x + 1, y]);
-        if (y > 0) stack.push([x, y - 1]);
-        if (y < height - 1) stack.push([x, y + 1]);
-      }
+  const tolerance = 30;
+
+  if (colorMatch(targetColor, fillColor, tolerance)) return;
+
+  const stack = [[startX, startY]];
+  const visited = new Uint8Array(width * height);
+
+  while (stack.length) {
+    const [x, y] = stack.pop();
+    const index = y * width + x;
+
+    if (visited[index]) continue;
+    visited[index] = 1;
+
+    const pixelIndex = index * 4;
+    const currentColor = data.slice(pixelIndex, pixelIndex + 4);
+
+    if (colorMatch(currentColor, targetColor, tolerance) || isContourPixel(x, y, data, width, height, targetColor, tolerance)) {
+      setPixelColor(data, x, y, width, fillColor);
+
+      if (x > 0) stack.push([x - 1, y]);
+      if (x < width - 1) stack.push([x + 1, y]);
+      if (y > 0) stack.push([x, y - 1]);
+      if (y < height - 1) stack.push([x, y + 1]);
     }
-    // Дополнительный проход для заполнения пропущенных пикселей
-    for (let y = 0; y < height; y++) {
-      for (let x = 0; x < width; x++) {
-        const index = y * width + x;
-        const pixelIndex = index * 4;
-        if (!colorMatch(data.slice(pixelIndex, pixelIndex + 4), fillColor, 0)) {
-          if (shouldFillPixel(x, y, data, width, height, fillColor)) {
-            data[pixelIndex] = fillColor[0];
-            data[pixelIndex + 1] = fillColor[1];
-            data[pixelIndex + 2] = fillColor[2];
-            data[pixelIndex + 3] = fillColor[3];
-          }
-        }
-      }
-    }
-    ctx.putImageData(imageData, 0, 0);
-    saveState();
   }
+
+  // Оптимизированный дополнительный проход
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const index = (y * width + x) * 4;
+      if (!colorMatch(data.slice(index, index + 4), fillColor, 0) && shouldFillPixel(x, y, data, width, height, fillColor)) {
+        setPixelColor(data, x, y, width, fillColor);
+      }
+    }
+  }
+
+  ctx.putImageData(imageData, 0, 0);
+  saveState();
+}
+
+function getPixelColor(data, x, y, width) {
+  const index = (y * width + x) * 4;
+  return data.slice(index, index + 4);
+}
+
+function setPixelColor(data, x, y, width, color) {
+  const index = (y * width + x) * 4;
+  data.set(color, index);
 }
 
 function isContourPixel(x, y, data, width, height, targetColor, tolerance) {
   const directions = [[-1, 0], [1, 0], [0, -1], [0, 1], [-1, -1], [-1, 1], [1, -1], [1, 1]];
-  const currentIndex = (y * width + x) * 4;
-  const currentColor = data.slice(currentIndex, currentIndex + 4);
-  if (colorMatch(currentColor, targetColor, tolerance)) {
-    return false;
-  }
-  for (const [dx, dy] of directions) {
+  const currentColor = getPixelColor(data, x, y, width);
+
+  if (colorMatch(currentColor, targetColor, tolerance)) return false;
+
+  return directions.some(([dx, dy]) => {
     const nx = x + dx;
     const ny = y + dy;
     if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
-      const neighborIndex = (ny * width + nx) * 4;
-      const neighborColor = data.slice(neighborIndex, neighborIndex + 4);
-      if (colorMatch(neighborColor, targetColor, tolerance)) {
-        return true;
-      }
+      const neighborColor = getPixelColor(data, nx, ny, width);
+      return colorMatch(neighborColor, targetColor, tolerance);
     }
-  }
-  return false;
+    return false;
+  });
 }
+
 function shouldFillPixel(x, y, data, width, height, fillColor) {
   const directions = [[-1, 0], [1, 0], [0, -1], [0, 1], [-1, -1], [-1, 1], [1, -1], [1, 1]];
   let filledNeighbors = 0;
+
   for (const [dx, dy] of directions) {
     const nx = x + dx;
     const ny = y + dy;
     if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
-      const neighborIndex = (ny * width + nx) * 4;
-      const neighborColor = data.slice(neighborIndex, neighborIndex + 4);
+      const neighborColor = getPixelColor(data, nx, ny, width);
       if (colorMatch(neighborColor, fillColor, 0)) {
         filledNeighbors++;
       }
     }
   }
-  return filledNeighbors >= 5; // Заполняем, если большинство соседей уже заполнены
+
+  return filledNeighbors >= 5;
 }
 
 function hexToRgba(hex) {
@@ -146,7 +152,7 @@ function hexToRgba(hex) {
   const b = parseInt(hex.slice(5, 7), 16);
   return [r, g, b, 255];
 }
-// Helper function to compare colors with tolerance
+
 function colorMatch(a, b, tolerance) {
   return Math.abs(a[0] - b[0]) <= tolerance &&
          Math.abs(a[1] - b[1]) <= tolerance &&

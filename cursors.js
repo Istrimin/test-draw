@@ -24,6 +24,7 @@ function loadCursors() {
         cursorPreview.title = cursor.name;
         cursorItem.appendChild(cursorPreview);
 
+// ! применяем курсор
         cursorItem.addEventListener('click', function() {
             document.getElementById('drawingCanvas').style.cursor = `url('cursors/${cursor.file}'), auto`;
             document.getElementById('cursorPanel').style.display = 'none';

@@ -11,6 +11,10 @@ const symmetryButton = document.getElementById('symmetry');
 const fillModeBtn = document.getElementById('fillModeBtn');
 const brushSizeValue = document.createElement('span');
 const opacityValue = document.createElement('span');
+const pressureBar = document.getElementById('pressureBar'); // Получаем элемент прогресс-бара
+
+
+
 
 brushSizeInput.parentNode.appendChild(brushSizeValue);
 opacityInput.parentNode.appendChild(opacityValue);
@@ -26,6 +30,15 @@ let redoHistory = [];
 let uploadedImage = null;
 let clearedCanvasState = null;
 let isFillMode = false;
+// Флаг для проверки поддержки pressure
+let isPressureSupported = false;
+
+// Проверка поддержки pressure
+try {
+  isPressureSupported = !!window.PointerEvent && 'pressure' in PointerEvent.prototype;
+} catch (e) {}
+
+
 
 ctx.fillStyle = '#' + Math.floor(Math.random() * 16777215).toString(16);
 ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -151,7 +164,23 @@ function draw(e) {
   const y = e.clientY - rect.top;
   const pressure = e.pressure || 1;
   
-  ctx.lineWidth = brushSizeInput.value * pressure;
+
+
+  const normalizedPressure = pressure; // No need to multiply, already 0-1
+
+const targetBrushSize = Math.round(
+    brushSizeInput.min + normalizedPressure * (brushSizeInput.max - brushSizeInput.min)
+  );
+
+const step = ctx.lineWidth < targetBrushSize ? 1 : -1;
+  ctx.lineWidth = Math.round(
+    ctx.lineWidth + step * (targetBrushSize - ctx.lineWidth) * 0.1
+  );
+// Обновляем прогресс-бар
+  if (isPressureSupported) {
+    pressureBar.value = pressure * 100; 
+  }
+  ctx.lineWidth = brushSizeInput.value * pressure*10;
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
   ctx.globalAlpha = opacityInput.value / 100;
@@ -230,3 +259,12 @@ document.addEventListener('keydown', (event) => {
     toggleBrushEyedropper();
   }
 });
+function toggleEyedropper() {
+    isEyedropperActive = !isEyedropperActive;
+    canvas.style.cursor = isEyedropperActive ? 'crosshair' : 'default';
+}
+
+function toggleBrushEyedropper() {
+    isBrushEyedropperActive = !isBrushEyedropperActive;
+    canvas.style.cursor = isBrushEyedropperActive ? 'crosshair' : 'default';
+}

@@ -71,6 +71,7 @@ input[type="range"]:hover {
     background-color: var(--button-active-color);
 }
 
+
 a[href="index.html"] { /* Targets the <a> element with href="index.html" */
   font-size: 100px; /* Sets font size to 20 pixels */
 
@@ -305,7 +306,7 @@ input[type="range"]::-moz-range-thumb {
   margin-bottom: 10px;
 }
 
-.pressure-bar {
+.pressureBar {
   height: 100%;
   background-color: #4CAF50;
   width: 0%;
