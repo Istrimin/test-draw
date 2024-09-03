@@ -275,6 +275,7 @@
 
     function createLayer() {
         layerCount++;
+
         const canvas = document.createElement('canvas');
         canvas.id = `layer${layerCount}`;
         canvas.width = 700;
@@ -302,32 +303,62 @@
         addEventListenersToLayer(canvas); 
         setCurrentLayer(layerCount);
         initializeLayer(layerCount);
+  button.textContent = layerCount - 1; 
 
         // Initialize history for the new layer
         history[layerCount] = [];
         redoHistory[layerCount] = [];
     }
-
+// что это делает?
 Object.values(layers).forEach(addEventListenersToLayer); 
 
-    function removeLayer() {
-        if (layerCount > 1) {
-            const canvas = layers[layerCount];
-            canvas.remove();
-            delete layers[layerCount];
-            delete contexts[layerCount];
 
-            const button = layerButtons.lastChild;
-            button.remove();
+function removeLayer() {
+    if (layerCount > 1) { 
+        // Remove canvas from display
+        const canvas = layers[currentLayer]; 
+        canvas.remove();
 
-            // Remove history for the deleted layer
-            delete history[layerCount];
-            delete redoHistory[layerCount];
+        // Remove from data structures
+        delete layers[currentLayer];
+        delete contexts[currentLayer];
 
-            layerCount--;
-            setCurrentLayer(layerCount);
+        // Remove button from layer panel
+        const buttonToRemove = document.querySelector(`.layer-button[data-layer="${currentLayer}"]`);
+        buttonToRemove.remove();
+
+        // Adjust layer count
+        layerCount--;
+
+        // If we deleted the last layer, switch to the new last one
+        if (currentLayer > layerCount) {
+            currentLayer = layerCount;
         }
+
+        // Update UI to reflect the active layer
+        setCurrentLayer(currentLayer); 
     }
+}
+
+
+    // function removeLayer() {
+    //     if (layerCount > 1) {
+    //         const canvas = layers[layerCount];
+    //         canvas.remove();
+    //         delete layers[layerCount];
+    //         delete contexts[layerCount];
+
+    //         const button = layerButtons.lastChild;
+    //         button.remove();
+
+    //         // Remove history for the deleted layer
+    //         delete history[layerCount];
+    //         delete redoHistory[layerCount];
+
+    //         layerCount--;
+    //         setCurrentLayer(layerCount);
+    //     }
+    // }
 
     function setCurrentLayer(layerNum) {
         currentLayer = layerNum;
@@ -487,6 +518,7 @@ Object.values(layers).forEach(addEventListenersToLayer);
 
     // Initialize the first layer
     createLayer();
+
     setDrawingColor(document.getElementById('colorPicker').value);
     resizeCanvas();
 
