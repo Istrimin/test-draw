@@ -41,13 +41,15 @@
             }
         });
 
-    // case 'KeyC': // Drawing color
-    //   // event.preventDefault();
-    //   document.getElementById('colorPicker3').click(); 
-    //   break;
+// кнопки
+// ... (Your existing JavaScript code) ...
 
-    //   break;
-// // Функция для установки цвета рисования
-// function setDrawingColor(color) {
-//   ctx1.strokeStyle = color; 
-// }
+// Get the undo and redo buttons by their IDs
+const undoButton = document.getElementById('undo');
+const redoButton = document.getElementById('redo');
+
+// Add event listeners for 'click' events
+undoButton.addEventListener('click', undo);
+redoButton.addEventListener('click', redo);
+
+// ... (Rest of your JavaScript code) ...

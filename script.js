@@ -19,16 +19,12 @@
         document.getElementById('eyedropperBtn').addEventListener('click', toggleEyedropper);
         document.getElementById('brushEyedropperBtn').addEventListener('click', toggleBrushEyedropper);
 
-        // Keyboard shortcut for brush eyedropper
-        // Helper function to convert RGB to HEX
         function rgbToHex(r, g, b) {
             if (r > 255 || g > 255 || b > 255)
                 throw "Invalid color component";
             return ((r << 16) | (g << 8) | b).toString(16);
         }
 
-const undoBtn = document.getElementById('undo');
-const redoBtn = document.getElementById('redo');
 const clearBtn = document.getElementById('clear');
 const saveImageBtn = document.getElementById('saveImageBtn');
 const imageInput = document.getElementById('imageInput');
@@ -64,8 +60,8 @@ UploadButton.addEventListener('click', () => imageInput.click());
 imageInput.addEventListener('change', handleImageUpload);
 symmetryButton.addEventListener('click', toggleSymmetry);
 saveImageBtn.addEventListener('click', downloadImage);
-undoBtn.addEventListener('click', undo);
-redoBtn.addEventListener('click', redo);
+// undoBtn.addEventListener('click', undo);
+// redoBtn.addEventListener('click', redo);
 clearBtn.addEventListener('click', clearCanvas);
 backgroundPicker.addEventListener('input', (event) => {
   layer1.style.backgroundColor = event.target.value;
@@ -124,26 +120,6 @@ function redrawCanvas() {
 function toggleSymmetry() {
   symmetry = !symmetry;
   symmetryButton.classList.toggle('active', symmetry);
-}
-
-function undo() {
-  if (history.length > 1) {
-    redoHistory.push(history.pop());
-    currentCtx.clearRect(0, 0, layer1.width, layer1.height);
-    if (history.length === 0 && clearedCanvasState) {
-      currentCtx.putImageData(clearedCanvasState, 0, 0);
-    } else {
-      redrawCanvas();
-    }
-  }
-}
-
-function redo() {
-  if (redoHistory.length > 0) {
-    history.push(redoHistory.pop());
-    currentCtx.clearRect(0, 0, layer1.width, layer1.height);
-    redrawCanvas();
-  }
 }
 
 

@@ -1,7 +1,10 @@
-version 0.0.271
+version 0.0.272
 
 
 
+
+version 0.0.272
+fixed save function
 
 version 0.0.271
 Добавил панель слоев(сами слои пока не работают, но они уже есть)
