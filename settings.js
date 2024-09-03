@@ -19,21 +19,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // !блокировка контекстного меню
 
-        document.addEventListener('contextmenu', event => event.preventDefault());
+        // document.addEventListener('contextmenu', event => event.preventDefault());
 
-        $(function () {
-            $("#message-container").resizable();
-        });
+        // $(function () {
+        //     $("#message-container").resizable();
+        // });
 
-        // function adjustFontSize() {
-        //     let fontSize = parseInt(window.getComputedStyle(messageElement).fontSize, 10);
-        //     while (messageElement.offsetWidth > containerElement.offsetWidth) {
-        //         fontSize--;
-        //         messageElement.style.fontSize = fontSize + 'px';
-        //     }
-        // }
-
-        // window.addEventListener('resize', adjustFontSize);
 
 
 });

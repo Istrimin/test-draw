@@ -31,6 +31,8 @@ setInterval(updateElapsedTime, 1000);
 
 // ! слово наверху канвас
 
+// ! слово наверху канвас
+
 async function fetchWords() {
     try {
         const response = await fetch('quizz.txt');
@@ -52,24 +54,25 @@ document.addEventListener('DOMContentLoaded', async function () {
     const nextWordButton = document.getElementById("nextWord");
 
     function updateWord() {
-        // Выбираем случайное слово из списка
-        const randomIndex = Math.floor(Math.random() * wordList.length);
-        wordElement.textContent = wordList[randomIndex];
+        wordElement.textContent = wordList[currentWordIndex];
     }
 
     previousWordButton.addEventListener("click", () => {
+        // Переходим к предыдущему слову, возвращаясь к концу списка при необходимости
         currentWordIndex = (currentWordIndex - 1 + wordList.length) % wordList.length;
         updateWord();
     });
 
     nextWordButton.addEventListener("click", () => {
+        // Переходим к следующему слову, возвращаясь к началу списка при необходимости
         currentWordIndex = (currentWordIndex + 1) % wordList.length;
         updateWord();
     });
 
+    // Отображаем первое слово при загрузке страницы
     updateWord();
-
 });
+
 
 
 // !

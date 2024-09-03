@@ -1,6 +1,32 @@
-const backgroundPicker = document.getElementById('backgroundPicker');
-const brushSizeInput = document.getElementById('brushSize');
-const opacityInput = document.getElementById('opacity');
+    // Initialize canvases and contexts
+
+
+        // Eyedropper functionality
+        let isBrushEyedropperActive = false;
+
+        function toggleEyedropper() {
+            isEyedropperActive = !isEyedropperActive;
+            isBrushEyedropperActive = false;
+            document.body.style.cursor = isEyedropperActive ? 'url(cursors/pipette.png), auto' : 'default';
+        }
+
+        function toggleBrushEyedropper() {
+            isBrushEyedropperActive = !isBrushEyedropperActive;
+            isEyedropperActive = false;
+            document.body.style.cursor = isBrushEyedropperActive ? 'url(cursors/pipette.png), auto' : 'default';
+        }
+
+        document.getElementById('eyedropperBtn').addEventListener('click', toggleEyedropper);
+        document.getElementById('brushEyedropperBtn').addEventListener('click', toggleBrushEyedropper);
+
+        // Keyboard shortcut for brush eyedropper
+        // Helper function to convert RGB to HEX
+        function rgbToHex(r, g, b) {
+            if (r > 255 || g > 255 || b > 255)
+                throw "Invalid color component";
+            return ((r << 16) | (g << 8) | b).toString(16);
+        }
+
 const undoBtn = document.getElementById('undo');
 const redoBtn = document.getElementById('redo');
 const clearBtn = document.getElementById('clear');
@@ -9,44 +35,31 @@ const imageInput = document.getElementById('imageInput');
 const UploadButton = document.getElementById('UploadButton');
 const symmetryButton = document.getElementById('symmetry');
 const fillModeBtn = document.getElementById('fillModeBtn');
+
+// Create and append value displays
 const brushSizeValue = document.createElement('span');
 const opacityValue = document.createElement('span');
-const pressureBar = document.getElementById('pressureBar'); // Получаем элемент прогресс-бара
-
-
-
-
 brushSizeInput.parentNode.appendChild(brushSizeValue);
 opacityInput.parentNode.appendChild(opacityValue);
 brushSizeValue.classList.add('input-value');
 opacityValue.classList.add('input-value');
 
-let symmetry = true;
-let isDrawing = false;
-let lastX = 0;
-let lastY = 0;
-let history = [];
-let redoHistory = [];
+
 let uploadedImage = null;
 let clearedCanvasState = null;
 let isFillMode = false;
-// Флаг для проверки поддержки pressure
-let isPressureSupported = false;
 
-// Проверка поддержки pressure
+// Check for pressure support
 try {
   isPressureSupported = !!window.PointerEvent && 'pressure' in PointerEvent.prototype;
 } catch (e) {}
 
 
-
-ctx.fillStyle = '#' + Math.floor(Math.random() * 16777215).toString(16);
-ctx.fillRect(0, 0, canvas.width, canvas.height);
-
 brushSizeInput.value = 3;
 brushSizeValue.textContent = brushSizeInput.value;
 opacityValue.textContent = opacityInput.value;
 
+// Event listeners
 UploadButton.addEventListener('click', () => imageInput.click());
 imageInput.addEventListener('change', handleImageUpload);
 symmetryButton.addEventListener('click', toggleSymmetry);
@@ -54,198 +67,96 @@ saveImageBtn.addEventListener('click', downloadImage);
 undoBtn.addEventListener('click', undo);
 redoBtn.addEventListener('click', redo);
 clearBtn.addEventListener('click', clearCanvas);
-
 backgroundPicker.addEventListener('input', (event) => {
-    canvas.style.backgroundColor = event.target.value;
-    redrawCanvas();
+  layer1.style.backgroundColor = event.target.value;
+  redrawCanvas();
 });
-
 brushSizeInput.addEventListener('input', () => {
   brushSizeValue.textContent = brushSizeInput.value;
 });
-
 opacityInput.addEventListener('input', () => {
   opacityValue.textContent = opacityInput.value;
-  ctx.globalAlpha = opacityInput.value / 100;
+  currentCtx.globalAlpha = opacityInput.value / 100;
 });
 
+// Layer switching
+document.querySelectorAll('.layer-button').forEach(button => {
+  button.addEventListener('click', function() {
+    // Remove active class from previously active layer
+    document.querySelector('.active-layer').classList.remove('active-layer');
+    // Add active class to the clicked layer
+    this.classList.add('active-layer');
+
+    // Update currentLayer and currentCtx
+    currentLayer = parseInt(this.dataset.layer);
+    currentCtx = window['ctx' + currentLayer];
+
+    // Ensure no drawing is happening when switching layers
+    isDrawing = false; 
+  });
+});
+
+// Functions
 function handleImageUpload(event) {
   const file = event.target.files[0];
   const reader = new FileReader();
   reader.onload = (e) => {
     uploadedImage = new Image();
     uploadedImage.onload = () => {
-      ctx.drawImage(uploadedImage, 0, 0, canvas.width, canvas.height);
+      currentCtx.drawImage(uploadedImage, 0, 0, layer1.width, layer1.height);
     };
     uploadedImage.src = e.target.result;
   };
   reader.readAsDataURL(file);
 }
 
-function resizeCanvas() {
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * devicePixelRatio;
-    canvas.height = rect.height * devicePixelRatio;
-    ctx.scale(devicePixelRatio, devicePixelRatio);
-}
-
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
 
 function redrawCanvas() {
-    ctx.fillStyle = backgroundPicker.value;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    if (uploadedImage) {
-      ctx.drawImage(uploadedImage, 0, 0, canvas.width, canvas.height);
-    }
-    history.forEach(imageData => ctx.putImageData(imageData, 0, 0));
+  currentCtx.fillStyle = backgroundPicker.value;
+  currentCtx.fillRect(0, 0, layer1.width, layer1.height);
+  if (uploadedImage) {
+    currentCtx.drawImage(uploadedImage, 0, 0, layer1.width, layer1.height);
+  }
+  history.forEach(imageData => currentCtx.putImageData(imageData, 0, 0));
 }
 
-function clearCanvas() {
-    clearedCanvasState = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = backgroundPicker.value;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    history.push(clearedCanvasState);
-    redoHistory = [];
-}
 
 function toggleSymmetry() {
-    symmetry = !symmetry;
-    symmetryButton.classList.toggle('active', symmetry);
+  symmetry = !symmetry;
+  symmetryButton.classList.toggle('active', symmetry);
 }
 
 function undo() {
-    if (history.length > 1) {
-        redoHistory.push(history.pop());
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        if (history.length === 0 && clearedCanvasState) {
-            ctx.putImageData(clearedCanvasState, 0, 0);
-        } else {
-            redrawCanvas();
-        }
+  if (history.length > 1) {
+    redoHistory.push(history.pop());
+    currentCtx.clearRect(0, 0, layer1.width, layer1.height);
+    if (history.length === 0 && clearedCanvasState) {
+      currentCtx.putImageData(clearedCanvasState, 0, 0);
+    } else {
+      redrawCanvas();
     }
+  }
 }
 
 function redo() {
-    if (redoHistory.length > 0) {
-        history.push(redoHistory.pop());
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        redrawCanvas();
-    }
+  if (redoHistory.length > 0) {
+    history.push(redoHistory.pop());
+    currentCtx.clearRect(0, 0, layer1.width, layer1.height);
+    redrawCanvas();
+  }
 }
 
-function saveState() {
-    history.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
-    redoHistory = [];
-}
 
 function downloadImage() {
   const link = document.createElement('a');
   link.download = 'my-drawing.png';
-  link.href = canvas.toDataURL('image/png');
+  link.href = layer1.toDataURL('image/png'); // Assuming you want to download layer 1
   link.click();
 }
 
-canvas.addEventListener('pointerdown', startDrawing);
-canvas.addEventListener('pointermove', draw);
-canvas.addEventListener('pointerup', stopDrawing);
-canvas.addEventListener('pointerout', stopDrawing);
-canvas.addEventListener('pointercancel', stopDrawing);
+// Drawing functions
 
-function startDrawing(e) {
-    isDrawing = true;
-    [lastX, lastY] = [e.offsetX, e.offsetY];
-}
-function draw(e) {
-  if (!isDrawing) return;
-  e.preventDefault();
-  const rect = canvas.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
-  const pressure = e.pressure || 1;
-  
-
-
-  const normalizedPressure = pressure; // No need to multiply, already 0-1
-
-const targetBrushSize = Math.round(
-    brushSizeInput.min + normalizedPressure * (brushSizeInput.max - brushSizeInput.min)
-  );
-
-const step = ctx.lineWidth < targetBrushSize ? 1 : -1;
-  ctx.lineWidth = Math.round(
-    ctx.lineWidth + step * (targetBrushSize - ctx.lineWidth) * 0.1
-  );
-// Обновляем прогресс-бар
-  if (isPressureSupported) {
-    pressureBar.value = pressure * 100; 
-  }
-  ctx.lineWidth = brushSizeInput.value * pressure*10;
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
-  ctx.globalAlpha = opacityInput.value / 100;
-
-  // Рисуем основную линию
-  ctx.beginPath();
-  ctx.moveTo(lastX, lastY);
-  ctx.lineTo(x, y);
-  ctx.stroke();
-
-  if (symmetry) {
-    // Рисуем симметричную линию
-    const centerX = canvas.width / 2;
-    const symmetricLastX = centerX + (centerX - lastX);
-    const symmetricX = centerX + (centerX - x);
-    
-    ctx.beginPath();
-    ctx.moveTo(symmetricLastX, lastY);
-    ctx.lineTo(symmetricX, y);
-    ctx.stroke();
-  }
-
-  [lastX, lastY] = [x, y];
-}
-
-function stopDrawing() {
-    if (isDrawing) {
-        isDrawing = false;
-        saveState();
-    }
-}
-
-function rgbToHex(r, g, b) {
-    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-}
-
-const exitLink = document.getElementById('exitLink');
-const doorSound = new Howl({
-  src: ['sounds/door-close.wav']
-});
-
-exitLink.addEventListener('click', () => {
-  doorSound.play();
-  doorSound.once('end', () => {
-    window.location.href = 'index.html';
-  });
-});
-
-const colorPickers = document.querySelectorAll('input[type="color"]');
-let isEyedropperActive = false;
-let isBrushEyedropperActive = false;  
-
-function setDrawingColor(color) {
-    ctx.strokeStyle = color;
-}
-
-function setFillColor(color) {
-}
-
-colorPickers.forEach(picker => {
-    picker.addEventListener('input', (event) => {
-        setDrawingColor(event.target.value);
-    });
-});
-
+// Keyboard shortcuts
 document.addEventListener('keydown', (event) => {
   if (event.code >= 'Digit1' && event.code <= 'Digit9') {
     const index = parseInt(event.code.replace('Digit', '')) - 1;
@@ -259,12 +170,28 @@ document.addEventListener('keydown', (event) => {
     toggleBrushEyedropper();
   }
 });
+
+// Eyedropper functions
 function toggleEyedropper() {
-    isEyedropperActive = !isEyedropperActive;
-    canvas.style.cursor = isEyedropperActive ? 'crosshair' : 'default';
+  isEyedropperActive = !isEyedropperActive;
+  document.body.style.cursor = isEyedropperActive ? 'url(cursors/pipette.png), auto' : 'default';
 }
 
 function toggleBrushEyedropper() {
-    isBrushEyedropperActive = !isBrushEyedropperActive;
-    canvas.style.cursor = isBrushEyedropperActive ? 'crosshair' : 'default';
+  isBrushEyedropperActive = !isBrushEyedropperActive;
+  document.body.style.cursor = isBrushEyedropperActive ? 'url(cursors/pipette.png), auto' : 'default';
 }
+
+// Exit functionality
+const exitLink = document.getElementById('exitLink');
+const doorSound = new Howl({
+  src: ['sounds/door-close.wav']
+});
+
+exitLink.addEventListener('click', () => {
+  doorSound.play();
+  doorSound.once('end', () => {
+    window.location.href = 'index.html';
+  });
+});
+

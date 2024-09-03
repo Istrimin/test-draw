@@ -11,21 +11,31 @@ body {
     min-height: 100vh;
     display: flex;
     align-items: flex-start;
-}
-body {
-  user-select: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
+
+/* отключаем прокрутку на странице */
+    overscroll-behavior-x: none;
+    overflow-x: hidden;
+
+
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+/* added     */
+    overflow: hidden; 
 }
 
-.drawingCursor {
-    cursor: url('../cursors/pencil.png'), auto;
+canvas {
+    border-radius: 20px;
 }
+/* canvas {
+    pointer-events: auto;
+} */
 
-.eraserCursor {
-    cursor: url('../cursors/eraser.png'), auto;
-}
+
+/*  */
 .pipetteCursor{
 cursor: url('../cursors/pipette.png'),auto;
 }
@@ -47,9 +57,11 @@ button:hover,
 .custom-file-upload:hover,
 input[type="color"]:hover,
 input[type="range"]:hover {
-    cursor: none;
+
+cursor: url('/cursors/pipette32.png'), auto; 
+
     color: rgb(0, 255, 13);
-    font-size: 40px;
+    font-size: xx-large; 
 }
 
 
@@ -93,11 +105,6 @@ a {
     flex-direction: row;
     align-items: center;
 }
-/* .color-picker-group{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-} */
 
 .tools {
     color: var(--button-text-color);
@@ -125,20 +132,13 @@ a {
     align-items: center;
 }
 
-canvas {
-    border-radius: 20px;
-}
-.canvas-and-sliders {
-    flex-direction: column;
-    /* width: 100%; */
-}
 
 
 @import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
 
 #Quizz {
   font-family: 'Lobster', cursive; 
-  font-size: 24px;
+  font-size: 5px;
   font-weight: bold;
 }
 
@@ -172,11 +172,6 @@ canvas {
     cursor: pointer;
 }
 
-.color-picker {
-    /* display: flex; */
-    background-color: gold;
-    margin-bottom: 10px;
-}
 
 .tools input,
 .tools button {
@@ -280,9 +275,9 @@ input[type="range"]::-moz-range-thumb {
     color:bisque;
     border-radius: 2.5px;
 }
-
+/* вид скролбара(не ползунка а поля) */
 .input-value {
-    color: red;
+    color: transparent;
 }
 
 
@@ -299,20 +294,6 @@ input[type="range"]::-moz-range-thumb {
 
 
 
-.pressure-indicator {
-  width: 400px;
-  height: 20px;
-  border-radius: 10px;
-  margin-bottom: 10px;
-}
-
-.pressureBar {
-  height: 100%;
-  background-color: #4CAF50;
-  width: 0%;
-  border-radius: 5px;
-  transition: width 0.1s ease;
-}
 
 
 
@@ -376,34 +357,22 @@ input[type="range"]::-moz-range-thumb {
 
 
 
-
-
-
-
-/* #canvas {
-  cursor: url('cursors/pipette.png'), auto;
-}  */
-
-
-
-
-
-/* 
-Стили для кнопок пипеток
-#eyedropperBtn, 
-#brushEyedropperBtn {
-  background-color: transparent;
-  border: none;
-  padding: 5px;
-  cursor: pointer;
+.pressure-indicator {
+  width: 400px;
+  height: 20px;
+  border-radius: 10px;
+  margin-bottom: 10px;
 }
 
-#eyedropperBtn:hover,
-#brushEyedropperBtn:hover {
-  background-color: lightgray;
+.pressureBar {
+  height: 100%;
+  background-color: #4CAF50;
+  width: 0%;
+  border-radius: 5px;
+  transition: width 0.1s ease;
 }
 
-#eyedropperBtn.active,
-#brushEyedropperBtn.active {
-  background-color: #ccc;
-} */
+.header-container{
+
+size: 300px;
+font-size: xx-large;}

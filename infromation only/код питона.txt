@@ -37,7 +37,7 @@ asyncio.ensure_future(update_time())
             </script>
         </div>
         <div class="column-container"> <div class="image-column"></div>
-            <img src="images/dream.jpg" width="200" alt="Рисуйка">
+            <img src="images/dream3.png" width="200" alt="Рисуйка">
 
         </div>
 
