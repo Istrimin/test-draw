@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,46 +19,56 @@
             z-index: 10;
         }
 
-
         .active-layer {
             /* background-color: #ddd; */
             color: #a6ff00;
         }
-.canv-container {
-    position: relative; /* To contain absolutely positioned children */
-    width: 700px; /* Width of the canvas */
-    height: 500px; /* Height of the canvas */
-}
 
-.canv-container canvas {
-    position: absolute; /* Position each canvas absolutely */
-    top: 0; /* Align all canvases to the top */
-    left: 0; /* Align all canvases to the left */
-    z-index: 1; /* Default z-index */
-}
-/* #layer1 { z-index: 1; }
+        .canv-container {
+            position: relative;
+            /* To contain absolutely positioned children */
+            width: 700px;
+            /* Width of the canvas */
+            height: 500px;
+            /* Height of the canvas */
+        }
+
+        .canv-container canvas {
+            position: absolute;
+            /* Position each canvas absolutely */
+            top: 0;
+            /* Align all canvases to the top */
+            left: 0;
+            /* Align all canvases to the left */
+            z-index: 1;
+            /* Default z-index */
+        }
+
+        /* #layer1 { z-index: 1; }
 #layer2 { z-index: 2; }
 #layer3 { z-index: 3; } */
+        /* added new */
+        .canvas-and-sliders {
+            display: flex;
+            /* Flexbox to arrange layer panel and canvases side by side */
+        }
 
-/* added new */
+        .layer-panel {
+            /* display: flex;
+            flex-direction: column; */
+            /* This line makes the items stack vertically */
+            gap: 5px;
+            font-size: 5px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
 
-.canvas-and-sliders {
-    display: flex; /* Flexbox to arrange layer panel and canvases side by side */
-}
+        .layer-controls {
+            display: flex;
+            flex-direction: column;
+            font-size: 5px;
+        }
 
-.layer-panel {
-    display: flex;
-    flex-direction: column; /* This line makes the items stack vertically */
-    gap: 5px;
-    font-size: 5px;
-    max-height: 600px;
-    overflow-y: auto;
-}
-.layer-controls{
-    display: flex;
-    flex-direction: column; 
-    font-size: 5px;
-}
         .layer-button {
             cursor: pointer;
             font-size: 5px;
@@ -65,77 +76,90 @@
             flex-direction: column;
         }
 
-
         .layerButtons {
             display: flex;
             flex-direction: column;
             padding: 5px;
             cursor: pointer;
         }
-.layer-button:hover {
-    background-color: rgb(255, 0, 0); 
-    font-size: 5px;
-}
 
+        .layer-button:hover {
+            background-color: rgb(255, 0, 0);
+            font-size: 5px;
+        }
 
-.color-picker-group {
-    display: flex; /* Горизонтальное выравнивание для элементов */
-    gap: 5px; /* Пространство между элементами */
-}
-/* add tema */
-    .color-picker-group input[type="color"] {
-        appearance: none; /* Убирает стандартный вид input */
-        -webkit-appearance: none; /* Убирает стандартный вид input в Safari */
-        border: none; /* Убираем рамку */
-        width: 10px; /* Ширина круга */
-        height: 10px; /* Высота круга */
-        border-radius: 50%; /* Делаем круглый */
-        padding: 0;
-        cursor: pointer;
-        overflow: hidden; /* Убираем любые выходящие части */
-    }
+        .color-picker-group {
+            display: flex;
+            /* Горизонтальное выравнивание для элементов */
+            gap: 5px;
+            /* Пространство между элементами */
+        }
 
-    .color-picker-group input[type="color"]::-webkit-color-swatch-wrapper {
-        padding: 0; /* Убирает внутренний отступ */
-    }
+        /* add tema */
+        .color-picker-group input[type="color"] {
+            appearance: none;
+            /* Убирает стандартный вид input */
+            -webkit-appearance: none;
+            /* Убирает стандартный вид input в Safari */
+            border: none;
+            /* Убираем рамку */
+            width: 10px;
+            /* Ширина круга */
+            height: 10px;
+            /* Высота круга */
+            border-radius: 50%;
+            /* Делаем круглый */
+            padding: 0;
+            cursor: pointer;
+            overflow: hidden;
+            /* Убираем любые выходящие части */
+        }
 
-    .color-picker-group input[type="color"]::-webkit-color-swatch {
-        border: none; /* Убирает рамку */
-        border-radius: 50%; /* Круглая форма */
-    }
+        .color-picker-group input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+            /* Убирает внутренний отступ */
+        }
 
+        .color-picker-group input[type="color"]::-webkit-color-swatch {
+            border: none;
+            /* Убирает рамку */
+            border-radius: 50%;
+            /* Круглая форма */
+        }
 
-.color-picker-and-word {
-    display: flex; 
-    align-items: center; 
-    margin-bottom: 0;
-    /* gap: 100px;  */
-}
+        .color-picker-and-word {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0;
+            /* gap: 100px;  */
+        }
 
+        .color-picker-and-word {
+            display: flex;
+            align-items: center;
+            /* Add this line */
+            margin-bottom: 0;
+            /* gap: 100px;  */
+        }
 
+        .word-navigation {
+            margin: 0;
+            /* Убираем стандартные отступы */
+            cursor: pointer;
+        }
 
-.color-picker-and-word {
-    display: flex; 
-    align-items: center; /* Add this line */
-    margin-bottom: 0;
-    /* gap: 100px;  */
-}
-.word-navigation {
-    margin: 0; /* Убираем стандартные отступы */
-
-    cursor: pointer;
-}
-
-.time-wrapper {
-  display: flex; /* Используем flexbox для выравнивания в строку */
-  align-items: center; /* Выравниваем элементы по вертикали */
-  gap: 10px; /* Добавляем отступ между элементами времени */
-}
-
+        .time-wrapper {
+            display: flex;
+            /* Используем flexbox для выравнивания в строку */
+            align-items: center;
+            /* Выравниваем элементы по вертикали */
+            gap: 10px;
+            /* Добавляем отступ между элементами времени */
+        }
     </style>
 </head>
-<body>
 
+<body>
     <div class="base-container">
         <div class="sidebar">
             <a href="index.html" target="_self" title="Выйти из команты" id="exitLink">🚪</a>
@@ -161,448 +185,444 @@
             </div>
             <button id="settings" title="Настройки">⚙️</button>
         </div>
-    <div class="canvas-and-sliders">
-        <div class="layer-panel">
-            <div class="layer-controls">
-                <button id="addLayerBtn">+</button>
-                <button id="removeLayerBtn">-</button>
-            </div>
-            <div id="layerButtons"></div>
-        </div>
-        <div class="canvas-container">
-<div class="color-picker-and-word">
-
-    <div class="color-picker-group">
-        <input type="color" id="colorPicker" value="#000000" title="Цвет заливки (C)">
-        <input type="color" id="backgroundPicker" value="#eeaaff" title="Цвет фона (B)">
-        <input type="color" id="colorPicker3" value="#ff0000" title="Цвет кисти 3">  
-        <input type="color" id="colorPicker4" value="#ffa500" title="Цвет кисти 4">
-        <input type="color" id="colorPicker5" value="#ffff00" title="Цвет кисти 5">    
-        <input type="color" id="colorPicker6" value="#008000" title="Цвет кисти 6">
-        <input type="color" id="colorPicker7" value="#00ffff" title="Цвет кисти 7">
-        <input type="color" id="colorPicker8" value="#0000ff" title="Цвет кисти 8">
-        <input type="color" id="colorPicker9" value="#800080" title="Цвет кисти 9">
-    </div>
-    <div class="word-navigation">
-        <button id="previousWord" title="Предыдущее слово">&lt;</button>
-        <p id="Quizz"></p>
-        <button id="nextWord" title="Следующее слово">&gt;</button>
-    </div>
-<div class="header-container">
-  <div class="time-wrapper"> 
-    <span id="time" class="time"></span>
-    <span id="startTime" class="time"></span>
-    <span id="elapsedTime" class="time"></span>
-  </div>
-</div>
-
-</div>
-
-            <div class="canv-container" id="canvasContainer">
-</div>
-            <div class="slider-group">
-                <div class="tools-column">
-                    <label for="opacity" title="Прозрачность">👻</label>
-                    <input type="range" id="opacity" min="1" max="100" value="100">
+        <div class="canvas-and-sliders">
+            <div class="layer-panel">
+                <div class="layer-controls">
+                    <button id="addLayerBtn">+</button>
+                    <button id="removeLayerBtn">-</button>
                 </div>
-                <div class="tools-column">
-                    <progress id="pressureBar" value="0" max="100"></progress>
-                    <label for="brushSize" title="Размер кисти">🖌️</label>
-                    <input type="range" id="brushSize" min="1" max="100" value="1">
+                <div id="layerButtons"></div>
+            </div>
+            <div class="canvas-container">
+
+                <div class="color-picker-and-word">
+                    <div class="color-picker-group">
+                        <input type="color" id="colorPicker" value="#000000" title="Цвет заливки (C)">
+                        <input type="color" id="backgroundPicker" value="#eeaaff" title="Цвет фона (B)">
+                        <input type="color" id="colorPicker3" value="#ff0000" title="Цвет кисти 3">
+                        <input type="color" id="colorPicker4" value="#ffa500" title="Цвет кисти 4">
+                        <input type="color" id="colorPicker5" value="#ffff00" title="Цвет кисти 5">
+                        <input type="color" id="colorPicker6" value="#008000" title="Цвет кисти 6">
+                        <input type="color" id="colorPicker7" value="#00ffff" title="Цвет кисти 7">
+                        <input type="color" id="colorPicker8" value="#0000ff" title="Цвет кисти 8">
+                        <input type="color" id="colorPicker9" value="#800080" title="Цвет кисти 9">
+                    </div>
+                    <div class="word-navigation">
+                        <button id="previousWord" title="Предыдущее слово">&lt;</button>
+                        <p id="Quizz"></p>
+                        <button id="nextWord" title="Следующее слово">&gt;</button>
+                    </div>
+                    <div class="header-container">
+                        <div class="time-wrapper">
+                            <span id="time" class="time"></span>
+                            <span id="startTime" class="time"></span>
+                            <span id="elapsedTime" class="time"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="canv-container" id="canvasContainer">
+                </div>
+                <div class="slider-group">
+                    <div class="tools-column">
+                        <label for="opacity" title="Прозрачность">👻</label>
+                        <input type="range" id="opacity" min="1" max="100" value="100">
+                    </div>
+                    <div class="tools-column">
+                        <progress id="pressureBar" value="0" max="100"></progress>
+                        <label for="brushSize" title="Размер кисти">🖌️</label>
+                        <input type="range" id="brushSize" min="1" max="100" value="1">
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
-            </div>
-        </div>
     </div>
-
+    </div>
     <script>
-    // Disable the default context menu for the entire document
-    document.addEventListener('contextmenu', event => event.preventDefault());
+        // Disable the default context menu for the entire document
+        document.addEventListener('contextmenu', event => event.preventDefault());
 
-    // Initialize layers and contexts
-    const layers = {};
-    const contexts = {};
-    let currentLayer = 1;
-    let currentCtx;
-    let layerCount = 0;
+        // Initialize layers and contexts
+        const layers = {};
+        const contexts = {};
+        let currentLayer = 1;
+        let currentCtx;
+        let layerCount = 0;
 
-    // Initialize other variables
-    let isEyedropperActive = false;
-    let isDrawing = false;
-    let lastX = 0;
-    let lastY = 0;
-    let symmetry = false;
+        // Initialize other variables
+        let isEyedropperActive = false;
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+        let symmetry = false;
 
-    // Get DOM elements
-    const brushSizeInput = document.getElementById('brushSize');
-    const opacityInput = document.getElementById('opacity');
-    const pressureBar = document.getElementById('pressureBar');
-    const backgroundPicker = document.getElementById('backgroundPicker');
-    const canvasContainer = document.getElementById('canvasContainer');
-    const layerButtons = document.getElementById('layerButtons');
-    const addLayerBtn = document.getElementById('addLayerBtn');
-    const removeLayerBtn = document.getElementById('removeLayerBtn');
+        // Get DOM elements
+        const brushSizeInput = document.getElementById('brushSize');
+        const opacityInput = document.getElementById('opacity');
+        const pressureBar = document.getElementById('pressureBar');
+        const backgroundPicker = document.getElementById('backgroundPicker');
+        const canvasContainer = document.getElementById('canvasContainer');
+        const layerButtons = document.getElementById('layerButtons');
+        const addLayerBtn = document.getElementById('addLayerBtn');
+        const removeLayerBtn = document.getElementById('removeLayerBtn');
 
-    // Initialize pressure-supported state
-    const isPressureSupported = 'onpointermove' in window;
+        // Initialize pressure-supported state
+        const isPressureSupported = 'onpointermove' in window;
 
-    // History management
-    let history = [];
-    let redoHistory = [];
-function createLayer() {
-    layerCount++;
-    const canvas = document.createElement('canvas');
-    canvas.id = `layer${layerCount}`;
-    canvas.width = 700;
-    canvas.height = 500;
-    canvas.style.position = 'absolute';
-    canvas.style.top = '0';
-    canvas.style.left = '0';
-    canvas.style.zIndex = layerCount;
-    canvasContainer.appendChild(canvas);
+        // History management
+        let history = [];
+        let redoHistory = [];
+        function createLayer() {
+            layerCount++;
+            const canvas = document.createElement('canvas');
+            canvas.id = `layer${layerCount}`;
+            canvas.width = 700;
+            canvas.height = 500;
+            canvas.style.position = 'absolute';
+            canvas.style.top = '0';
+            canvas.style.left = '0';
+            canvas.style.zIndex = layerCount;
+            canvasContainer.appendChild(canvas);
 
-    layers[layerCount] = canvas;
-    contexts[layerCount] = canvas.getContext('2d');
+            layers[layerCount] = canvas;
+            contexts[layerCount] = canvas.getContext('2d');
 
-    const button = document.createElement('button');
-    button.textContent = layerCount;
-    button.classList.add('layer-button');
-    button.dataset.layer = layerCount;
-    layerButtons.appendChild(button);
+            const button = document.createElement('button');
+            button.textContent = layerCount;
+            button.classList.add('layer-button');
+            button.dataset.layer = layerCount;
+            layerButtons.appendChild(button);
 
-    button.addEventListener('click', function() {
-        setCurrentLayer(parseInt(this.dataset.layer));
-    });
+            button.addEventListener('click', function () {
+                setCurrentLayer(parseInt(this.dataset.layer));
+            });
 
-    addEventListenersToLayer(canvas);  // Добавляем слушатели событий к новому слою
-    setCurrentLayer(layerCount);
-    initializeLayer(layerCount);
-}
-
-    function removeLayer() {
-        if (layerCount > 1) {
-            const canvas = layers[layerCount];
-            canvas.remove();
-            delete layers[layerCount];
-            delete contexts[layerCount];
-
-            const button = layerButtons.lastChild;
-            button.remove();
-
-            layerCount--;
+            addEventListenersToLayer(canvas);  // Добавляем слушатели событий к новому слою
             setCurrentLayer(layerCount);
+            initializeLayer(layerCount);
         }
-    }
 
-    function setCurrentLayer(layerNum) {
-        currentLayer = layerNum;
-        currentCtx = contexts[currentLayer];
-        document.querySelectorAll('.layer-button').forEach(btn => {
-            btn.classList.remove('active-layer');
-            if (parseInt(btn.dataset.layer) === currentLayer) {
-                btn.classList.add('active-layer');
+        function removeLayer() {
+            if (layerCount > 1) {
+                const canvas = layers[layerCount];
+                canvas.remove();
+                delete layers[layerCount];
+                delete contexts[layerCount];
+
+                const button = layerButtons.lastChild;
+                button.remove();
+
+                layerCount--;
+                setCurrentLayer(layerCount);
+            }
+        }
+
+        function setCurrentLayer(layerNum) {
+            currentLayer = layerNum;
+            currentCtx = contexts[currentLayer];
+            document.querySelectorAll('.layer-button').forEach(btn => {
+                btn.classList.remove('active-layer');
+                if (parseInt(btn.dataset.layer) === currentLayer) {
+                    btn.classList.add('active-layer');
+                }
+            });
+            console.log('Switched to layer:', currentLayer, 'Context:', currentCtx);
+        }
+
+        function initializeLayer(layerNum) {
+            if (layerNum === 1) {
+                contexts[layerNum].fillStyle = '#' + Math.floor(Math.random() * 16777215).toString(16);
+            } else {
+                contexts[layerNum].fillStyle = 'rgba(0,0,0,0)'; // Transparent
+            }
+            contexts[layerNum].fillRect(0, 0, layers[layerNum].width, layers[layerNum].height);
+        }
+
+        function clearCanvas() {
+            if (!currentCtx) return;
+            let clearedCanvasState = currentCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height);
+            currentCtx.fillStyle = backgroundPicker.value;
+            currentCtx.fillRect(0, 0, layers[currentLayer].width, layers[currentLayer].height);
+            history.push(clearedCanvasState);
+            redoHistory = [];
+        }
+
+        function saveState() {
+            if (!currentCtx) {
+                console.error('Error: currentCtx is undefined in saveState. Current layer:', currentLayer);
+                return;
+            }
+            history.push(currentCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height));
+            redoHistory = [];
+            console.log('State saved for layer:', currentLayer);
+        }
+
+        function startDrawing(e) {
+            if (!currentCtx) {
+                console.error('Error: currentCtx is undefined in startDrawing. Current layer:', currentLayer);
+                return;
+            }
+            isDrawing = true;
+            const rect = layers[currentLayer].getBoundingClientRect();
+            [lastX, lastY] = [e.clientX - rect.left, e.clientY - rect.top];
+        }
+
+        function draw(e) {
+            if (!isDrawing || !currentCtx) {
+                if (!currentCtx) {
+                    console.error('Error: currentCtx is undefined in draw. Current layer:', currentLayer);
+                }
+                return;
+            }
+
+            e.preventDefault();
+            const rect = layers[currentLayer].getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const pressure = e.pressure || 1;
+
+            currentCtx.lineWidth = brushSizeInput.value * pressure;
+            currentCtx.lineCap = 'round';
+            currentCtx.lineJoin = 'round';
+            currentCtx.globalAlpha = opacityInput.value / 100;
+
+            currentCtx.beginPath();
+            currentCtx.moveTo(lastX, lastY);
+            currentCtx.lineTo(x, y);
+            currentCtx.stroke();
+
+            if (symmetry) {
+                const centerX = layers[currentLayer].width / 2;
+                const symmetricLastX = centerX + (centerX - lastX);
+                const symmetricX = centerX + (centerX - x);
+                currentCtx.beginPath();
+                currentCtx.moveTo(symmetricLastX, lastY);
+                currentCtx.lineTo(symmetricX, y);
+                currentCtx.stroke();
+            }
+
+            [lastX, lastY] = [x, y];
+
+            if (isPressureSupported) {
+                pressureBar.value = pressure * 100;
+            }
+        }
+
+        function stopDrawing() {
+            if (isDrawing) {
+                isDrawing = false;
+                saveState();
+            }
+        }
+
+        function setDrawingColor(color) {
+            if (currentCtx) {
+                currentCtx.strokeStyle = color;
+            }
+        }
+
+        // Event Listeners
+        addLayerBtn.addEventListener('click', createLayer);
+        removeLayerBtn.addEventListener('click', removeLayer);
+
+        const eyedropperBtn = document.getElementById('eyedropperBtn');
+        eyedropperBtn.addEventListener('click', () => {
+            isEyedropperActive = !isEyedropperActive;
+            if (isEyedropperActive) {
+                layers[currentLayer].classList.add('pipetteCursor');
+            } else {
+                layers[currentLayer].classList.remove('pipetteCursor');
             }
         });
-        console.log('Switched to layer:', currentLayer, 'Context:', currentCtx);
-    }
 
-    function initializeLayer(layerNum) {
-        if (layerNum === 1) {
-            contexts[layerNum].fillStyle = '#' + Math.floor(Math.random() * 16777215).toString(16);
-        } else {
-            contexts[layerNum].fillStyle = 'rgba(0,0,0,0)'; // Transparent
-        }
-        contexts[layerNum].fillRect(0, 0, layers[layerNum].width, layers[layerNum].height);
-    }
+        const colorPickers = document.querySelectorAll('input[type="color"]');
+        colorPickers.forEach(picker => {
+            picker.addEventListener('input', (event) => {
+                setDrawingColor(event.target.value);
+            });
+        });
 
-    function clearCanvas() {
-        if (!currentCtx) return;
-        let clearedCanvasState = currentCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height);
-        currentCtx.fillStyle = backgroundPicker.value;
-        currentCtx.fillRect(0, 0, layers[currentLayer].width, layers[currentLayer].height);
-        history.push(clearedCanvasState);
-        redoHistory = [];
-    }
-
-    function saveState() {
-        if (!currentCtx) {
-            console.error('Error: currentCtx is undefined in saveState. Current layer:', currentLayer);
-            return;
-        }
-        history.push(currentCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height));
-        redoHistory = [];
-        console.log('State saved for layer:', currentLayer);
-    }
-
-    function startDrawing(e) {
-        if (!currentCtx) {
-            console.error('Error: currentCtx is undefined in startDrawing. Current layer:', currentLayer);
-            return;
-        }
-        isDrawing = true;
-        const rect = layers[currentLayer].getBoundingClientRect();
-        [lastX, lastY] = [e.clientX - rect.left, e.clientY - rect.top];
-    }
-
-    function draw(e) {
-        if (!isDrawing || !currentCtx) {
-            if (!currentCtx) {
-                console.error('Error: currentCtx is undefined in draw. Current layer:', currentLayer);
+        document.addEventListener('touchstart', function (e) {
+            if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT') {
+                e.preventDefault();
             }
-            return;
+        }, { passive: false });
+
+        function addEventListenersToLayer(layer) {
+            layer.addEventListener('pointerdown', startDrawing);
+            layer.addEventListener('pointermove', draw);
+            layer.addEventListener('pointerup', stopDrawing);
+            layer.addEventListener('pointerout', stopDrawing);
+            layer.addEventListener('pointercancel', stopDrawing);
         }
 
-        e.preventDefault();
-        const rect = layers[currentLayer].getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        const pressure = e.pressure || 1;
+        document.querySelectorAll('button, input').forEach(element => {
+            element.addEventListener('pointerdown', (e) => {
+                e.stopPropagation();
+            });
+        });
 
-        currentCtx.lineWidth = brushSizeInput.value * pressure;
-        currentCtx.lineCap = 'round';
-        currentCtx.lineJoin = 'round';
-        currentCtx.globalAlpha = opacityInput.value / 100;
-
-        currentCtx.beginPath();
-        currentCtx.moveTo(lastX, lastY);
-        currentCtx.lineTo(x, y);
-        currentCtx.stroke();
-
-        if (symmetry) {
-            const centerX = layers[currentLayer].width / 2;
-            const symmetricLastX = centerX + (centerX - lastX);
-            const symmetricX = centerX + (centerX - x);
-            currentCtx.beginPath();
-            currentCtx.moveTo(symmetricLastX, lastY);
-            currentCtx.lineTo(symmetricX, y);
-            currentCtx.stroke();
+        function resizeCanvas() {
+            const rect = canvasContainer.getBoundingClientRect();
+            Object.values(layers).forEach(layer => {
+                layer.width = rect.width * devicePixelRatio;
+                layer.height = rect.height * devicePixelRatio;
+                layer.getContext('2d').scale(devicePixelRatio, devicePixelRatio);
+            });
+            Object.keys(layers).forEach(layerNum => initializeLayer(parseInt(layerNum)));
         }
 
-        [lastX, lastY] = [x, y];
+        window.addEventListener('resize', resizeCanvas);
 
-        if (isPressureSupported) {
-            pressureBar.value = pressure * 100;
+        // Initialize the first layer
+        createLayer();
+        setDrawingColor(document.getElementById('colorPicker').value);
+        resizeCanvas();
+
+
+        // Добавляем слушатели событий к существующим слоям
+        Object.values(layers).forEach(addEventListenersToLayer);
+    </script>
+    <script>
+
+
+        fillModeBtn.addEventListener('click', toggleFillMode);
+        function toggleFillMode() {
+            isFillMode = !isFillMode;
+            // Optionally add visual indication of fill mode being active or inactive
+            fillModeBtn.classList.toggle('active', isFillMode);
         }
-    }
 
-    function stopDrawing() {
-        if (isDrawing) {
-            isDrawing = false;
+        // fill
+        // ... (Your existing code) ...
+
+        // Flood Fill Functionality
+        function floodFill(e) {
+            const startX = e.offsetX;
+            const startY = e.offsetY;
+
+            // Use currentCtx and layers[currentLayer]
+            const imageData = currentCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height);
+            const data = imageData.data;
+            const width = imageData.width;
+            const height = imageData.height;
+
+            const targetColor = getPixelColor(data, startX, startY, width);
+            const fillColor = hexToRgba(colorPicker.value);
+            const tolerance = 30;
+
+            if (colorMatch(targetColor, fillColor, tolerance)) return;
+
+            const stack = [[startX, startY]];
+            const visited = new Uint8Array(width * height);
+
+            while (stack.length) {
+                const [x, y] = stack.pop();
+                const index = y * width + x;
+
+                if (visited[index]) continue;
+                visited[index] = 1;
+
+                const pixelIndex = index * 4;
+                const currentColor = data.slice(pixelIndex, pixelIndex + 4);
+
+                if (colorMatch(currentColor, targetColor, tolerance) || isContourPixel(x, y, data, width, height, targetColor, tolerance)) {
+                    setPixelColor(data, x, y, width, fillColor);
+
+                    if (x > 0) stack.push([x - 1, y]);
+                    if (x < width - 1) stack.push([x + 1, y]);
+                    if (y > 0) stack.push([x, y - 1]);
+                    if (y < height - 1) stack.push([x, y + 1]);
+                }
+            }
+
+            // Оптимизированный дополнительный проход
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    const index = (y * width + x) * 4;
+                    if (!colorMatch(data.slice(index, index + 4), fillColor, 0) && shouldFillPixel(x, y, data, width, height, fillColor)) {
+                        setPixelColor(data, x, y, width, fillColor);
+                    }
+                }
+            }
+
+            // Use currentCtx to putImageData
+            currentCtx.putImageData(imageData, 0, 0);
             saveState();
         }
-    }
 
-    function setDrawingColor(color) {
-        if (currentCtx) {
-            currentCtx.strokeStyle = color;
-        }
-    }
+        // ... (Your other functions: getPixelColor, setPixelColor, etc.) ...
 
-    // Event Listeners
-    addLayerBtn.addEventListener('click', createLayer);
-    removeLayerBtn.addEventListener('click', removeLayer);
-
-    const eyedropperBtn = document.getElementById('eyedropperBtn');
-    eyedropperBtn.addEventListener('click', () => {
-        isEyedropperActive = !isEyedropperActive;
-        if (isEyedropperActive) {
-            layers[currentLayer].classList.add('pipetteCursor');
-        } else {
-            layers[currentLayer].classList.remove('pipetteCursor');
-        }
-    });
-
-    const colorPickers = document.querySelectorAll('input[type="color"]');
-    colorPickers.forEach(picker => {
-        picker.addEventListener('input', (event) => {
-            setDrawingColor(event.target.value);
+        // Modify the event listener to use the active layer
+        layers[currentLayer].addEventListener('click', (e) => {
+            if (isFillMode) {
+                floodFill(e);
+            }
         });
-    });
 
-    document.addEventListener('touchstart', function(e) {
-        if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT') {
-            e.preventDefault();
+        // ... (Rest of your code) ...
+
+        function getPixelColor(data, x, y, width) {
+            const index = (y * width + x) * 4;
+            return data.slice(index, index + 4);
         }
-    }, { passive: false });
 
-    function addEventListenersToLayer(layer) {
-        layer.addEventListener('pointerdown', startDrawing);
-        layer.addEventListener('pointermove', draw);
-        layer.addEventListener('pointerup', stopDrawing);
-        layer.addEventListener('pointerout', stopDrawing);
-        layer.addEventListener('pointercancel', stopDrawing);
-    }
+        function setPixelColor(data, x, y, width, color) {
+            const index = (y * width + x) * 4;
+            data.set(color, index);
+        }
 
-    document.querySelectorAll('button, input').forEach(element => {
-        element.addEventListener('pointerdown', (e) => {
-            e.stopPropagation();
-        });
-    });
+        function isContourPixel(x, y, data, width, height, targetColor, tolerance) {
+            const directions = [[-1, 0], [1, 0], [0, -1], [0, 1], [-1, -1], [-1, 1], [1, -1], [1, 1]];
+            const currentColor = getPixelColor(data, x, y, width);
 
-    function resizeCanvas() {
-        const rect = canvasContainer.getBoundingClientRect();
-        Object.values(layers).forEach(layer => {
-            layer.width = rect.width * devicePixelRatio;
-            layer.height = rect.height * devicePixelRatio;
-            layer.getContext('2d').scale(devicePixelRatio, devicePixelRatio);
-        });
-        Object.keys(layers).forEach(layerNum => initializeLayer(parseInt(layerNum)));
-    }
+            if (colorMatch(currentColor, targetColor, tolerance)) return false;
 
-    window.addEventListener('resize', resizeCanvas);
+            return directions.some(([dx, dy]) => {
+                const nx = x + dx;
+                const ny = y + dy;
+                if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+                    const neighborColor = getPixelColor(data, nx, ny, width);
+                    return colorMatch(neighborColor, targetColor, tolerance);
+                }
+                return false;
+            });
+        }
 
-    // Initialize the first layer
-    createLayer();
-    setDrawingColor(document.getElementById('colorPicker').value);
-    resizeCanvas();
+        function shouldFillPixel(x, y, data, width, height, fillColor) {
+            const directions = [[-1, 0], [1, 0], [0, -1], [0, 1], [-1, -1], [-1, 1], [1, -1], [1, 1]];
+            let filledNeighbors = 0;
+
+            for (const [dx, dy] of directions) {
+                const nx = x + dx;
+                const ny = y + dy;
+                if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+                    const neighborColor = getPixelColor(data, nx, ny, width);
+                    if (colorMatch(neighborColor, fillColor, 0)) {
+                        filledNeighbors++;
+                    }
+                }
+            }
+
+            return filledNeighbors >= 5;
+        }
+
+        function hexToRgba(hex) {
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            return [r, g, b, 255];
+        }
+
+        function colorMatch(a, b, tolerance) {
+            return Math.abs(a[0] - b[0]) <= tolerance &&
+                Math.abs(a[1] - b[1]) <= tolerance &&
+                Math.abs(a[2] - b[2]) <= tolerance &&
+                Math.abs(a[3] - b[3]) <= tolerance;
+        }
 
 
-// Добавляем слушатели событий к существующим слоям
-Object.values(layers).forEach(addEventListenersToLayer);
     </script>
-<script>
-
-
-fillModeBtn.addEventListener('click', toggleFillMode);
-function toggleFillMode() {
-  isFillMode = !isFillMode;
-  // Optionally add visual indication of fill mode being active or inactive
-  fillModeBtn.classList.toggle('active', isFillMode); 
-}
-
-// fill
-// ... (Your existing code) ...
-
-// Flood Fill Functionality
-function floodFill(e) {
-  const startX = e.offsetX;
-  const startY = e.offsetY;
-
-  // Use currentCtx and layers[currentLayer]
-  const imageData = currentCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height);
-  const data = imageData.data;
-  const width = imageData.width;
-  const height = imageData.height;
-
-  const targetColor = getPixelColor(data, startX, startY, width);
-  const fillColor = hexToRgba(colorPicker.value);
-  const tolerance = 30;
-
-  if (colorMatch(targetColor, fillColor, tolerance)) return;
-
-  const stack = [[startX, startY]];
-  const visited = new Uint8Array(width * height);
-
-  while (stack.length) {
-    const [x, y] = stack.pop();
-    const index = y * width + x;
-
-    if (visited[index]) continue;
-    visited[index] = 1;
-
-    const pixelIndex = index * 4;
-    const currentColor = data.slice(pixelIndex, pixelIndex + 4);
-
-    if (colorMatch(currentColor, targetColor, tolerance) || isContourPixel(x, y, data, width, height, targetColor, tolerance)) {
-      setPixelColor(data, x, y, width, fillColor);
-
-      if (x > 0) stack.push([x - 1, y]);
-      if (x < width - 1) stack.push([x + 1, y]);
-      if (y > 0) stack.push([x, y - 1]);
-      if (y < height - 1) stack.push([x, y + 1]);
-    }
-  }
-
-  // Оптимизированный дополнительный проход
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      const index = (y * width + x) * 4;
-      if (!colorMatch(data.slice(index, index + 4), fillColor, 0) && shouldFillPixel(x, y, data, width, height, fillColor)) {
-        setPixelColor(data, x, y, width, fillColor);
-      }
-    }
-  }
-
-  // Use currentCtx to putImageData
-  currentCtx.putImageData(imageData, 0, 0);
-  saveState();
-}
-
-// ... (Your other functions: getPixelColor, setPixelColor, etc.) ...
-
-// Modify the event listener to use the active layer
-layers[currentLayer].addEventListener('click', (e) => { 
-  if (isFillMode) {
-    floodFill(e);
-  }
-});
-
-// ... (Rest of your code) ...
-
-function getPixelColor(data, x, y, width) {
-  const index = (y * width + x) * 4;
-  return data.slice(index, index + 4);
-}
-
-function setPixelColor(data, x, y, width, color) {
-  const index = (y * width + x) * 4;
-  data.set(color, index);
-}
-
-function isContourPixel(x, y, data, width, height, targetColor, tolerance) {
-  const directions = [[-1, 0], [1, 0], [0, -1], [0, 1], [-1, -1], [-1, 1], [1, -1], [1, 1]];
-  const currentColor = getPixelColor(data, x, y, width);
-
-  if (colorMatch(currentColor, targetColor, tolerance)) return false;
-
-  return directions.some(([dx, dy]) => {
-    const nx = x + dx;
-    const ny = y + dy;
-    if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
-      const neighborColor = getPixelColor(data, nx, ny, width);
-      return colorMatch(neighborColor, targetColor, tolerance);
-    }
-    return false;
-  });
-}
-
-function shouldFillPixel(x, y, data, width, height, fillColor) {
-  const directions = [[-1, 0], [1, 0], [0, -1], [0, 1], [-1, -1], [-1, 1], [1, -1], [1, 1]];
-  let filledNeighbors = 0;
-
-  for (const [dx, dy] of directions) {
-    const nx = x + dx;
-    const ny = y + dy;
-    if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
-      const neighborColor = getPixelColor(data, nx, ny, width);
-      if (colorMatch(neighborColor, fillColor, 0)) {
-        filledNeighbors++;
-      }
-    }
-  }
-
-  return filledNeighbors >= 5;
-}
-
-function hexToRgba(hex) {
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  return [r, g, b, 255];
-}
-
-function colorMatch(a, b, tolerance) {
-  return Math.abs(a[0] - b[0]) <= tolerance &&
-         Math.abs(a[1] - b[1]) <= tolerance &&
-         Math.abs(a[2] - b[2]) <= tolerance &&
-         Math.abs(a[3] - b[3]) <= tolerance;
-}
-
-
-</script>
     <script src="cursors.js" defer></script>
     <script src="script.js" defer></script>
     <script type="module" src="hotkey.js" defer></script>
@@ -611,4 +631,5 @@ function colorMatch(a, b, tolerance) {
     <script type="module" src="helperFunction.js" defer></script>
     <!-- <script type="module" src="tools" defer></script> -->
 </body>
+
 </html>
