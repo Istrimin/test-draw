@@ -147,12 +147,6 @@ function redo() {
 }
 
 
-function downloadImage() {
-  const link = document.createElement('a');
-  link.download = 'my-drawing.png';
-  link.href = layer1.toDataURL('image/png'); // Assuming you want to download layer 1
-  link.click();
-}
 
 // Drawing functions
 

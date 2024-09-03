@@ -621,6 +621,25 @@
                 Math.abs(a[3] - b[3]) <= tolerance;
         }
 
+function downloadImage() {
+  // Create a temporary canvas to merge all layers
+  const mergeCanvas = document.createElement('canvas');
+  const mergeCtx = mergeCanvas.getContext('2d');
+  mergeCanvas.width = layers[1].width; // Assuming all layers have the same size
+  mergeCanvas.height = layers[1].height;
+
+  // Draw each layer onto the temporary canvas
+  for (let i = 1; i <= layerCount; i++) {
+    mergeCtx.drawImage(layers[i], 0, 0);
+  }
+
+  // Create a link and trigger the download
+  const link = document.createElement('a');
+  link.download = 'my-drawing.png';
+  link.href = mergeCanvas.toDataURL('image/png');
+  link.click();
+}
+
 
     </script>
     <script src="cursors.js" defer></script>
