@@ -1,3 +1,80 @@
+// ADD
+
+let isEyedropperActive = false;
+let isBrushEyedropperActive = false;
+
+function getPixelColor(x, y) {
+    if (!currentCtx) {
+        console.error('Error: currentCtx is undefined in getPixelColor. Current layer:', currentLayer);
+        return;
+    }
+    const pixelData = currentCtx.getImageData(x, y, 1, 1).data;
+    return `#${pixelData[0].toString(16).padStart(2, '0')}${pixelData[1].toString(16).padStart(2, '0')}${pixelData[2].toString(16).padStart(2, '0')}`;
+}
+
+function handleEyedropperClick(e) {
+    if (isEyedropperActive || isBrushEyedropperActive) {
+        const rect = layers[currentLayer].getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const pickedColor = getPixelColor(x, y);
+
+        if (isEyedropperActive) {
+            document.getElementById('colorPicker').value = pickedColor;
+            setDrawingColor(pickedColor); // Update the drawing color
+        } else if (isBrushEyedropperActive) {
+            document.getElementById('colorPicker3').value = pickedColor; // Assuming you want to set colorPicker3
+            setDrawingColor(pickedColor); // Update the drawing color
+        }
+    }
+}
+
+canvasContainer.addEventListener('click', handleEyedropperClick);
+
+function toggleEyedropper() {
+    isEyedropperActive = !isEyedropperActive;
+    isBrushEyedropperActive = false; // Ensure only one eyedropper is active at a time
+    if (isEyedropperActive) {
+        canvasContainer.style.cursor = 'url(cursors/pipette.png), auto'; // Assuming you have a pipette cursor image
+    } else {
+        canvasContainer.style.cursor = 'default';
+    }
+}
+
+function toggleBrushEyedropper() {
+    isBrushEyedropperActive = !isBrushEyedropperActive;
+    isEyedropperActive = false; // Ensure only one eyedropper is active at a time
+    if (isBrushEyedropperActive) {
+        canvasContainer.style.cursor = 'url(cursors/pipette.png), auto'; // Assuming you have a pipette cursor image
+    } else {
+        canvasContainer.style.cursor = 'default';
+    }
+}
+
+// document.getElementById('eyedropperBtn').addEventListener('click', toggleEyedropper);
+// document.getElementById('brushEyedropperBtn').addEventListener('click', toggleBrushEyedropper);
+
+
+
+
+    // Event Listeners
+    // addLayerBtn.addEventListener('click', createLayer);
+    // removeLayerBtn.addEventListener('click', removeLayer);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // // tools.js
 
 // // Пипетка

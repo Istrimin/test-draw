@@ -52,4 +52,22 @@ const redoButton = document.getElementById('redo');
 undoButton.addEventListener('click', undo);
 redoButton.addEventListener('click', redo);
 
-// ... (Rest of your JavaScript code) ...
+
+// пипетка
+        document.getElementById('eyedropperBtn').addEventListener('click', toggleEyedropper);
+        document.getElementById('brushEyedropperBtn').addEventListener('click', toggleBrushEyedropper);
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (event) => {
+  if (event.code >= 'Digit1' && event.code <= 'Digit9') {
+    const index = parseInt(event.code.replace('Digit', '')) - 1;
+    if (index < colorPickers.length) {
+      const color = colorPickers[index].value;
+      setDrawingColor(color);
+    }
+  } else if (event.code === 'KeyA') {
+    toggleEyedropper();
+  } else if (event.code === 'KeyD') {
+    toggleBrushEyedropper();
+  }
+});
