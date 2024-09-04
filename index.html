@@ -29,6 +29,26 @@
   text-decoration: none;
 }
 
+
+
+.image-container {
+  position: relative; /* Important for positioning the hover image */
+  width: 6em; /* Match the width of your images */
+  height: auto; /* Maintain aspect ratio */
+}
+
+.hover-image {
+  position: absolute; /* Position over the default image */
+  top: 0;
+  left: 0;
+  opacity: 0; /* Initially hide the hover image */
+  transition: opacity 0.3s ease; /* Add a smooth transition effect */
+}
+
+.image-container:hover .hover-image {
+  opacity: 1; /* Show the hover image on hover */
+}
+
     </style>
 </head>
 <body>
@@ -40,7 +60,16 @@
         <h2>Привет художник!</h2> 
         <class class="image-row">
 
-<a href="main.html" target="_self" title="Я про" class="no-underline" style="font-size:6em;">🖍️</a> 
+
+<!-- <a href="main.html" target="_self" title="Я про" class="no-underline">
+  <img src="images/Бабочка Большая.png" alt="Я про" style="width: 6em;"> 
+</a> -->
+<a href="main.html" target="_self" title="Я про" class="no-underline">
+  <div class="image-container">
+    <img src="images/Бабочка Большая.png" alt="Я про" style="width: 6em;" class="default-image"> 
+    <img src="images/Бабочка Большая Hover.png" alt="Я про" style="width: 6em;" class="hover-image"> 
+  </div>
+</a>
 
         <a href="cancer.html" target="_self" title="Я рак">
         <img src="images/cancer.png" width="100">
