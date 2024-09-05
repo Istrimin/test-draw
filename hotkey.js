@@ -1,58 +1,52 @@
 document.addEventListener('keydown', function(event) {
-    // Normalize the key to be case-insensitive and layout-independent
-    const keyPressed = event.key.toLowerCase(); 
+    // Получаем код клавиши независимо от раскладки
+    const keyCode = event.code;
 
-    // Use a single switch for better organization
-    switch (keyPressed) {
-        case 'a': 
+    // Используем switch-case для обработки разных клавиш
+    switch (keyCode) {
+        case 'KeyA':
             document.getElementById('eyedropperBtn').click();
             break;
-        case 'z':
+        case 'KeyZ':
             undo();
             break;
-        case 'x':
+        case 'KeyX':
             redo();
             break;
-        case 'b': // Background color
+        case 'KeyB': // Background color
             event.preventDefault();
             document.getElementById('backgroundPicker').click();
             break;
-        case 'e': // Eraser
+        case 'KeyE': // Eraser
             event.preventDefault();
             document.getElementById('eraserBtn').click();
             break;
-        case 's': // Save
+        case 'KeyS': // Save
             event.preventDefault();
             document.getElementById('saveImageBtn').click();
             break;
-        case 'r': // Clear
+        case 'KeyR': // Clear
             event.preventDefault();
             document.getElementById('clear').click();
             break;
-        case 'q': // Symmetry
+        case 'KeyQ': // Symmetry
             event.preventDefault();
             document.getElementById('symmetry').click();
             break;
-        case 'f': // Fill Mode
+        case 'KeyF': // Fill Mode
             event.preventDefault();
             document.getElementById('fillModeBtn').click();
             break;
-        case 'u': // Upload Image
+        case 'KeyU': // Upload Image
             event.preventDefault();
             document.getElementById('UploadButton').click();
             break;
-        case 'w': // Toggle previous layer
-            event.preventDefault(); 
+        case 'KeyW': // Toggle previous layer
+            event.preventDefault();
             togglePreviousLayer();
             break;
     }
 });
-
-// ... rest of your hotkey.js code (togglePreviousLayer, etc.)
-
-// ... (Your existing JavaScript code) ...
-
-// ... (Your existing JavaScript code) ...
 
 // пипетка
 document.getElementById('eyedropperBtn').addEventListener('click', toggleEyedropper);
@@ -62,12 +56,12 @@ document.getElementById('brushEyedropperBtn').addEventListener('click', toggleBr
 document.addEventListener('keydown', (event) => {
   // ... (your existing number key logic)
 
-  // Normalize the key for layout independence
-  const keyPressed = event.code.toLowerCase(); 
+  // Используем код клавиши, не зависящий от раскладки
+  const keyCode = event.code;
 
-  if (keyPressed === 'keya') {
+  if (keyCode === 'KeyA') {
     toggleEyedropper();
-  } else if (keyPressed === 'keyd') {
+  } else if (keyCode === 'KeyD') {
     toggleBrushEyedropper();
   }
 });
