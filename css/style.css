@@ -25,7 +25,44 @@ body {
     user-select: none;
     /* added     */
     overflow: hidden;
+/* проверка будет ли это влиять ну другие кнопки */
+    outline:#aa0404;
 }
+
+
+.layer-button:focus {
+    /* outline: none; */
+    /* outline:#aa0404; */
+}
+
+/* .layer-button:focus-visible {
+    outline: 3000px solid 
+} */
+
+button:focus{
+
+outline:none}
+
+
+button {
+    background-color: transparent;
+    color: var(--button-text-color);
+    font-style: bold;
+    font-size: 30px;
+}
+
+button:hover,
+.custom-file-upload:hover,
+input[type="color"]:hover,
+input[type="range"]:hover {
+
+    cursor: url('/cursors/pipette32.png'), auto;
+
+    color: rgb(0, 255, 13);
+    /* font-size: xx-large;  */
+}
+
+
 
 /* 
 #drawingCanvas {
@@ -55,24 +92,6 @@ canvas {
     --button-color: rgb(25, 25, 25);
     --button-text-color: rgb(211, 116, 255);
     --button-active-color: rgb(9, 95, 0);
-}
-
-button {
-    background-color: transparent;
-    color: var(--button-text-color);
-    font-style: bold;
-    font-size: 30px;
-}
-
-button:hover,
-.custom-file-upload:hover,
-input[type="color"]:hover,
-input[type="range"]:hover {
-
-    cursor: url('/cursors/pipette32.png'), auto;
-
-    color: rgb(0, 255, 13);
-    /* font-size: xx-large;  */
 }
 
 
@@ -463,3 +482,7 @@ input[type="range"]::-moz-range-thumb {
             align-items: center;
             gap: 10px;
         }
+
+
+
+

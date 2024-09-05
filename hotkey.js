@@ -9,39 +9,41 @@ document.addEventListener('keydown', function(event) {
             break;
         case 'KeyZ':
             undo();
+            // document.getElementById('undoBtn').click();
             break;
         case 'KeyX':
-            redo();
+            redo(); 
+            // document.getElementById('redoBtn').click();
             break;
-        case 'KeyB': // Background color
+        case 'KeyB':
             event.preventDefault();
             document.getElementById('backgroundPicker').click();
             break;
-        case 'KeyE': // Eraser
+        case 'KeyE':
             event.preventDefault();
             document.getElementById('eraserBtn').click();
             break;
-        case 'KeyS': // Save
+        case 'KeyS':
             event.preventDefault();
             document.getElementById('saveImageBtn').click();
             break;
-        case 'KeyR': // Clear
+        case 'KeyR':
             event.preventDefault();
             document.getElementById('clear').click();
             break;
-        case 'KeyQ': // Symmetry
+        case 'KeyQ':
             event.preventDefault();
             document.getElementById('symmetry').click();
             break;
-        case 'KeyF': // Fill Mode
+        case 'KeyF':
             event.preventDefault();
             document.getElementById('fillModeBtn').click();
             break;
-        case 'KeyU': // Upload Image
+        case 'KeyU':
             event.preventDefault();
             document.getElementById('UploadButton').click();
             break;
-        case 'KeyW': // Toggle previous layer
+        case 'KeyW':
             event.preventDefault();
             togglePreviousLayer();
             break;
@@ -54,9 +56,7 @@ document.getElementById('brushEyedropperBtn').addEventListener('click', toggleBr
 
 // Keyboard shortcuts
 document.addEventListener('keydown', (event) => {
-  // ... (your existing number key logic)
 
-  // Используем код клавиши, не зависящий от раскладки
   const keyCode = event.code;
 
   if (keyCode === 'KeyA') {

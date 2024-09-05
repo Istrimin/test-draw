@@ -38,12 +38,9 @@
         }
   
         .layer-button.active-layer {
-            /* color: #ff0000; */
 color:transparent;
-            /* font-size: 20px; */
-                        /* border-radius: 50%; */
         height: 50px;;
-    border: none; 
+    /* border: none;  */
 
         }
 
@@ -85,7 +82,7 @@ color:transparent;
     <div class="base-container">
         <div class="sidebar">
             <a href="index.html" target="_self" title="Выйти из команты" id="exitLink">🚪</a>
-            <button id="myBtn" title="Сообщение">✉️</button>
+            <button id="message" title="Сообщение">✉️</button>
             <div id="message-container" style="display: none;">
                 <p id="message"></p>
             </div>
@@ -95,8 +92,8 @@ color:transparent;
             <button id="saveImageBtn" title="Сохранить изображение">🎬</button>
             <button id="eraserBtn">🧽</button>
             <button id="changeCursorBtn" title="Сменить курсор">🎨</button>
-            <button id="undo" title="Отменить (Z)">⟲</button>
-            <button id="redo" title="Повторить (X)">⟳</button>
+            <button id="undoBtn" title="Отменить (Z)">⟲</button>
+            <button id="redoBtn" title="Повторить (X)">⟳</button>
             <button id="clear" title="Очистить">💀</button>
 
             <button id="fillModeBtn" title="Заливка (F)">🌊</button>
@@ -470,8 +467,8 @@ color:transparent;
             }
         }
 
-        document.getElementById('undoBtn').addEventListener('click', undo);
-        document.getElementById('redoBtn').addEventListener('click', redo);
+        // document.getElementById('undoBtn').addEventListener('click', undo);
+        // document.getElementById('redoBtn').addEventListener('click', redo);
 
 
         function togglePreviousLayer() {
@@ -589,6 +586,61 @@ layerPanel.addEventListener('pointerup', () => {
 
 
 
+
+
+
+
+
+
+
+
+
+// // Функция для предотвращения действия по умолчанию
+// function preventDefaultAction(event) {
+//   event.preventDefault();
+//   event.stopPropagation();
+//   return false;
+// }
+
+// // Перехватываем все события keydown
+// document.addEventListener('keydown', function(event) {
+//   // Разрешаем только F12
+//   if (event.key !== 'F12') {
+//     return preventDefaultAction(event);
+//   }
+// }, true);
+
+// // Перехватываем все события keyup
+// document.addEventListener('keyup', function(event) {
+//   // Разрешаем только F12
+//   if (event.key !== 'F12') {
+//     return preventDefaultAction(event);
+//   }
+// }, true);
+
+// // Перехватываем все события keypress
+// document.addEventListener('keypress', function(event) {
+//   // Разрешаем только F12
+//   if (event.key !== 'F12') {
+//     return preventDefaultAction(event);
+//   }
+// }, true);
+
+// // Дополнительно перехватываем beforeunload для предотвращения обновления страницы
+// window.addEventListener('beforeunload', function(event) {
+//   event.preventDefault();
+//   event.returnValue = '';
+// });
+
+// // Перехватываем contextmenu для отключения контекстного меню
+// document.addEventListener('contextmenu', function(event) {
+//   event.preventDefault();
+// });
+
+
+
+
+
     </script>
     <script src="cursors.js" defer></script>
     <script src="script.js" defer></script>
@@ -598,6 +650,9 @@ layerPanel.addEventListener('pointerup', () => {
     <script type="module" src="settings.js" defer></script>
     <script type="module" src="helperFunction.js" defer></script>
     <script type="module" src="tools.js" defer></script>
+
+    <!-- <script type="module" src="buttons.js" defer></script> -->
+
 </body>
 
 </html>
