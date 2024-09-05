@@ -116,9 +116,7 @@
         .color-picker-and-word {
             display: flex;
             align-items: center;
-            /* Add this line */
             margin-bottom: 0;
-            /* gap: 100px;  */
         }
 
         .word-navigation {
@@ -144,15 +142,40 @@
             /* Example: Light gray border */
         }
 
-body {
-    cursor: url('cursors/pencil.png'), auto;
+        body {
+            cursor: url('cursors/pencil.png'), auto;
+        }
+
+
+.color-picker-group-two input[type="color"] {
+    appearance: none;
+    -webkit-appearance: none;   
+    border: none;
+    width: 20px;  /* Увеличим размер для лучшей видимости */
+    height: 20px;
+    padding: 0;
+    cursor: pointer;
+}
+
+.color-picker-group-two input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.color-picker-group-two input[type="color"]::-webkit-color-swatch {
+    border: none;
+    border-radius: 0;  /* Убираем скругление углов */
+}
+
+/* Для Firefox */
+.color-picker-group-two input[type="color"]::-moz-color-swatch {
+    border: none;
+    border-radius: 0;
 }
 
     </style>
 </head>
 
 <body>
-
     <div class="base-container">
         <div class="sidebar">
             <a href="index.html" target="_self" title="Выйти из команты" id="exitLink">🚪</a>
@@ -187,7 +210,7 @@ body {
                 <div class="color-picker-and-word">
                     <div class="color-picker-group">
                         <input type="color" id="colorPicker" value="#000000" title="Цвет заливки (C)">
-                        <input type="color" id="backgroundPicker" value="#ffffff" title="Цвет фона (B)">
+                        <input type="color" id="colorPicker2" value="#ffffff" title="булый">
                         <input type="color" id="colorPicker3" value="#ff0000" title="Цвет кисти 3">
                         <input type="color" id="colorPicker4" value="#ffa500" title="Цвет кисти 4">
                         <input type="color" id="colorPicker5" value="#ffff00" title="Цвет кисти 5">
@@ -195,6 +218,9 @@ body {
                         <input type="color" id="colorPicker7" value="#00ffff" title="Цвет кисти 7">
                         <input type="color" id="colorPicker8" value="#0000ff" title="Цвет кисти 8">
                         <input type="color" id="colorPicker9" value="#800080" title="Цвет кисти 9">
+                    <div class="color-picker-group-two">
+                        <input type="color" id="backgroundPicker" value="#ffffff" title="Цвет фона (B)">
+                    </div>
                     </div>
                     <div class="word-navigation">
                         <button id="previousWord" title="Предыдущее слово">&lt;</button>
@@ -218,7 +244,7 @@ body {
                     </div>
                     <div class="tools-column">
                         <label for="brushSize" title="Размер кисти">🖌️</label>
-                        <input type="range" id="brushSize" min="1" max="100" value="1">
+                        <input type="range" id="brushSize" min="1" max="200" value="3">
                     </div>
                     <div class="tools-column">
                         <div class="pressure-bar-container">
@@ -235,8 +261,11 @@ body {
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            for (let i = 0; i < 100; i++) {
+            for (let i = 2; i < 100; i++) {
                 createLayer();
+                setCurrentLayer(50);
+                const layerButtonsContainer = document.querySelector('.layer-panel');
+                layerButtonsContainer.scrollTop = (layerButtonsContainer.scrollHeight / 120) * 50;
             }
         });
 
@@ -274,7 +303,7 @@ body {
 
         let history = {};
         let redoHistory = {};
-        let previousLayer = 1; 
+        let previousLayer = 1;
 
         function createLayer() {
             layerCount++;
@@ -321,30 +350,31 @@ body {
             updateLayerButtonColor(layerCount);
         }
 
-    function setCurrentLayer(layerNum) {
-        // Update previousLayer ONLY if the layer is actually changing
-        if (currentLayer !== layerNum) { 
-            previousLayer = currentLayer; 
-        }
-
-        currentLayer = layerNum;
-        currentCtx = contexts[currentLayer];
-
-        document.querySelectorAll('.layer-button').forEach(btn => {
-            btn.classList.remove('active-layer');
-            if (parseInt(btn.dataset.layer) === currentLayer) {
-                btn.classList.add('active-layer');
+        function setCurrentLayer(layerNum) {
+            // Update previousLayer ONLY if the layer is actually changing
+            if (currentLayer !== layerNum) {
+                previousLayer = currentLayer;
             }
-        });
-    console.log('Switched to layer:', currentLayer, 'Context:', currentCtx);
 
-    // Update button colors when switching layers
-    updateLayerButtonColor(layerNum);
+            currentLayer = layerNum;
+            currentCtx = contexts[currentLayer];
 
-    if (layerColors[layerNum]) {
-        currentCtx.strokeStyle = layerColors[layerNum];
-    }
-}
+            document.querySelectorAll('.layer-button').forEach(btn => {
+                btn.classList.remove('active-layer');
+                if (parseInt(btn.dataset.layer) === currentLayer) {
+                    btn.classList.add('active-layer');
+                }
+            });
+
+            console.log('Switched to layer:', currentLayer, 'Context:', currentCtx);
+
+            // Update button colors when switching layers
+            updateLayerButtonColor(layerNum);
+
+            if (layerColors[layerNum]) {
+                currentCtx.strokeStyle = layerColors[layerNum];
+            }
+        }
 
 
 
@@ -359,23 +389,12 @@ body {
 
         // !!!??? почему тут 1 леер указан не пойму.
         function initializeLayer(layerNum) {
-            if (layerNum === 2) {
+            if (layerNum === 0) {
                 contexts[layerNum].fillStyle = '#' + Math.floor(Math.random() * 16777215).toString(16);
             } else {
                 contexts[layerNum].fillStyle = 'rgba(0,0,0,0)'; // Transparent
             }
             contexts[layerNum].fillRect(0, 0, layers[layerNum].width, layers[layerNum].height);
-        }
-
-        function clearCanvas() {
-            if (!currentCtx) return;
-            // Clear only the current layer's canvas
-            currentCtx.clearRect(0, 0, layers[currentLayer].width, layers[currentLayer].height);
-            // You can optionally fill it with a background color:
-            currentCtx.fillStyle = backgroundPicker.value;
-            currentCtx.fillRect(0, 0, layers[currentLayer].width, layers[currentLayer].height);
-            // Update history for the current layer
-            saveState();
         }
 
         function saveState() {
@@ -453,12 +472,18 @@ body {
             }
         }
 
-        const colorPickers = document.querySelectorAll('input[type="color"]');
-        colorPickers.forEach(picker => {
-            picker.addEventListener('input', (event) => {
-                setDrawingColor(event.target.value);
-            });
-        });
+const colorPickers = document.querySelectorAll('input[type="color"]');
+colorPickers.forEach((picker, index) => {
+    picker.addEventListener('input', (event) => {
+        setDrawingColor(event.target.value);
+    });
+    // Назначаем горячие клавиши для выбора цветов
+    document.addEventListener('keydown', (e) => {
+        if (e.key === (index + 1).toString()) {
+            setDrawingColor(picker.value);
+        }
+    });
+});
 
         document.addEventListener('touchstart', function (e) {
             if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT') {
@@ -479,27 +504,48 @@ body {
                 e.stopPropagation();
             });
         });
+function clearCanvas() {
+    if (!currentCtx) return;
 
-        // Функция отмены
-        function undo() {
-            if (history[currentLayer] && history[currentLayer].length > 1) {
-                redoHistory[currentLayer].push(history[currentLayer].pop());
-                const previousState = history[currentLayer][history[currentLayer].length - 1];
-                currentCtx.putImageData(previousState, 0, 0);
-            } else if (history[currentLayer] && history[currentLayer].length === 1) {
-                // Если это последнее состояние, очищаем холст полностью
-                currentCtx.clearRect(0, 0, layers[currentLayer].width, layers[currentLayer].height);
-            }
-        }
+    // Save the current state before clearing
+    saveState();
 
-        // Функция повтора
-        function redo() {
-            if (redoHistory[currentLayer] && redoHistory[currentLayer].length > 0) {
-                const nextState = redoHistory[currentLayer].pop();
-                history[currentLayer].push(nextState);
-                currentCtx.putImageData(nextState, 0, 0);
-            }
-        }
+    // Clear only the current layer's canvas
+    currentCtx.clearRect(0, 0, layers[currentLayer].width, layers[currentLayer].height);
+
+    // If it's the background layer (layer 1), fill it with the background color
+    if (currentLayer === 1) {
+        currentCtx.fillStyle = backgroundPicker.value;
+        currentCtx.fillRect(0, 0, layers[currentLayer].width, layers[currentLayer].height);
+    }
+
+    // Save the cleared state
+    saveState();
+}
+
+
+        // // Функция отмены
+        // function undo() {
+        //     if (history[currentLayer] && history[currentLayer].length > 1) {
+        //         redoHistory[currentLayer].push(history[currentLayer].pop());
+        //         const previousState = history[currentLayer][history[currentLayer].length - 1];
+        //         currentCtx.putImageData(previousState, 0, 0);
+        //     } else if (history[currentLayer] && history[currentLayer].length === 1) {
+        //         // Если это последнее состояние, очищаем холст полностью
+        //         currentCtx.clearRect(0, 0, layers[currentLayer].width, layers[currentLayer].height);
+        //     }
+        // }
+
+        // // Функция повтора
+        // function redo() {
+        //     if (redoHistory[currentLayer] && redoHistory[currentLayer].length > 0) {
+        //         const nextState = redoHistory[currentLayer].pop();
+        //         history[currentLayer].push(nextState);
+        //         currentCtx.putImageData(nextState, 0, 0);
+        //     }
+        // }
+
+
 
         // Initialize the first layer
         createLayer();
@@ -530,18 +576,31 @@ body {
         document.getElementById('redoBtn').addEventListener('click', redo);
 
 
-function togglePreviousLayer() {
-    // Swap currentLayer and previousLayer
-    [currentLayer, previousLayer] = [previousLayer, currentLayer]; 
+        function togglePreviousLayer() {
+            // Swap currentLayer and previousLayer
+            [currentLayer, previousLayer] = [previousLayer, currentLayer];
 
-    // Simulate a click on the corresponding layer button
-    const layerButton = document.querySelector(`.layer-button[data-layer="${currentLayer}"]`);
-    if (layerButton) {
-        layerButton.click(); // This will trigger the button's click event
+            // Simulate a click on the corresponding layer button
+            const layerButton = document.querySelector(`.layer-button[data-layer="${currentLayer}"]`);
+            if (layerButton) {
+                layerButton.click(); // This will trigger the button's click event
+            }
+        }
+
+        function redrawCanvas() {
+            currentCtx.fillStyle = backgroundPicker.value;
+            currentCtx.fillRect(0, 0, layer2.width, layer2.height);
+            if (uploadedImage) {
+                currentCtx.drawImage(uploadedImage, 0, 0, layer2.width, layer2.height);
+            }
+        }
+function setBackground() {
+    if (contexts[1]) {
+        contexts[1].fillStyle = backgroundPicker.value;
+        contexts[1].fillRect(0, 0, layers[1].width, layers[1].height);
+        saveState();
     }
 }
-
-
     </script>
     <script src="cursors.js" defer></script>
     <script src="script.js" defer></script>

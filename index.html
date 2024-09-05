@@ -92,13 +92,7 @@
 
 
 
-  const images = [
-    'images/dream3.png',
-    'images/dream3.png', 
-    'images/dream3.png',
-    "images/dream4.png"
-    // Добавьте сюда пути к другим изображениям
-  ];
+const images = Array.from({ length: 3 }, (_, i) => `images/dream/dream${i + 1}.png`);
 
   function getRandomImage(images) {
     const randomIndex = Math.floor(Math.random() * images.length);
