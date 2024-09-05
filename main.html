@@ -31,116 +31,22 @@
             font-size: 10px;
             flex-direction: column;
             display: flex;
+ 
             /* padding: 50px; */
             cursor: pointer;
-            border-radius: 50%;
+            border-radius: 20%;
         }
-
+  
         .layer-button.active-layer {
-            /* font-weight: bold;  */
-            border: 2px solid #ff0000;
-            color: #ff0000;
-            /* font-size: 15px; */
+            /* color: #ff0000; */
+color:transparent;
+            /* font-size: 20px; */
+                        /* border-radius: 50%; */
+        height: 50px;;
+    border: none; 
+
         }
 
-        .canv-container {
-            position: relative;
-            /* To contain absolutely positioned children */
-            width: 700px;
-            /* Width of the canvas */
-            height: 500px;
-            /* Height of the canvas */
-        }
-
-        .canv-container canvas {
-            position: absolute;
-            /* Position each canvas absolutely */
-            top: 0;
-            /* Align all canvases to the top */
-            left: 0;
-            /* Align all canvases to the left */
-            z-index: 1;
-            /* Default z-index */
-        }
-
-        .canvas-and-sliders {
-            display: flex;
-        }
-
-        .color-picker-group {
-            display: flex;
-            /* Горизонтальное выравнивание для элементов */
-            gap: 5px;
-            /* Пространство между элементами */
-        }
-
-        /* add tema */
-        .color-picker-group input[type="color"] {
-            appearance: none;
-            /* Убирает стандартный вид input */
-            -webkit-appearance: none;
-            /* Убирает стандартный вид input в Safari */
-            border: none;
-            /* Убираем рамку */
-            width: 15px;
-            /* Ширина круга */
-            height: 10px;
-            /* Высота круга */
-            border-radius: 50%;
-            /* Делаем круглый */
-            padding: 0;
-            cursor: pointer;
-            overflow: hidden;
-            /* Убираем любые выходящие части */
-        }
-
-        .color-picker-group input[type="color"]::-webkit-color-swatch-wrapper {
-            padding: 0;
-            /* Убирает внутренний отступ */
-        }
-
-        .color-picker-group input[type="color"]::-webkit-color-swatch {
-            border: none;
-            /* Убирает рамку */
-            border-radius: 50%;
-            /* Круглая форма */
-        }
-
-        .color-picker-and-word {
-            display: flex;
-            align-items: center;
-            margin-bottom: 0;
-            /* gap: 100px;  */
-        }
-
-        .color-picker-and-word {
-            display: flex;
-            align-items: center;
-            margin-bottom: 0;
-        }
-
-        .word-navigation {
-            margin: 0;
-            /* Убираем стандартные отступы */
-            cursor: pointer;
-        }
-
-        .time-wrapper {
-            display: flex;
-            /* Используем flexbox для выравнивания в строку */
-            align-items: center;
-            /* Выравниваем элементы по вертикали */
-            gap: 10px;
-            /* Добавляем отступ между элементами времени */
-        }
-
-        #eraserBtn.active {
-            /* Choose a visual style to indicate activation */
-            background-color: #ff0000;
-            /* Example: Light gray background */
-            border: 2px solid #ccc;
-            /* Example: Light gray border */
-        }
 
         body {
             cursor: url('cursors/pencil.png'), auto;
@@ -192,7 +98,7 @@
             <button id="undo" title="Отменить (Z)">⟲</button>
             <button id="redo" title="Повторить (X)">⟳</button>
             <button id="clear" title="Очистить">💀</button>
-            <button id="symmetry" title="Симметрия (S)">🦋</button>
+
             <button id="fillModeBtn" title="Заливка (F)">🌊</button>
             <button id="floodFillBtn" title="Залить цветом">✨</button>
             <button id="eyedropperBtn" title="Пипетка заливки (A)">💧</button>
@@ -221,7 +127,9 @@
                         <input type="color" id="colorPicker9" value="#800080" title="Цвет кисти 9">
                         <div class="color-picker-group-two">
                             <input type="color" id="backgroundPicker" value="#ffffff" title="Цвет фона (B)">
+            <button id="symmetry" title="Симметрия (S)">🦋</button>
                         </div>
+
                     </div>
                     <div class="word-navigation">
                         <button id="previousWord" title="Предыдущее слово">&lt;</button>
@@ -250,7 +158,7 @@
                     <div class="tools-column">
                         <div class="pressure-bar-container">
                             <label for="pressureBar" title="Нажим">🎯</label>
-                            <progress id="pressureBar" value="0" max="100"></progress>
+                            <progress id="pressureBar" value="0" max="4000"></progress>
                         </div>
                     </div>
                 </div>
@@ -308,13 +216,14 @@
 
         function createLayer() {
             layerCount++;
-            if (layerCount === 1) {
-                canvas.style.visibility = 'hidden'; // Hide the first layer
-            }
+
             layerColors[layerCount] = '#' + Math.floor(Math.random() * 16777215).toString(16);
 
             const canvas = document.createElement('canvas');
             canvas.id = `layer${layerCount}`;
+            if (layerCount === 1) {
+                canvas.style.visibility = 'hidden'; // Hide the first layer
+            }
             canvas.width = 700;
             canvas.height = 500;
             canvas.style.position = 'absolute';
@@ -479,7 +388,8 @@
             [lastX, lastY] = [x, y];
 
             if (isPressureSupported) {
-                pressureBar.value = pressure * 100;
+                console.log(pressure)
+                pressureBar.value = pressure * 10000;
             }
         }
 
@@ -541,32 +451,9 @@
         }
 
 
-        // // Функция отмены
-        // function undo() {
-        //     if (history[currentLayer] && history[currentLayer].length > 1) {
-        //         redoHistory[currentLayer].push(history[currentLayer].pop());
-        //         const previousState = history[currentLayer][history[currentLayer].length - 1];
-        //         currentCtx.putImageData(previousState, 0, 0);
-        //     } else if (history[currentLayer] && history[currentLayer].length === 1) {
-        //         // Если это последнее состояние, очищаем холст полностью
-        //         currentCtx.clearRect(0, 0, layers[currentLayer].width, layers[currentLayer].height);
-        //     }
-        // }
-
-        // // Функция повтора
-        // function redo() {
-        //     if (redoHistory[currentLayer] && redoHistory[currentLayer].length > 0) {
-        //         const nextState = redoHistory[currentLayer].pop();
-        //         history[currentLayer].push(nextState);
-        //         currentCtx.putImageData(nextState, 0, 0);
-        //     }
-        // }
-
-
-
         // Initialize the first layer
         createLayer();
-        setDrawingColor(document.getElementById('colorPicker').value);
+
 
         // Добавляем слушатели событий к существующим слоям
         Object.values(layers).forEach(addEventListenersToLayer);
@@ -574,7 +461,7 @@
 
         function toggleEraser() {
             isErasing = !isErasing;
-
+            eraserBtn.classList.toggle('active', isErasing);
             // Change the cursor to indicate eraser mode
             if (isErasing) {
                 document.body.style.cursor = 'url(cursors/eraser.png), auto'; // Assuming you have an eraser cursor image
@@ -582,13 +469,7 @@
                 document.body.style.cursor = 'default';
             }
         }
-        // Добавляем функциональность стирания
-        eraserBtn.addEventListener('click', () => {
-            isErasing = !isErasing;
-            eraserBtn.classList.toggle('active', isErasing);
-        });
 
-        // Добавляем обработчики для кнопок отмены и повтора
         document.getElementById('undoBtn').addEventListener('click', undo);
         document.getElementById('redoBtn').addEventListener('click', redo);
 
@@ -644,11 +525,7 @@
 
         // Button click event to toggle layer identification mode
         identifyLayerBtn.addEventListener('click', () => {
-            // Toggle layer identification mode
-            isIdentifyingLayer = !isIdentifyingLayer;
 
-            // Toggle visual feedback for the button
-            identifyLayerBtn.classList.toggle('active', isIdentifyingLayer);
 
             if (isIdentifyingLayer) {
                 // Temporarily disable drawing when identifying the layer
@@ -665,6 +542,10 @@
 
         // Handler to identify the clicked layer
         function identifyLayerClickHandler(e) {
+
+            isIdentifyingLayer = !isIdentifyingLayer;
+
+            identifyLayerBtn.classList.toggle('active', isIdentifyingLayer);
             const rect = layers[1].getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
@@ -681,6 +562,31 @@
                 }
             }
         }
+
+
+const layerPanel = document.querySelector('.layer-panel');
+
+let isDraggingScroll = false;
+let startY;
+
+layerPanel.addEventListener('pointerdown', (e) => {
+    e.preventDefault(); // Prevents drawing from interfering with scrolling
+    isDraggingScroll = true;
+    startY = e.clientY;
+});
+
+layerPanel.addEventListener('pointermove', (e) => {
+    if (isDraggingScroll) {
+        const deltaY = e.clientY - startY;
+        layerPanel.scrollTop += deltaY;
+        startY = e.clientY;
+    }
+});
+
+layerPanel.addEventListener('pointerup', () => {
+    isDraggingScroll = false;
+});
+
 
 
     </script>

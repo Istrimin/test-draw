@@ -29,7 +29,6 @@ setInterval(updateElapsedTime, 1000);
 
 
 
-// ! слово наверху канвас
 
 // ! слово наверху канвас
 
@@ -73,11 +72,14 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     // Отображаем первое слово при загрузке страницы
     updateWord();
-});
 
-// ... (rest of your code)
+// Check for pressure support
+try {
+  isPressureSupported = !!window.PointerEvent && 'pressure' in PointerEvent.prototype;
+} catch (e) { }
 
 
+}
 
+);
 
-// !

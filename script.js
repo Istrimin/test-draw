@@ -5,9 +5,6 @@
 // let isBrushEyedropperActive = false;
 
 
-
-
-
 function rgbToHex(r, g, b) {
   if (r > 255 || g > 255 || b > 255)
     throw "Invalid color component";
@@ -33,11 +30,11 @@ opacityValue.classList.add('input-value');
 let uploadedImage = null;
 let clearedCanvasState = null;
 let isFillMode = false;
+let isEyedropperActive = false;
+let isBrushEyedropperActive = false;
 
-// Check for pressure support
-try {
-  isPressureSupported = !!window.PointerEvent && 'pressure' in PointerEvent.prototype;
-} catch (e) { }
+
+
 
 
 brushSizeInput.value = 3;
@@ -123,16 +120,10 @@ function toggleSymmetry() {
 }
 
 
-
 // Drawing functions
-
-
 // Eyedropper functions
 
 
-
-let isEyedropperActive = false;
-let isBrushEyedropperActive = false;
 
 function getPixelColor(x, y) {
   if (!currentCtx) {
@@ -276,6 +267,7 @@ function setDrawingColor(color) {
     }
 }
 
+        // setDrawingColor(document.getElementById('colorPicker').value);
 // add 
 // Функция отмены
 function undo() {
