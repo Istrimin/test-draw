@@ -44,34 +44,39 @@ async function fetchWords() {
         return [];
     }
 }
+// ... (your existing code)
 
 document.addEventListener('DOMContentLoaded', async function () {
     // Word navigation
     const wordList = await fetchWords();
-    let currentWordIndex = 0;
+    let currentWordIndex = 0; // This variable is no longer needed
     const wordElement = document.getElementById("Quizz");
     const previousWordButton = document.getElementById("previousWord");
     const nextWordButton = document.getElementById("nextWord");
 
+    // Function to get a random word from the list
+    function getRandomWord() {
+        return wordList[Math.floor(Math.random() * wordList.length)];
+    }
+
     function updateWord() {
-        wordElement.textContent = wordList[currentWordIndex];
+        wordElement.textContent = getRandomWord(); // Get a random word
     }
 
     previousWordButton.addEventListener("click", () => {
-        // Переходим к предыдущему слову, возвращаясь к концу списка при необходимости
-        currentWordIndex = (currentWordIndex - 1 + wordList.length) % wordList.length;
-        updateWord();
+        updateWord(); // Just update to a new random word
     });
 
     nextWordButton.addEventListener("click", () => {
-        // Переходим к следующему слову, возвращаясь к началу списка при необходимости
-        currentWordIndex = (currentWordIndex + 1) % wordList.length;
-        updateWord();
+        updateWord(); // Just update to a new random word
     });
 
     // Отображаем первое слово при загрузке страницы
     updateWord();
 });
+
+// ... (rest of your code)
+
 
 
 

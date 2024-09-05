@@ -146,32 +146,32 @@
             cursor: url('cursors/pencil.png'), auto;
         }
 
+        .color-picker-group-two input[type="color"] {
+            appearance: none;
+            /* -webkit-appearance: none;    */
+            border: none;
+            width: 20px;
+            /* Увеличим размер для лучшей видимости */
+            height: 20px;
+            /* padding: 0; */
+            cursor: pointer;
+        }
 
-.color-picker-group-two input[type="color"] {
-    appearance: none;
-    -webkit-appearance: none;   
-    border: none;
-    width: 20px;  /* Увеличим размер для лучшей видимости */
-    height: 20px;
-    padding: 0;
-    cursor: pointer;
-}
+        .color-picker-group-two input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
 
-.color-picker-group-two input[type="color"]::-webkit-color-swatch-wrapper {
-    padding: 0;
-}
+        .color-picker-group-two input[type="color"]::-webkit-color-swatch {
+            border: none;
+            border-radius: 0;
+            /* Убираем скругление углов */
+        }
 
-.color-picker-group-two input[type="color"]::-webkit-color-swatch {
-    border: none;
-    border-radius: 0;  /* Убираем скругление углов */
-}
-
-/* Для Firefox */
-.color-picker-group-two input[type="color"]::-moz-color-swatch {
-    border: none;
-    border-radius: 0;
-}
-
+        /* Для Firefox */
+        .color-picker-group-two input[type="color"]::-moz-color-swatch {
+            border: none;
+            border-radius: 0;
+        }
     </style>
 </head>
 
@@ -183,6 +183,7 @@
             <div id="message-container" style="display: none;">
                 <p id="message"></p>
             </div>
+            <button id="identifyLayerBtn" title="Определить слой">🔍</button>
             <input type="file" id="imageInput" accept="image/*" style="display: none;">
             <button id="UploadButton" title="Загрузить изображение (U)">🌺</button>
             <button id="saveImageBtn" title="Сохранить изображение">🎬</button>
@@ -218,9 +219,9 @@
                         <input type="color" id="colorPicker7" value="#00ffff" title="Цвет кисти 7">
                         <input type="color" id="colorPicker8" value="#0000ff" title="Цвет кисти 8">
                         <input type="color" id="colorPicker9" value="#800080" title="Цвет кисти 9">
-                    <div class="color-picker-group-two">
-                        <input type="color" id="backgroundPicker" value="#ffffff" title="Цвет фона (B)">
-                    </div>
+                        <div class="color-picker-group-two">
+                            <input type="color" id="backgroundPicker" value="#ffffff" title="Цвет фона (B)">
+                        </div>
                     </div>
                     <div class="word-navigation">
                         <button id="previousWord" title="Предыдущее слово">&lt;</button>
@@ -369,7 +370,9 @@
             console.log('Switched to layer:', currentLayer, 'Context:', currentCtx);
 
             // Update button colors when switching layers
-            updateLayerButtonColor(layerNum);
+            if (!isErasing) {
+                updateLayerButtonColor(layerNum);
+            }
 
             if (layerColors[layerNum]) {
                 currentCtx.strokeStyle = layerColors[layerNum];
@@ -404,8 +407,22 @@
             }
             history[currentLayer].push(currentCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height));
             redoHistory[currentLayer] = [];
-            console.log('State saved for layer:', currentLayer);
         }
+
+
+        // function saveState() {
+        //     if (!currentCtx) {
+        //         console.error('ошибка в функции saveState', currentLayer);
+        //         return;
+        //     }
+
+        //     const currentState = currentCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height);
+        //     history[currentLayer].push(currentState);
+        //     redoHistory[currentLayer] = []; // Очищаем redo историю при новом действии
+
+        //     console.log('State saved for layer:', currentLayer);
+        // }
+
 
         function startDrawing(e) {
             if (!currentCtx) {
@@ -472,18 +489,18 @@
             }
         }
 
-const colorPickers = document.querySelectorAll('input[type="color"]');
-colorPickers.forEach((picker, index) => {
-    picker.addEventListener('input', (event) => {
-        setDrawingColor(event.target.value);
-    });
-    // Назначаем горячие клавиши для выбора цветов
-    document.addEventListener('keydown', (e) => {
-        if (e.key === (index + 1).toString()) {
-            setDrawingColor(picker.value);
-        }
-    });
-});
+        const colorPickers = document.querySelectorAll('input[type="color"]');
+        colorPickers.forEach((picker, index) => {
+            picker.addEventListener('input', (event) => {
+                setDrawingColor(event.target.value);
+            });
+            // Назначаем горячие клавиши для выбора цветов
+            document.addEventListener('keydown', (e) => {
+                if (e.key === (index + 1).toString()) {
+                    setDrawingColor(picker.value);
+                }
+            });
+        });
 
         document.addEventListener('touchstart', function (e) {
             if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT') {
@@ -504,24 +521,24 @@ colorPickers.forEach((picker, index) => {
                 e.stopPropagation();
             });
         });
-function clearCanvas() {
-    if (!currentCtx) return;
+        function clearCanvas() {
+            if (!currentCtx) return;
 
-    // Save the current state before clearing
-    saveState();
+            // Save the current state before clearing
+            saveState();
 
-    // Clear only the current layer's canvas
-    currentCtx.clearRect(0, 0, layers[currentLayer].width, layers[currentLayer].height);
+            // Clear only the current layer's canvas
+            currentCtx.clearRect(0, 0, layers[currentLayer].width, layers[currentLayer].height);
 
-    // If it's the background layer (layer 1), fill it with the background color
-    if (currentLayer === 1) {
-        currentCtx.fillStyle = backgroundPicker.value;
-        currentCtx.fillRect(0, 0, layers[currentLayer].width, layers[currentLayer].height);
-    }
+            // If it's the background layer (layer 1), fill it with the background color
+            if (currentLayer === 1) {
+                currentCtx.fillStyle = backgroundPicker.value;
+                currentCtx.fillRect(0, 0, layers[currentLayer].width, layers[currentLayer].height);
+            }
 
-    // Save the cleared state
-    saveState();
-}
+            // Save the cleared state
+            saveState();
+        }
 
 
         // // Функция отмены
@@ -594,13 +611,78 @@ function clearCanvas() {
                 currentCtx.drawImage(uploadedImage, 0, 0, layer2.width, layer2.height);
             }
         }
-function setBackground() {
-    if (contexts[1]) {
-        contexts[1].fillStyle = backgroundPicker.value;
-        contexts[1].fillRect(0, 0, layers[1].width, layers[1].height);
-        saveState();
-    }
-}
+        function setBackground() {
+            if (contexts[1]) {
+                contexts[1].fillStyle = backgroundPicker.value;
+                contexts[1].fillRect(0, 0, layers[1].width, layers[1].height);
+                saveState();
+            }
+        }
+
+        // идентификатор слоев
+        let isIdentifyingLayer = false;
+        let wasDrawing = false;  // Moved `wasDrawing` to global scope
+
+        const identifyLayerBtn = document.getElementById('identifyLayerBtn');
+
+        // Add a single click event listener to the canvas container
+
+        // Canvas container click event to identify layers
+        canvasContainer.addEventListener('click', (e) => {
+            if (isIdentifyingLayer) {
+                identifyLayerClickHandler(e);
+
+                // Reset cursor and drawing state AFTER layer identification
+                canvasContainer.style.cursor = 'default';
+                isDrawing = wasDrawing;  // Restore drawing state
+
+                // Deactivate layer identification mode
+                isIdentifyingLayer = false;
+                identifyLayerBtn.classList.remove('active');
+            }
+        });
+
+        // Button click event to toggle layer identification mode
+        identifyLayerBtn.addEventListener('click', () => {
+            // Toggle layer identification mode
+            isIdentifyingLayer = !isIdentifyingLayer;
+
+            // Toggle visual feedback for the button
+            identifyLayerBtn.classList.toggle('active', isIdentifyingLayer);
+
+            if (isIdentifyingLayer) {
+                // Temporarily disable drawing when identifying the layer
+                wasDrawing = isDrawing;  // Save current drawing state
+                isDrawing = false;
+
+                canvasContainer.style.cursor = 'crosshair';
+            } else {
+                // Restore default cursor when exiting identification mode
+                canvasContainer.style.cursor = 'default';
+                isDrawing = wasDrawing;  // Restore drawing state
+            }
+        });
+
+        // Handler to identify the clicked layer
+        function identifyLayerClickHandler(e) {
+            const rect = layers[1].getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            for (let i = layerCount; i >= 1; i--) {
+                const ctx = contexts[i];
+                const pixelData = ctx.getImageData(x, y, 1, 1).data;
+
+                if (pixelData[3] > 0) {  // Alpha value > 0 means something is drawn
+                    setCurrentLayer(i);
+                    console.log('Found drawing on layer:', i);
+                    updateLayerButtonColor(i);
+                    break;  // Exit the loop after finding the top-most layer
+                }
+            }
+        }
+
+
     </script>
     <script src="cursors.js" defer></script>
     <script src="script.js" defer></script>

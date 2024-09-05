@@ -313,18 +313,7 @@ function redo() {
 }
 
 // Обновленная функция saveState
-function saveState() {
-    if (!currentCtx) {
-        console.error('ошибка в функции saveState', currentLayer);
-        return;
-    }
-    
-    const currentState = currentCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height);
-    history[currentLayer].push(currentState);
-    redoHistory[currentLayer] = []; // Очищаем redo историю при новом действии
-    
-    console.log('State saved for layer:', currentLayer);
-}
+
 
 
 
