@@ -12,7 +12,7 @@ body {
     display: flex;
     align-items: flex-start;
 
-/* отключаем прокрутку на странице */
+    /* отключаем прокрутку на странице */
     overscroll-behavior-x: none;
     overflow-x: hidden;
 
@@ -23,21 +23,32 @@ body {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
-/* added     */
-    overflow: hidden; 
+    /* added     */
+    overflow: hidden;
 }
+
+/* 
+#drawingCanvas {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    touch-action: none;
+} */
+
 
 canvas {
     border-radius: 20px;
 }
+
 /* canvas {
     pointer-events: auto;
 } */
 
 
 /*  */
-.pipetteCursor{
-cursor: url('../cursors/pipette.png'),auto;
+.pipetteCursor {
+    cursor: url('../cursors/pipette.png'), auto;
 }
 
 :root {
@@ -58,10 +69,10 @@ button:hover,
 input[type="color"]:hover,
 input[type="range"]:hover {
 
-cursor: url('/cursors/pipette32.png'), auto; 
+    cursor: url('/cursors/pipette32.png'), auto;
 
     color: rgb(0, 255, 13);
-    font-size: xx-large; 
+    /* font-size: xx-large;  */
 }
 
 
@@ -79,17 +90,21 @@ cursor: url('/cursors/pipette32.png'), auto;
 #symmetry.active {
     background-color: var(--button-active-color);
 }
+
 #eyedropperBtn.active {
     background-color: var(--button-active-color);
 }
 
 
-a[href="index.html"] { /* Targets the <a> element with href="index.html" */
-  font-size: 100px; /* Sets font size to 20 pixels */
+a[href="index.html"] {
+    /* Targets the <a> element with href="index.html" */
+    font-size: 60px;
+    /* Sets font size to 20 pixels */
 
 }
+
 a {
-  text-decoration: none;
+    text-decoration: none;
 }
 
 
@@ -98,8 +113,9 @@ a {
     flex-direction: column;
     max-height: 600px;
     /* margin-bottom: 5px; */
-    overflow-y: auto; 
+    overflow-y: auto;
 }
+
 .tools-column {
     display: flex;
     flex-direction: row;
@@ -137,9 +153,9 @@ a {
 @import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
 
 #Quizz {
-  font-family: 'Lobster', cursive; 
-  font-size: 5px;
-  font-weight: bold;
+    font-family: 'Lobster', cursive;
+    font-size: 5px;
+    font-weight: bold;
 }
 
 /* @import url('https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap');
@@ -195,7 +211,7 @@ input[type="range"]:hover {
 }
 
 input[type="range"] {
-    width: 100%; 
+    width: 100%;
 }
 
 input[type="range"]::-webkit-slider-thumb {
@@ -214,40 +230,41 @@ input[type="range"]::-moz-range-thumb {
     cursor: pointer;
     border-radius: 50%;
 }
-		#cursorPanel {
-			position: absolute;
-			top: 0;
-			left: 0;
-			right: 0;
-			bottom: 0;
-			background-color: transparent;
-			border-radius: 20px;
-			display: none;
-			z-index: 10;
-			padding: 10px;
-			box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-			overflow-y: auto;
-		}
 
-		.cursor-item {
-			display: inline-block;
-			margin: 5px;
-			cursor: pointer;
-		}
+#cursorPanel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: transparent;
+    border-radius: 20px;
+    display: none;
+    z-index: 10;
+    padding: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+}
 
-		.cursor-preview {
-			width: 64px;
-			height: 64px;
-			border: 1px solid #00cc4100;
-			padding: 2px;
-		}
+.cursor-item {
+    display: inline-block;
+    margin: 5px;
+    cursor: pointer;
+}
 
-		.cursor-item:hover .cursor-preview {
-			border-color: hsl(69, 100%, 52%);
-		}
+.cursor-preview {
+    width: 64px;
+    height: 64px;
+    border: 1px solid #00cc4100;
+    padding: 2px;
+}
+
+.cursor-item:hover .cursor-preview {
+    border-color: hsl(69, 100%, 52%);
+}
 
 
-.canvas-container { 
+.canvas-container {
     position: relative;
     /* display: flex; */
     justify-content: center;
@@ -256,15 +273,16 @@ input[type="range"]::-moz-range-thumb {
     color: #ffffff;
     margin: 0;
 }
-		.canv-container {
-			position: relative;
-		}
+
+.canv-container {
+    position: relative;
+}
 
 
 ::-webkit-scrollbar {
     width: 5px;
     background-color: transparent;
-} 
+}
 
 ::-webkit-scrollbar-track {
     background: transparent;
@@ -272,9 +290,10 @@ input[type="range"]::-moz-range-thumb {
 
 ::-webkit-scrollbar-thumb {
     background-color: rgb(66, 0, 66);
-    color:bisque;
+    color: bisque;
     border-radius: 2.5px;
 }
+
 /* вид скролбара(не ползунка а поля) */
 .input-value {
     color: transparent;
@@ -284,45 +303,36 @@ input[type="range"]::-moz-range-thumb {
 
 
 
-#drawingCanvas {
-  user-select: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-    touch-action: none;
-}
-
-
 
 
 
 
 
 #message-container p {
-color: #80ff8f;
-width: 100%;
- text-align: center;
+    color: #80ff8f;
+    width: 100%;
+    text-align: center;
 }
 
 #message {
-  font-size: 20px; 
+    font-size: 20px;
 }
 
 
 
 
-        .time {
-            background-color: transparent;
-            color: #ffffff;
-            font-family: monospace;
-            font-size: 10px;
-            margin: 0;
-            padding: 0;
-        }
+.time {
+    background-color: transparent;
+    color: #ffffff;
+    font-family: monospace;
+    font-size: 10px;
+    margin: 0;
+    padding: 0;
+}
 
 /* Optional: Add a "no-drop" cursor style for better visual feedback */
 body.no-drop {
-  cursor: not-allowed; 
+    cursor: not-allowed;
 }
 
 
@@ -358,21 +368,22 @@ input[type="range"]::-moz-range-thumb {
 
 
 .pressure-indicator {
-  width: 400px;
-  height: 20px;
-  border-radius: 10px;
-  margin-bottom: 10px;
+    width: 400px;
+    height: 20px;
+    border-radius: 10px;
+    margin-bottom: 10px;
 }
 
 .pressureBar {
-  height: 100%;
-  background-color: #4CAF50;
-  width: 0%;
-  border-radius: 5px;
-  transition: width 0.1s ease;
+    height: 100%;
+    background-color: #4CAF50;
+    width: 0%;
+    border-radius: 5px;
+    transition: width 0.1s ease;
 }
 
-.header-container{
+.header-container {
 
-size: 300px;
-font-size: xx-large;}
+    size: 300px;
+    font-size: xx-large;
+}

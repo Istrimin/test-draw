@@ -1,73 +1,73 @@
-        document.addEventListener('keydown', function(event) {
-            // Use a single switch for better organization
-            switch (event.code) {
-                case 'KeyA':
-                    document.getElementById('eyedropperBtn').click();
-                    break;
-                case 'KeyZ':
-                    undo();
-                    break;
-                case 'KeyX':
-                    redo();
-                    break;
-                case 'KeyB': // Background color
-                    event.preventDefault();
-                    document.getElementById('backgroundPicker').click();
-                    break;
-                case 'KeyE': // Eraser
-                    event.preventDefault();
-                    document.getElementById('eraser').click();
-                    break;
-                case 'KeyS': // Save
-                    event.preventDefault();
-                    document.getElementById('saveImageBtn').click();
-                    break;
-                case 'KeyR': // Clear
-                    event.preventDefault();
-                    document.getElementById('clear').click();
-                    break;
-                case 'KeyQ': // Symmetry
-                    event.preventDefault();
-                    document.getElementById('symmetry').click();
-                    break;
-                case 'KeyF': // Fill Mode
-                    event.preventDefault();
-                    document.getElementById('fillModeBtn').click();
-                    break;
-                case 'KeyU': // Upload Image
-                    event.preventDefault();
-                    document.getElementById('UploadButton').click();
-                    break;
-            }
-        });
+document.addEventListener('keydown', function(event) {
+    // Normalize the key to be case-insensitive and layout-independent
+    const keyPressed = event.key.toLowerCase(); 
 
-// кнопки
+    // Use a single switch for better organization
+    switch (keyPressed) {
+        case 'a': 
+            document.getElementById('eyedropperBtn').click();
+            break;
+        case 'z':
+            undo();
+            break;
+        case 'x':
+            redo();
+            break;
+        case 'b': // Background color
+            event.preventDefault();
+            document.getElementById('backgroundPicker').click();
+            break;
+        case 'e': // Eraser
+            event.preventDefault();
+            document.getElementById('eraserBtn').click();
+            break;
+        case 's': // Save
+            event.preventDefault();
+            document.getElementById('saveImageBtn').click();
+            break;
+        case 'r': // Clear
+            event.preventDefault();
+            document.getElementById('clear').click();
+            break;
+        case 'q': // Symmetry
+            event.preventDefault();
+            document.getElementById('symmetry').click();
+            break;
+        case 'f': // Fill Mode
+            event.preventDefault();
+            document.getElementById('fillModeBtn').click();
+            break;
+        case 'u': // Upload Image
+            event.preventDefault();
+            document.getElementById('UploadButton').click();
+            break;
+        case 'w': // Toggle previous layer
+            event.preventDefault(); 
+            togglePreviousLayer();
+            break;
+    }
+});
+
+// ... rest of your hotkey.js code (togglePreviousLayer, etc.)
+
 // ... (Your existing JavaScript code) ...
 
-// Get the undo and redo buttons by their IDs
-const undoButton = document.getElementById('undo');
-const redoButton = document.getElementById('redo');
-
-// Add event listeners for 'click' events
-undoButton.addEventListener('click', undo);
-redoButton.addEventListener('click', redo);
-
+// ... (Your existing JavaScript code) ...
 
 // пипетка
-        document.getElementById('eyedropperBtn').addEventListener('click', toggleEyedropper);
-        document.getElementById('brushEyedropperBtn').addEventListener('click', toggleBrushEyedropper);
+document.getElementById('eyedropperBtn').addEventListener('click', toggleEyedropper);
+document.getElementById('brushEyedropperBtn').addEventListener('click', toggleBrushEyedropper);
 
 // Keyboard shortcuts
 document.addEventListener('keydown', (event) => {
-  if (event.code >= 'Digit1' && event.code <= 'Digit9') {
-    const index = parseInt(event.code.replace('Digit', '')) - 1;
-    if (index < colorPickers.length) {
-      const color = colorPickers[index].value;
-      setDrawingColor(color);
-    }
-  } else if (event.code === 'KeyA') {
+  // ... (your existing number key logic)
+
+  // Normalize the key for layout independence
+  const keyPressed = event.code.toLowerCase(); 
+
+  if (keyPressed === 'keya') {
     toggleEyedropper();
-  } else if (event.code === 'KeyD') {
+  } else if (keyPressed === 'keyd') {
     toggleBrushEyedropper();
   }
 });

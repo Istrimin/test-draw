@@ -209,11 +209,11 @@ function downloadImage() {
   // Create a temporary canvas to merge all layers
   const mergeCanvas = document.createElement('canvas');
   const mergeCtx = mergeCanvas.getContext('2d');
-  mergeCanvas.width = layers[1].width; // Assuming all layers have the same size
-  mergeCanvas.height = layers[1].height;
+  mergeCanvas.width = layers[2].width; // Assuming all layers have the same size
+  mergeCanvas.height = layers[2].height;
 
   // Draw each layer onto the temporary canvas
-  for (let i = 1; i <= layerCount; i++) {
+  for (let i = 2; i <= layerCount; i++) {
     mergeCtx.drawImage(layers[i], 0, 0);
   }
 
@@ -251,3 +251,17 @@ exitLink.addEventListener('click', () => {
     window.location.href = 'index.html';
   });
 });
+
+// add
+
+function setDrawingColor(color) {
+    if (currentCtx) {
+        // Store the color for the current layer
+        layerColors[currentLayer] = color;
+        // Update the current context's color for immediate visual feedback
+        currentCtx.strokeStyle = color;
+        // Update button color when drawing color changes
+        updateLayerButtonColor(currentLayer);
+    }
+}
+
