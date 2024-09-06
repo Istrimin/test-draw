@@ -12,9 +12,6 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jscolor/2.4.5/jscolor.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
 	<script src="cancerCursors.js" defer></script>
-
-
-
 	<style>
 		/* Стили для активной кнопки */
 		.active {
@@ -22,9 +19,9 @@
 		}
 
 #drawingCanvas {
-  /* ... other canvas styles ... */
-  cursor: none; /* Initially hide the default cursor */
+  cursor: url('cursors/1.png'), auto; /* Предполагая, что 'cursors/1.png' - путь к изображению вашего карандаша */
 }
+
 	</style>
 </head>
 
@@ -33,12 +30,12 @@
 		<div class="header-container">
 			<!-- <div id="time" class="time"></div>
 			<div id="startTime" class="time"></div> -->
-
 		</div>
 	</header>
 	<main class="base-container">
 		<aside class="sidebar">
-			<a href="../index.html" target="_self" title="Выйти из команты" id="exitLink">🚪</a>
+			<a href="../index.html" target="_self" title="Выйти из команты" id="exitLink"
+				style="font-size: 50px;">🚪</a>
 			<div id="message-container" style="display: none;">
 				<p id="message"></p>
 			</div>
@@ -51,8 +48,8 @@
 			<button id="clearBtn" title="Очистить">💀</button>
 			<button id="saveImageBtn" title="Сохранить изображение">💾</button>
 			<!-- <button id="eraserBtn" title="Стерка">🧽</button> -->
-<button id="eraserBtn" title="Стерка">
-  <img src="cursors/2.png" alt="Стерка" width="50"> 
+			<button id="eraserBtn" title="Стерка">
+				<img src="cursors/2.png" alt="Стерка" width="50">
 		</aside>
 		<div class="canvas-and-sliders">
 			<div class="canvas-container">
@@ -62,10 +59,11 @@
 					<button id="previousWord" title="Предыдущее слово">&lt;</button>
 					<p id="Quizz"></p>
 					<button id="nextWord" title="Следующее слово">&gt;</button>
-			<div id="elapsedTime" class="time"></div>
+					<div id="elapsedTime" class="time"></div>
 				</div>
 				<div class="canv-container">
-					<canvas id="backgroundCanvas" width="700" height="500" style="width:700px;height:500px; position: absolute; z-index: -1;"></canvas>
+					<canvas id="backgroundCanvas" width="700" height="500"
+						style="width:700px;height:500px; position: absolute; z-index: -1;"></canvas>
 					<canvas id="drawingCanvas" width="700" height="500" style="width:700px;height:500px;">
 					</canvas>
 					<div id="cursorPanel" class="cursor-panel" style="display: none;">
@@ -83,231 +81,300 @@
 		</div>
 	</main>
 	<script>
-const colorPicker = document.getElementById('colorPicker');
-const backgroundPicker = document.getElementById('backgroundPicker');
-const drawingCanvas = document.getElementById('drawingCanvas');
-const backgroundCanvas = document.getElementById('backgroundCanvas');
-const ctx = drawingCanvas.getContext('2d');
-const bgCtx = backgroundCanvas.getContext('2d');
-const symmetryButton = document.getElementById('symmetry');
-const brushSizeInput = document.getElementById('brushSize');
-const eyedropperBtn = document.getElementById('eyedropperBtn');
-const clearBtn = document.getElementById('clearBtn');
-const eraserBtn = document.getElementById('eraserBtn');
+		const colorPicker = document.getElementById('colorPicker');
+		const backgroundPicker = document.getElementById('backgroundPicker');
+		const drawingCanvas = document.getElementById('drawingCanvas');
+		const backgroundCanvas = document.getElementById('backgroundCanvas');
+		const ctx = drawingCanvas.getContext('2d');
+		const bgCtx = backgroundCanvas.getContext('2d');
+		const symmetryButton = document.getElementById('symmetry');
+		const brushSizeInput = document.getElementById('brushSize');
+		const eyedropperBtn = document.getElementById('eyedropperBtn');
+		const clearBtn = document.getElementById('clearBtn');
+		const eraserBtn = document.getElementById('eraserBtn');
 
-let isDrawing = false;
-let lastX = 0;
-let lastY = 0;
-let isEyedropperActive = false;
-let symmetry = true;
-let isErasing = false; 
+		let isDrawing = false;
+		let lastX = 0;
+		let lastY = 0;
+		let isEyedropperActive = false;
+		let symmetry = true;
+		let isErasing = false;
 
-ctx.imageSmoothingEnabled = false;
-ctx.willReadFrequently = true;
+		ctx.imageSmoothingEnabled = false;
+		ctx.willReadFrequently = true;
 
-colorPicker.addEventListener('input', () => {
-  ctx.strokeStyle = colorPicker.value;
-});
+		colorPicker.addEventListener('input', () => {
+			ctx.strokeStyle = colorPicker.value;
+		});
 
-backgroundPicker.addEventListener('input', () => {
-  bgCtx.fillStyle = backgroundPicker.value;
-  bgCtx.fillRect(0, 0, backgroundCanvas.width, backgroundCanvas.height);
-});
+		backgroundPicker.addEventListener('input', () => {
+			bgCtx.fillStyle = backgroundPicker.value;
+			bgCtx.fillRect(0, 0, backgroundCanvas.width, backgroundCanvas.height);
+		});
 
-drawingCanvas.addEventListener('pointerdown', startDrawing);
-drawingCanvas.addEventListener('pointermove', draw);
-drawingCanvas.addEventListener('pointerup', stopDrawing);
-drawingCanvas.addEventListener('pointerout', stopDrawing);
-drawingCanvas.addEventListener('pointercancel', stopDrawing);
+		drawingCanvas.addEventListener('pointerdown', startDrawing);
+		drawingCanvas.addEventListener('pointermove', draw);
+		drawingCanvas.addEventListener('pointerup', stopDrawing);
+		drawingCanvas.addEventListener('pointerout', stopDrawing);
+		drawingCanvas.addEventListener('pointercancel', stopDrawing);
 
-symmetryButton.addEventListener('click', toggleSymmetry);
+		symmetryButton.addEventListener('click', toggleSymmetry);
 
-function saveState() {
-  history.push(ctx.getImageData(0, 0, drawingCanvas.width, drawingCanvas.height));
-  redoHistory = [];
-}
+		function saveState() {
+			history.push(ctx.getImageData(0, 0, drawingCanvas.width, drawingCanvas.height));
+			redoHistory = [];
+		}
 
-function startDrawing(e) {
-  isDrawing = true;
-  [lastX, lastY] = [e.offsetX, e.offsetY];
-}
+		function startDrawing(e) {
+			isDrawing = true;
+			[lastX, lastY] = [e.offsetX, e.offsetY];
+		}
 
-function draw(e) {
-  if (!isDrawing) return;
+		function draw(e) {
+			if (!isDrawing) return;
 
-  e.preventDefault();
-  const rect = drawingCanvas.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
-  const pressure = e.pressure || 1;
+			e.preventDefault();
+			const rect = drawingCanvas.getBoundingClientRect();
+			const x = e.clientX - rect.left;
+			const y = e.clientY - rect.top;
+			const pressure = e.pressure || 1;
 
-  ctx.lineWidth = brushSizeInput.value * pressure;
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
+			ctx.lineWidth = brushSizeInput.value * pressure;
+			ctx.lineCap = 'round';
+			ctx.lineJoin = 'round';
 
-  if (isErasing) {
-    ctx.globalCompositeOperation = 'destination-out'; 
-  } else {
-    ctx.globalCompositeOperation = 'source-over'; 
-    ctx.strokeStyle = colorPicker.value; 
-  }
+			if (isErasing) {
+				ctx.globalCompositeOperation = 'destination-out';
+			} else {
+				ctx.globalCompositeOperation = 'source-over';
+				ctx.strokeStyle = colorPicker.value;
+			}
 
-  ctx.beginPath();
-  ctx.moveTo(lastX, lastY);
-  ctx.lineTo(x, y);
-  ctx.stroke();
+			ctx.beginPath();
+			ctx.moveTo(lastX, lastY);
+			ctx.lineTo(x, y);
+			ctx.stroke();
 
-  if (symmetry) {
-    const centerX = drawingCanvas.width / 2;
-    const symmetricX = 2 * centerX - x;
+			if (symmetry) {
+				const centerX = drawingCanvas.width / 2;
+				const symmetricX = 2 * centerX - x;
 
-    ctx.beginPath();
-    ctx.moveTo(2 * centerX - lastX, lastY);
-    ctx.lineTo(symmetricX, y);
-    ctx.stroke();
-  }
+				ctx.beginPath();
+				ctx.moveTo(2 * centerX - lastX, lastY);
+				ctx.lineTo(symmetricX, y);
+				ctx.stroke();
+			}
 
-  [lastX, lastY] = [x, y];
-}
+			[lastX, lastY] = [x, y];
+		}
 
 
-function stopDrawing() {
-  if (isDrawing) {
-    isDrawing = false;
-    saveState();
-  }
-}
+		function stopDrawing() {
+			if (isDrawing) {
+				isDrawing = false;
+				saveState();
+			}
+		}
 
-function toggleSymmetry() {
-  symmetry = !symmetry;
-  symmetryButton.classList.toggle('active', symmetry);
-}
+		function toggleSymmetry() {
+			symmetry = !symmetry;
+			symmetryButton.classList.toggle('active', symmetry);
+		}
 
-document.addEventListener('DOMContentLoaded', () => {
-  const cursorPanel = document.getElementById('cursorPanel');
-  const cursorList = document.getElementById('cursorList');
-  const changeCursorBtn = document.getElementById('changeCursorBtn');
+		document.addEventListener('DOMContentLoaded', () => {
+			const cursorPanel = document.getElementById('cursorPanel');
+			const cursorList = document.getElementById('cursorList');
+			const changeCursorBtn = document.getElementById('changeCursorBtn');
 
-  function loadCursors() {
-    cursorList.innerHTML = '';
-    for (let i = 1; i <= 10; i++) {
-      const cursorUrl = `cursors/${i}.png`;
+			function loadCursors() {
+				cursorList.innerHTML = '';
+				for (let i = 1; i <= 10; i++) {
+					const cursorUrl = `cursors/${i}.png`;
 
-      const image = new Image();
-      image.src = cursorUrl;
-      image.onload = () => {
-        
-        let targetWidth = image.width;
-        let targetHeight = image.height;
+					const image = new Image();
+					image.src = cursorUrl;
+					image.onload = () => {
 
-        
-        const maxSize = 64; 
+						let targetWidth = image.width;
+						let targetHeight = image.height;
 
-        if (targetWidth > maxSize || targetHeight > maxSize) {
-          const aspectRatio = targetWidth / targetHeight;
-          if (targetWidth > targetHeight) {
-            targetWidth = maxSize;
-            targetHeight = maxSize / aspectRatio;
-          } else {
-            targetHeight = maxSize;
-            targetWidth = maxSize * aspectRatio;
-          }
-        }
 
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = targetWidth;
-        canvas.height = targetHeight;
-        ctx.drawImage(image, 0, 0, targetWidth, targetHeight);
-        const resizedCursorUrl = canvas.toDataURL();
-        
+						const maxSize = 64;
 
-        const cursorImg = document.createElement('img');
-        cursorImg.src = resizedCursorUrl; 
-        cursorImg.alt = `cursor${i}`;
-        cursorImg.style.maxWidth = `${maxSize}px`; 
+						if (targetWidth > maxSize || targetHeight > maxSize) {
+							const aspectRatio = targetWidth / targetHeight;
+							if (targetWidth > targetHeight) {
+								targetWidth = maxSize;
+								targetHeight = maxSize / aspectRatio;
+							} else {
+								targetHeight = maxSize;
+								targetWidth = maxSize * aspectRatio;
+							}
+						}
 
-        cursorImg.addEventListener('click', () => {
-          drawingCanvas.style.cursor = `url(${resizedCursorUrl}), auto`; 
-          cursorPanel.style.display = 'none';
-        });
+						const canvas = document.createElement('canvas');
+						const ctx = canvas.getContext('2d');
+						canvas.width = targetWidth;
+						canvas.height = targetHeight;
+						ctx.drawImage(image, 0, 0, targetWidth, targetHeight);
+						const resizedCursorUrl = canvas.toDataURL();
 
-        cursorList.appendChild(cursorImg);
-      };
-    }
-  }
 
-  changeCursorBtn.addEventListener('click', () => {
-    cursorPanel.style.display = cursorPanel.style.display === 'none' ? 'block' : 'none';
-  });
+						const cursorImg = document.createElement('img');
+						cursorImg.src = resizedCursorUrl;
+						cursorImg.alt = `cursor${i}`;
+						cursorImg.style.maxWidth = `${maxSize}px`;
 
-  loadCursors();
-});
+						cursorImg.addEventListener('click', () => {
+							drawingCanvas.style.cursor = `url(${resizedCursorUrl}), auto`;
+							cursorPanel.style.display = 'none';
+						});
 
-eyedropperBtn.addEventListener('click', toggleEyedropper);
+						cursorList.appendChild(cursorImg);
+					};
+				}
+			}
 
-function toggleEyedropper() {
-  isEyedropperActive = !isEyedropperActive;
-  eyedropperBtn.classList.toggle('active', isEyedropperActive);
+			changeCursorBtn.addEventListener('click', () => {
+				cursorPanel.style.display = cursorPanel.style.display === 'none' ? 'block' : 'none';
+			});
 
-  if (isEyedropperActive) {
-    drawingCanvas.style.cursor = 'url(cursors/4.png), auto'; 
-  } else {
-    drawingCanvas.style.cursor = 'default';
-  }
-}
+			loadCursors();
+		});
 
-drawingCanvas.addEventListener('click', (e) => {
-  if (isEyedropperActive) {
-    const rect = drawingCanvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const pixelData = ctx.getImageData(x, y, 1, 1).data;
-    const color = `rgb(${pixelData[0]}, ${pixelData[1]}, ${pixelData[2]})`;
+		eyedropperBtn.addEventListener('click', toggleEyedropper);
 
-    colorPicker.value = color;
-    ctx.strokeStyle = color;
+		function toggleEyedropper() {
+			isEyedropperActive = !isEyedropperActive;
+			eyedropperBtn.classList.toggle('active', isEyedropperActive);
 
-    isEyedropperActive = false;
-    drawingCanvas.style.cursor = 'default';
-  }
-});
+			if (isEyedropperActive) {
+				drawingCanvas.style.cursor = 'url(cursors/4.png), auto';
+			} else {
+				drawingCanvas.style.cursor = 'default';
+			}
+		}
 
-let history = [];
-let redoHistory = [];
+		drawingCanvas.addEventListener('click', (e) => {
+			if (isEyedropperActive) {
+				const rect = drawingCanvas.getBoundingClientRect();
+				const x = e.clientX - rect.left;
+				const y = e.clientY - rect.top;
+				const pixelData = ctx.getImageData(x, y, 1, 1).data;
+				const color = `rgb(${pixelData[0]}, ${pixelData[1]}, ${pixelData[2]})`;
 
-document.getElementById('undo').addEventListener('click', () => {
-  if (history.length > 0) {
-    redoHistory.push(history.pop());
-    const previousState = history[history.length - 1];
-    ctx.putImageData(previousState, 0, 0);
-  }
-});
+				colorPicker.value = color;
+				ctx.strokeStyle = color;
 
-document.getElementById('redo').addEventListener('click', () => {
-  if (redoHistory.length > 0) {
-    history.push(redoHistory.pop());
-    const nextState = history[history.length - 1];
-    ctx.putImageData(nextState, 0, 0);
-  }
-});
+				isEyedropperActive = false;
+				drawingCanvas.style.cursor = 'default';
+			}
+		});
 
-clearBtn.addEventListener('click', () => {
-  ctx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
-  saveState();
-});
+		let history = [];
+		let redoHistory = [];
 
-eraserBtn.addEventListener('click', () => {
-  isErasing = !isErasing;
-  eraserBtn.classList.toggle('active', isErasing);
+		document.getElementById('undo').addEventListener('click', () => {
+			if (history.length > 0) {
+				redoHistory.push(history.pop());
+				const previousState = history[history.length - 1];
+				ctx.putImageData(previousState, 0, 0);
+			}
+		});
 
-  
-  if (isErasing) {
-    drawingCanvas.style.cursor = 'url(cursors/2.png), auto'; 
-  } else {
-    drawingCanvas.style.cursor = 'default';
-  }
-});
+		document.getElementById('redo').addEventListener('click', () => {
+			if (redoHistory.length > 0) {
+				history.push(redoHistory.pop());
+				const nextState = history[history.length - 1];
+				ctx.putImageData(nextState, 0, 0);
+			}
+		});
+
+		clearBtn.addEventListener('click', () => {
+			ctx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+			saveState();
+		});
+
+		eraserBtn.addEventListener('click', () => {
+			isErasing = !isErasing;
+			eraserBtn.classList.toggle('active', isErasing);
+
+
+			if (isErasing) {
+				drawingCanvas.style.cursor = 'url(cursors/2.png), auto';
+			} else {
+				drawingCanvas.style.cursor = 'default';
+			}
+		});
+// ... (your existing code) ...
+
+// // Flood Fill Functionality
+// function floodFill(e) {
+//   if (!currentCtx) {
+//     console.error('Error: currentCtx is undefined in floodFill. Current layer:', currentLayer);
+//     return;
+//   }
+
+//   const startX = e.offsetX;
+//   const startY = e.offsetY;
+//   const imageData = currentCtx.getImageData(0, 0, drawingCanvas.width, drawingCanvas.height); // Use drawingCanvas
+//   const data = imageData.data;
+//   const width = imageData.width;
+//   const height = imageData.height;
+
+//   const targetColor = getPixelColor(data, startX, startY, width);
+//   const fillColor = hexToRgba(colorPicker.value);
+//   const tolerance = 30;
+
+//   if (colorMatch(targetColor, fillColor, tolerance)) return;
+
+//   const stack = [[startX, startY]];
+//   const visited = new Uint8Array(width * height);
+
+//   while (stack.length) {
+//     const [x, y] = stack.pop();
+//     const index = y * width + x;
+
+//     if (visited[index]) continue;
+//     visited[index] = 1;
+
+//     const pixelIndex = index * 4;
+//     const currentColor = data.slice(pixelIndex, pixelIndex + 4);
+
+//     if (colorMatch(currentColor, targetColor, tolerance) || isContourPixel(x, y, data, width, height, targetColor, tolerance)) {
+//       setPixelColor(data, x, y, width, fillColor);
+
+//       if (x > 0) stack.push([x - 1, y]);
+//       if (x < width - 1) stack.push([x + 1, y]);
+//       if (y > 0) stack.push([x, y - 1]);
+//       if (y < height - 1) stack.push([x, y + 1]);
+//     }
+//   }
+
+//   // Оптимизированный дополнительный проход
+//   for (let y = 0; y < height; y++) {
+//     for (let x = 0; x < width; x++) {
+//       const index = (y * width + x) * 4;
+//       if (!colorMatch(data.slice(index, index + 4), fillColor, 0) && shouldFillPixel(x, y, data, width, height, fillColor)) {
+//         setPixelColor(data, x, y, width, fillColor);
+//       }
+//     }
+//   }
+
+//   currentCtx.putImageData(imageData, 0, 0);
+//   saveState();
+// }
+
+// // ... (rest of your flood fill helper functions) ...
+
+// // Modify the event listener for floodFill 
+// drawingCanvas.addEventListener('click', (e) => { // Use drawingCanvas here
+//   if (isFillMode) {
+//     floodFill(e);
+//   }
+// });
+
+// ... (your existing code) ...
 
 
 	</script>

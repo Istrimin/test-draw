@@ -46,42 +46,40 @@ async function fetchWords() {
 // ... (your existing code)
 
 document.addEventListener('DOMContentLoaded', async function () {
+    // Word navigation
     const wordList = await fetchWords();
-    let currentWordIndex = Math.floor(Math.random() * wordList.length); // Start with a random word
+    let currentWordIndex = 0; // This variable is no longer needed
     const wordElement = document.getElementById("Quizz");
     const previousWordButton = document.getElementById("previousWord");
     const nextWordButton = document.getElementById("nextWord");
 
+    // Function to get a random word from the list
+    function getRandomWord() {
+        return wordList[Math.floor(Math.random() * wordList.length)];
+    }
+
     function updateWord() {
-        wordElement.textContent = wordList[currentWordIndex];
+        wordElement.textContent = getRandomWord(); // Get a random word
     }
 
     previousWordButton.addEventListener("click", () => {
-        currentWordIndex = (currentWordIndex - 1 + wordList.length) % wordList.length;
-        updateWord();
+        updateWord(); // Just update to a new random word
     });
 
     nextWordButton.addEventListener("click", () => {
-        currentWordIndex = (currentWordIndex + 1) % wordList.length; 
-        updateWord();
+        updateWord(); // Just update to a new random word
     });
 
-    updateWord(); // Display the initial random word
-});
+    // Отображаем первое слово при загрузке страницы
+    updateWord();
+
+// Check for pressure support
+try {
+  isPressureSupported = !!window.PointerEvent && 'pressure' in PointerEvent.prototype;
+} catch (e) { }
 
 
+}
 
+);
 
-const brushSizeSlider = document.getElementById("brushSize");
-const brushSizeValue = document.getElementById("brushSizeValue");
-const opacityValue = document.getElementById("opacityValue");
-const opacitySlider = document.getElementById("opacity"); 
-
-
-brushSizeSlider.addEventListener("input", () => {
-    brushSizeValue.textContent = brushSizeSlider.value;
-
-});
-opacitySlider.addEventListener("input", () => { 
-    opacityValue.textContent = opacitySlider.value;
-});
