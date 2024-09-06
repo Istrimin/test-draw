@@ -6,13 +6,13 @@ if (window.PointerEvent) {
 
 
 // ---------- UI Elements ----------
-const backgroundPicker = document.getElementById('backgroundPicker');
+// const backgroundPicker = document.getElementById('backgroundPicker');
 
-const brushSizeInput = document.getElementById('brushSize');
+// const brushSizeInput = document.getElementById('brushSize');
 const opacityInput = document.getElementById('opacity');
 const undoBtn = document.getElementById('undo');
 const redoBtn = document.getElementById('redo');
-const clearBtn = document.getElementById('clear');
+// const clearBtn = document.getElementById('clear');
 const inviteFriendsBtn = document.getElementById('inviteFriends');
 const saveImageBtn = document.getElementById('saveImageBtn');
 const imageInput = document.getElementById('imageInput');
@@ -31,18 +31,14 @@ brushSizeInput.parentNode.appendChild(brushSizeValue);
 brushSizeValue.classList.add('input-value');
 
 // ---------- Drawing State ----------
-let isDrawing = false;
-let lastX = 0;
-let lastY = 0;
-let history = [];
-let redoHistory = [];
+
 let uploadedImage = null;
 let clearedCanvasState = null;
 let isFillMode = false;
 
 // ---------- Initialization ----------
 ctx.fillStyle = '#' + Math.floor(Math.random() * 16777215).toString(16);
-ctx.fillRect(0, 0, canvas.width, canvas.height);
+ctx.fillRect(0, 0, Canvasdrawing .width, Canvasdrawing .height);
 brushSizeInput.value = 3;
 brushSizeValue.textContent = brushSizeInput.value;
 
@@ -50,12 +46,12 @@ brushSizeValue.textContent = brushSizeInput.value;
 
 undoBtn.addEventListener('click', undo);
 redoBtn.addEventListener('click', redo);
-clearBtn.addEventListener('click', clearCanvas);
+// clearBtn.addEventListener('click', clearCanvasdrawing );
 
 
 backgroundPicker.addEventListener('input', (event) => {
-    canvas.style.backgroundColor = event.target.value;
-    redrawCanvas();
+    Canvasdrawing .style.backgroundColor = event.target.value;
+    redrawCanvasdrawing ();
 });
 
 brushSizeInput.addEventListener('input', () => {
@@ -65,69 +61,61 @@ brushSizeInput.addEventListener('input', () => {
 
 // ---------- Functions ----------
 
-function resizeCanvas() {
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * devicePixelRatio;
-    canvas.height = rect.height * devicePixelRatio;
-    ctx.scale(devicePixelRatio, devicePixelRatio);
+// function resizeCanvasdrawing () {
+//     const rect = Canvasdrawing .getBoundingClientRect();
+//     Canvasdrawing .width = rect.width * devicePixelRatio;
+//     Canvasdrawing .height = rect.height * devicePixelRatio;
+//     ctx.scale(devicePixelRatio, devicePixelRatio);
+// }
+
+function resizeCanvasdrawing () {
+  // Get the Canvasdrawing  element's dimensions relative to the viewport
+  const rect = Canvasdrawing .getBoundingClientRect();
+
+  // Update the Canvasdrawing 's internal width and height, taking device pixel ratio into account
+  // This ensures the Canvasdrawing  renders sharply on high-resolution displays
+  Canvasdrawing .width = rect.width * devicePixelRatio;
+  Canvasdrawing .height = rect.height * devicePixelRatio;
+
+  // Adjust the Canvasdrawing  context's scaling to match the device pixel ratio
+  // This ensures that drawing operations are scaled appropriately for the display
+  ctx.scale(devicePixelRatio, devicePixelRatio);
+
+  // Redraw the Canvasdrawing  content after resizing
+  // This prevents the drawing from being stretched or distorted
+  redrawCanvasdrawing (); 
 }
 
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
 
-function redrawCanvas() {
+
+window.addEventListener('resize', resizeCanvasdrawing );
+resizeCanvasdrawing ();
+
+function redrawCanvasdrawing () {
     ctx.fillStyle = 
 backgroundPicker.value;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillRect(0, 0, Canvasdrawing .width, Canvasdrawing .height);
     if (uploadedImage) {
-      ctx.drawImage(uploadedImage, 0, 0, canvas.width, canvas.height);
+      ctx.drawImage(uploadedImage, 0, 0, Canvasdrawing .width, Canvasdrawing .height);
     }
     history.forEach(imageData => ctx.putImageData(imageData, 0, 0));
 }
 
-function clearCanvas() {
-    clearedCanvasState = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = 
-backgroundPicker.value;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    history.push(clearedCanvasState);
-    redoHistory = [];
-}
 
-
-function undo() {
-    if (history.length > 1) {
-        redoHistory.push(history.pop());
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        if (history.length === 0 && clearedCanvasState) {
-            ctx.putImageData(clearedCanvasState, 0, 0);
-        } else {
-            redrawCanvas();
-        }
-    }
-}
-
-function redo() {
-    if (redoHistory.length > 0) {
-        history.push(redoHistory.pop());
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        redrawCanvas();
-    }
-}
 
 
 
 saveImageBtn.addEventListener('click', () => {
   const link = document.createElement('a');
   link.download = 'my-drawing.png';
-  link.href = canvas.toDataURL('image/png');
+  link.href = Canvasdrawing .toDataURL('image/png');
   link.click();
 });
 
 // new
-canvas.style.cursor = 'url(../cursors/pipette.png), auto';
+Canvasdrawing .style.cursor = 'url(../cursors/pipette.png), auto';
 function toggleEyedropper() {
   isEyedropperActive = !isEyedropperActive;
   isBrushEyedropperActive = false;
-  canvas.style.cursor = isEyedropperActive ? 'url(cursors/pipette.png), auto' : 'default';
+  Canvasdrawing .style.cursor = isEyedropperActive ? 'url(cursors/pipette.png), auto' : 'default';
 }

@@ -5,7 +5,8 @@ function updateTime() {
     const minutes = now.getMinutes().toString().padStart(2, '0');
     const seconds = now.getSeconds().toString().padStart(2, '0');
     const timeString = `${hours}:${minutes}:${seconds}`;
-    document.getElementById('time').textContent = timeString;
+
+    // document.getElementById('time').textContent = timeString;
 }
 
 const gameStartTime = new Date();
@@ -14,13 +15,14 @@ const startTimeHours = gameStartTime.getHours().toString().padStart(2, '0');
 const startTimeMinutes = gameStartTime.getMinutes().toString().padStart(2, '0');
 const startTimeSeconds = gameStartTime.getSeconds().toString().padStart(2, '0');
 
-document.getElementById('startTime').textContent = `${startTimeHours}:${startTimeMinutes}:${startTimeSeconds}`;
+// document.getElementById('startTime').textContent = `${startTimeHours}:${startTimeMinutes}:${startTimeSeconds}`;
 
 function updateElapsedTime() {
     const currentTime = new Date();
     let elapsedSeconds = Math.floor((currentTime - gameStartTime) / 1000);
     const elapsedMinutes = Math.floor(elapsedSeconds / 60);
     elapsedSeconds %= 60;
+
     document.getElementById('elapsedTime').textContent = `${elapsedMinutes.toString().padStart(2, '0')}:${elapsedSeconds.toString().padStart(2, '0')}`;
 }
 

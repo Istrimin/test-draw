@@ -1,39 +1,53 @@
-// cursors.js
-
-// // Список доступных курсоров
-// const cursors = [
-//     { name: 'Карандаш', file: 'pencil.png' },
-//     // { name: 'Кисть', file: 'brush.png' },
-//     { name: 'Ластик', file: 'eraser.png' },
-//     // Добавьте другие курсоры по необходимости
-// ];
-
-// Функция для загрузки курсоров
 function loadCursors() {
-    const cursorList = document.getElementById('cursorList');
-    cursorList.innerHTML = '';  // Очищаем список перед добавлением новых элементов
-   
-    cursors.forEach(cursor => {
-        const cursorItem = document.createElement('div');
-        cursorItem.className = 'cursor-item';
-       
-        const cursorPreview = document.createElement('img');
-        cursorPreview.src = `cursors/${cursor.file}`;
-        cursorPreview.className = 'cursor-preview';
-        cursorPreview.alt = cursor.name;
-        cursorPreview.title = cursor.name;
-        cursorItem.appendChild(cursorPreview);
+    cursorList.innerHTML = '';
+    for (let i = 1; i <= 10; i++) {
+        const cursorUrl = `cursors/${i}.png`;
 
-// ! применяем курсор
-        cursorItem.addEventListener('click', function() {
-            document.getElementById('drawingCanvas').style.cursor = `url('cursors/${cursor.file}'), auto`;
-            document.getElementById('cursorPanel').style.display = 'none';
-        });
-        cursorList.appendChild(cursorItem);
-    });
+        const image = new Image();
+        image.src = cursorUrl;
+        image.onload = () => {
+            // --- Resizing Logic ---
+            let targetWidth = image.width;
+            let targetHeight = image.height;
+
+            // Set maximum size to 32 pixels for testing
+            const maxSize = 32;
+
+            if (targetWidth > maxSize || targetHeight > maxSize) {
+                const aspectRatio = targetWidth / targetHeight;
+                if (targetWidth > targetHeight) {
+                    targetWidth = maxSize;
+                    targetHeight = maxSize / aspectRatio;
+                } else {
+                    targetHeight = maxSize;
+                    targetWidth = maxSize * aspectRatio;
+                }
+            }
+
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = targetWidth;
+            canvas.height = targetHeight;
+            ctx.drawImage(image, 0, 0, targetWidth, targetHeight);
+            const resizedCursorUrl = canvas.toDataURL();
+            // --- End of Resizing Logic ---
+
+            const cursorImg = document.createElement('img');
+            cursorImg.src = resizedCursorUrl; // Use resized image for preview
+            cursorImg.alt = `cursor${i}`;
+            cursorImg.style.maxWidth = `${maxSize}px`; // Limit preview size in the panel
+
+            cursorImg.addEventListener('click', () => {
+                drawingCanvas.style.cursor = `url(${resizedCursorUrl}), auto`; // Use resized URL for cursor
+                cursorPanel.style.display = 'none';
+            });
+
+            cursorList.appendChild(cursorImg);
+        };
+    }
 }
 
-// Функция для инициализации обработчика кнопки смены курсора
+// Function to initialize the cursor change button handler
 function initChangeCursorButton() {
     document.getElementById('changeCursorBtn').addEventListener('click', function() {
         const cursorPanel = document.getElementById('cursorPanel');
@@ -45,10 +59,4 @@ function initChangeCursorButton() {
         }
     });
 }
-
-// // Экспортируем функцию для использования в основном файле
-// window.initCursors = initChangeCursorButton;
-
-
-//     window.initCursors();
 
