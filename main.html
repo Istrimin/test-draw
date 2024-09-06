@@ -147,10 +147,14 @@ color:transparent;
                     <div class="tools-column">
                         <label for="opacity" title="Прозрачность">👻</label>
                         <input type="range" id="opacity" min="1" max="100" value="100">
+                        <span id="opacityValue" style="color: red;">100</span>
+
                     </div>
                     <div class="tools-column">
                         <label for="brushSize" title="Размер кисти">🖌️</label>
-                        <input type="range" id="brushSize" min="1" max="200" value="3">
+                        <input type="range" id="brushSize" min="1" max="300" value="3">
+                        <span id="brushSizeValue" style="color: red;">3</span>
+
                     </div>
                     <div class="tools-column">
                         <div class="pressure-bar-container">
@@ -196,6 +200,7 @@ color:transparent;
         const brushSizeInput = document.getElementById('brushSize');
         const opacityInput = document.getElementById('opacity');
         const pressureBar = document.getElementById('pressureBar');
+
         const backgroundPicker = document.getElementById('backgroundPicker');
         const canvasContainer = document.getElementById('canvasContainer');
         const layerButtons = document.getElementById('layerButtons');
@@ -638,6 +643,34 @@ layerPanel.addEventListener('pointerup', () => {
 // });
 
 
+// В файле main.js, после инициализации кнопок слоёв
+
+// Получаем контейнер для кнопок слоёв
+const layerButtonsContainer = document.getElementById('layerButtons');
+
+// Делаем кнопки слоёв перетаскиваемыми
+$(function() {
+  $(layerButtonsContainer).sortable({
+    // Обновляем порядок слоёв после перетаскивания
+    update: function(event, ui) {
+      updateLayerOrder();
+    }
+  });
+  $(layerButtonsContainer).disableSelection();
+});
+
+// Функция для обновления порядка слоёв
+function updateLayerOrder() {
+  // Получаем все кнопки слоёв в новом порядке
+  const layerButtons = layerButtonsContainer.querySelectorAll('.layer-button');
+
+  // Обновляем z-index каждого слоя в соответствии с новым порядком кнопок
+  layerButtons.forEach((button, index) => {
+    const layerId = `layer${button.dataset.layer}`;
+    const canvas = document.getElementById(layerId);
+    canvas.style.zIndex = index + 1; // z-index начинается с 1
+  });
+}
 
 
 
@@ -651,7 +684,7 @@ layerPanel.addEventListener('pointerup', () => {
     <script type="module" src="helperFunction.js" defer></script>
     <script type="module" src="tools.js" defer></script>
 
-    <!-- <script type="module" src="buttons.js" defer></script> -->
+    <script type="module" src="buttons.js" defer></script>
 
 </body>
 

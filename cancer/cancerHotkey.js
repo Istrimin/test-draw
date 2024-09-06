@@ -48,20 +48,20 @@ document.addEventListener('keydown', function(event) {
     }
 });
 
-// пипетка
-document.getElementById('eyedropperBtn').addEventListener('click', toggleEyedropper);
-document.getElementById('brushEyedropperBtn').addEventListener('click', toggleBrushEyedropper);
+// // пипетка
+// document.getElementById('eyedropperBtn').addEventListener('click', toggleEyedropper);
+// document.getElementById('brushEyedropperBtn').addEventListener('click', toggleBrushEyedropper);
 
-// Keyboard shortcuts
-document.addEventListener('keydown', (event) => {
-  // ... (your existing number key logic)
+// // Keyboard shortcuts
+// document.addEventListener('keydown', (event) => {
+//   // ... (your existing number key logic)
 
-  // Используем код клавиши, не зависящий от раскладки
-  const keyCode = event.code;
+//   // Используем код клавиши, не зависящий от раскладки
+//   const keyCode = event.code;
 
-  if (keyCode === 'KeyA') {
-    toggleEyedropper();
-  } else if (keyCode === 'KeyD') {
-    toggleBrushEyedropper();
-  }
-});
+//   if (keyCode === 'KeyA') {
+//     toggleEyedropper();
+//   } else if (keyCode === 'KeyD') {
+//     toggleBrushEyedropper();
+//   }
+// });

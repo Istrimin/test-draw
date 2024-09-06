@@ -11,20 +11,24 @@ body {
     min-height: 100vh;
     display: flex;
     align-items: flex-start;
+    /* user-select: none; */
 
     /* отключаем прокрутку на странице */
     overscroll-behavior-x: none;
     overflow-x: hidden;
 
-
-    -webkit-touch-callout: none;
+/* ? */    
+overflow: hidden;
+/* отключил для проверки и это дало то, что могу теперь двигать кнопки планшетом */
+    /* -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
     -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+    -ms-user-select: none; */
+
+
+
     /* added     */
-    overflow: hidden;
 /* проверка будет ли это влиять ну другие кнопки */
     outline:#aa0404;
 }
@@ -242,22 +246,22 @@ input[type="range"] {
     width: 100%;
 }
 
-input[type="range"]::-webkit-slider-thumb {
+/* input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
     width: 10px;
     height: 10px;
     background: #a204aa;
     cursor: pointer;
     border-radius: 50%;
-}
+} */
 
-input[type="range"]::-moz-range-thumb {
+/* input[type="range"]::-moz-range-thumb {
     width: 10px;
     height: 10px;
     background: #04AA6D;
     cursor: pointer;
     border-radius: 50%;
-}
+} */
 
 #cursorPanel {
     position: absolute;

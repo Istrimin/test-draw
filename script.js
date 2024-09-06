@@ -5,6 +5,9 @@
 // let isBrushEyedropperActive = false;
 
 
+
+
+
 function rgbToHex(r, g, b) {
   if (r > 255 || g > 255 || b > 255)
     throw "Invalid color component";
@@ -18,36 +21,25 @@ const UploadButton = document.getElementById('UploadButton');
 const symmetryButton = document.getElementById('symmetry');
 const fillModeBtn = document.getElementById('fillModeBtn');
 
-// Create and append value displays
-const brushSizeValue = document.createElement('span');
-const opacityValue = document.createElement('span');
-brushSizeInput.parentNode.appendChild(brushSizeValue);
-opacityInput.parentNode.appendChild(opacityValue);
-brushSizeValue.classList.add('input-value');
-opacityValue.classList.add('input-value');
-
 
 let uploadedImage = null;
 let clearedCanvasState = null;
 let isFillMode = false;
-let isEyedropperActive = false;
-let isBrushEyedropperActive = false;
+
+// Check for pressure support
+// try {
+//   isPressureSupported = !!window.PointerEvent && 'pressure' in PointerEvent.prototype;
+// } catch (e) { }
 
 
-
-
-
-brushSizeInput.value = 3;
-brushSizeValue.textContent = brushSizeInput.value;
-opacityValue.textContent = opacityInput.value;
 
 // Event listeners
 UploadButton.addEventListener('click', () => imageInput.click());
-imageInput.addEventListener('change', handleImageUpload);
+imageInput.addEventListener('change', importImage);
 symmetryButton.addEventListener('click', toggleSymmetry);
-saveImageBtn.addEventListener('click', downloadImage);
-// undoBtn.addEventListener('click', undo);
-// redoBtn.addEventListener('click', redo);
+saveImageBtn.addEventListener('click', exportImage);
+undoBtn.addEventListener('click', undo);
+redoBtn.addEventListener('click', redo);
 clearBtn.addEventListener('click', clearCanvas);
 
 
@@ -100,7 +92,7 @@ document.querySelectorAll('.layer-button').forEach(button => {
 });
 
 // Functions
-function handleImageUpload(event) {
+function importImage(event) {
   const file = event.target.files[0];
   const reader = new FileReader();
   reader.onload = (e) => {
@@ -113,7 +105,6 @@ function handleImageUpload(event) {
 }
 
 
-
 function toggleSymmetry() {
   symmetry = !symmetry;
   symmetryButton.classList.toggle('active', symmetry);
@@ -124,6 +115,9 @@ function toggleSymmetry() {
 // Eyedropper functions
 
 
+
+let isEyedropperActive = false;
+let isBrushEyedropperActive = false;
 
 function getPixelColor(x, y) {
   if (!currentCtx) {
@@ -207,7 +201,7 @@ function toggleBrushEyedropper() {
 
 
 
-function downloadImage() {
+function exportImage() {
   // Create a temporary canvas to merge all layers
   const mergeCanvas = document.createElement('canvas');
   const mergeCtx = mergeCanvas.getContext('2d');
@@ -267,7 +261,6 @@ function setDrawingColor(color) {
     }
 }
 
-        // setDrawingColor(document.getElementById('colorPicker').value);
 // add 
 // Функция отмены
 function undo() {

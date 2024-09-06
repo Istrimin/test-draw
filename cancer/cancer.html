@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Draw</title>
+	<link rel="stylesheet" href="cancer.css">
+	<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jscolor/2.4.5/jscolor.min.js"></script>
+	<script src="cancerCursors.js" defer></script>
+	<script src="cancer.js" defer></script>
+
+	<script type="module" src="cancerSettings.js" defer></script>
+	<script type="module" src="cancerHelper.js" defer></script>
+	<script type="module" src="cancerHotkey.js" defer></script>
+	<style>
+		#symmetry {
+		/* ... (ваши стили) */
+	}
+
+	/* Стили для активной кнопки симметрии */
+	#symmetry.active {
+		background-color: lightblue; /* Или любой другой цвет */
+	}
+	</style>
+</head>
+
+<body>
+	<div class="header-container">
+		<div id="time" class="time"></div>
+		<div id="startTime" class="time"></div>
+		<div id="elapsedTime" class="time"></div>
+	</div>
+	<div class="base-container">
+		<div class="sidebar">
+			<a href="index.html" target="_self" title="Выйти из команты" id="exitLink">🚪</a>
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+			<div id="message-container" style="display: none;">
+				<p id="message"></p>
+			</div>
+			<input type="file" id="imageInput" accept="image/*" style="display: none;">
+			<button id="undo" title="Отменить (Z)">⟲</button>
+			<button id="redo" title="Повторить (X)">⟳</button>
+			<button id="symmetry" title="Симметрия (S)">🦋</button>
+			<button id="eyedropperBtn" title="Пипетка заливки (A)">💧</button>
+			<button id="changeCursorBtn" title="Сменить курсор">🎨</button>
+			<button id="clear" title="Очистить">💀</button>
+			<button id="saveImageBtn" title="Сохранить изображение">💾</button>
+		</div>
+		<div class="canvas-and-sliders">
+			<div class="canvas-container">
+
+				<div class="color-picker-group">
+					<input type="color" id="colorPicker" value="#000000" title="Цвет заливки (C)">
+					<input type="color" id="backgroundPicker" value="#ffffff" title="Цвет фона (B)">
+					<!-- <div class="word-navigation"> -->
+					<button id="previousWord" title="Предыдущее слово">&lt;</button>
+					<p id="Quizz"></p>
+					<button id="nextWord" title="Следующее слово">&gt;</button>
+					<!-- </div> -->
+				</div>
+
+				<div class=" canv-container">
+					<canvas id="drawingCanvas" width="700" height="500" style=width:700px;height:500px>
+					</canvas>
+					<div id="cursorPanel" class="cursor-panel" style="display: none;">
+						<div id="cursorList"></div>
+					</div>
+				</div>
+			</div>
+			<div class="slider-group">
+				<div class="slider">
+					<div class="pressure-bar" id="pressureBar"></div>
+					<label for="brushSize" title="Размер кисти">🖌️</label>
+					<input type="range" id="brushSize" min="1" max="100" value="1">
+				</div>
+			</div>
+		</div>
+	</div>
+	<script>
+// Получаем элементы colorPicker и drawingCanvas
+const colorPicker = document.getElementById('colorPicker');
+const canvas = document.getElementById('drawingCanvas');
+const ctx = canvas.getContext('2d'); // Получаем контекст холста
+const symmetryButton = document.getElementById('symmetry');
+
+ctx.imageSmoothingEnabled = false;
+ctx.willReadFrequently = true;
+let symmetry = false; // Флаг для включения/выключения симметрии
+	
+// Добавляем обработчик события 'input' для colorPicker
+colorPicker.addEventListener('input', () => {
+  ctx.strokeStyle = colorPicker.value; // Устанавливаем цвет рисования
+});
+symmetryButton.addEventListener('click', toggleSymmetry);
+
+// Внутри тега <script> в cancer.html
+
+// ... (остальной код)
+
+
+function toggleSymmetry() {
+    symmetry = !symmetry;
+    symmetryButton.classList.toggle('active', symmetry);
+}
+
+// ... (код для получения элементов, установки цвета и т.д.)
+
+// Функция для рисования
+
+function saveState() {
+    history.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+    redoHistory = [];
+}
+
+
+canvas.addEventListener('pointerdown', startDrawing);
+canvas.addEventListener('pointermove', draw);
+canvas.addEventListener('pointerup', stopDrawing);
+canvas.addEventListener('pointerout', stopDrawing);
+canvas.addEventListener('pointercancel', stopDrawing);
+
+function startDrawing(e) {
+    isDrawing = true;
+    [lastX, lastY] = [e.offsetX, e.offsetY];
+}
+
+function draw(e) {
+  if (!isDrawing) return;
+
+  e.preventDefault(); 
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  const pressure = e.pressure || 1; 
+
+  ctx.lineWidth = brushSizeInput.value * pressure;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  // Draw the main line
+  ctx.beginPath();
+  ctx.moveTo(lastX, lastY);
+  ctx.lineTo(x, y);
+  ctx.stroke();
+
+  if (symmetry) {
+    // Calculate the mirrored point
+    const centerX = canvas.width / 2;
+    const symmetricX = 2 * centerX - x;
+
+    // Draw the mirrored line
+    ctx.beginPath();
+    ctx.moveTo(2 * centerX - lastX, lastY);
+    ctx.lineTo(symmetricX, y);
+    ctx.stroke();
+  }
+
+  [lastX, lastY] = [x, y];
+}
+
+
+function stopDrawing() {
+    if (isDrawing) {
+        isDrawing = false;
+        saveState();
+    }
+}
+
+
+// Обработчик для кнопки "Симметрия"
+const symmetryBtn = document.getElementById('symmetry');
+symmetryBtn.addEventListener('click', () => {
+  symmetry = !symmetry; // Меняем значение флага симметрии
+  symmetryBtn.classList.toggle('active', symmetry); 	
+});
+
+
+symmetryBtn.addEventListener('click', () => {
+  symmetry = !symmetry; // Меняем значение флага симметрии
+  symmetryBtn.classList.toggle('active', symmetry); // Добавляем/удаляем класс 'active'
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    // ... (ваш существующий код) ...
+
+    const cursorPanel = document.getElementById('cursorPanel');
+    const cursorList = document.getElementById('cursorList');
+    const changeCursorBtn = document.getElementById('changeCursorBtn');
+
+    function loadCursors() {
+        cursorList.innerHTML = ''; // Очищаем список перед добавлением новых курсоров
+
+        // Загружаем курсоры от cursor1 до cursor10 (или сколько у вас есть)
+        for (let i = 1; i <= 10; i++) {
+            const cursorUrl = `cursors/${i}.png`; // Предполагаем, что имена файлов - cursor1.png, cursor2.png и т.д.
+
+            // Создаем элемент изображения для курсора
+            const cursorImg = document.createElement('img');
+            cursorImg.src = cursorUrl;
+            cursorImg.alt = `cursor${i}`; // имя курсора
+            cursorImg.classList.add('cursor-option'); // Добавляем класс для стилизации
+
+            // Добавляем обработчик события при клике на курсор
+            cursorImg.addEventListener('click', () => {
+                // Устанавливаем выбранный курсор для холста
+                canvas.style.cursor = `url(${cursorUrl}), auto`; 
+
+                // Скрываем панель курсоров после выбора
+                cursorPanel.style.display = 'none'; 
+            });
+
+            // Добавляем изображение курсора в список
+            cursorList.appendChild(cursorImg);
+        }
+    }
+
+    // Показываем/скрываем панель курсоров
+    changeCursorBtn.addEventListener('click', () => {
+        cursorPanel.style.display = cursorPanel.style.display === 'none' ? 'block' : 'none';
+    });
+
+    // Загружаем курсоры при загрузке страницы
+    loadCursors();
+
+    // ... (ваш существующий код) ...
+});
+
+
+	</script>
+</body>
+
+</html>
