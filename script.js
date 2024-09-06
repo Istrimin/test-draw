@@ -5,6 +5,9 @@
 // let isBrushEyedropperActive = false;
 
 
+
+
+
 function rgbToHex(r, g, b) {
   if (r > 255 || g > 255 || b > 255)
     throw "Invalid color component";
@@ -18,35 +21,25 @@ const UploadButton = document.getElementById('UploadButton');
 const symmetryButton = document.getElementById('symmetry');
 const fillModeBtn = document.getElementById('fillModeBtn');
 
-// Create and append value displays
-const brushSizeValue = document.createElement('span');
-const opacityValue = document.createElement('span');
-brushSizeInput.parentNode.appendChild(brushSizeValue);
-opacityInput.parentNode.appendChild(opacityValue);
-brushSizeValue.classList.add('input-value');
-opacityValue.classList.add('input-value');
-
 
 let uploadedImage = null;
 let clearedCanvasState = null;
 let isFillMode = false;
-let isEyedropperActive = false;
-let isBrushEyedropperActive = false;
+
+// Check for pressure support
+// try {
+//   isPressureSupported = !!window.PointerEvent && 'pressure' in PointerEvent.prototype;
+// } catch (e) { }
 
 
-
-
-
-brushSizeInput.value = 3;
-brushSizeValue.textContent = brushSizeInput.value;
-opacityValue.textContent = opacityInput.value;
 
 // Event listeners
+UploadButton.addEventListener('click', () => imageInput.click());
 imageInput.addEventListener('change', importImage);
 symmetryButton.addEventListener('click', toggleSymmetry);
 saveImageBtn.addEventListener('click', exportImage);
-// undoBtn.addEventListener('click', undo);
-// redoBtn.addEventListener('click', redo);
+undoBtn.addEventListener('click', undo);
+redoBtn.addEventListener('click', redo);
 clearBtn.addEventListener('click', clearCanvas);
 
 
@@ -99,55 +92,17 @@ document.querySelectorAll('.layer-button').forEach(button => {
 });
 
 // Functions
-
-// function importImage(event) {
-//   const file = event.target.files[0];
-//   const reader = new FileReader();
-//   reader.onload = (e) => {
-//     uploadedImage = new Image();
-//     uploadedImage.onload = () => {currentCtx.drawImage(uploadedImage, 0, 0, layer2.width, layer2.height);
-//     };
-//     uploadedImage.src = e.target.result;
-//   };
-//   reader.readAsDataURL(file);
-// }
-
-
 function importImage(event) {
   const file = event.target.files[0];
   const reader = new FileReader();
   reader.onload = (e) => {
     uploadedImage = new Image();
-    uploadedImage.onload = () => {
-      const aspectRatio = uploadedImage.width / uploadedImage.height;
-
-      let newWidth = uploadedImage.width;
-      let newHeight = uploadedImage.height;
-
-      // Check if the image is larger than the canvas
-      if (uploadedImage.width > layers[currentLayer].width || uploadedImage.height > layers[currentLayer].height) {
-        // If wider than it is tall, resize by width
-        if (uploadedImage.width / layers[currentLayer].width > uploadedImage.height / layers[currentLayer].height) {
-          newWidth = layers[currentLayer].width;
-          newHeight = layers[currentLayer].width / aspectRatio;
-        } else {
-          // Otherwise, resize by height
-          newHeight = layers[currentLayer].height;
-          newWidth = layers[currentLayer].height * aspectRatio;
-        }
-      }
-
-      // Calculate the position to center the image
-      const x = (layers[currentLayer].width - newWidth) / 2;
-      const y = (layers[currentLayer].height - newHeight) / 2;
-
-      currentCtx.drawImage(uploadedImage, x, y, newWidth, newHeight);
+    uploadedImage.onload = () => {currentCtx.drawImage(uploadedImage, 0, 0, layer2.width, layer2.height);
     };
     uploadedImage.src = e.target.result;
   };
   reader.readAsDataURL(file);
 }
-
 
 
 function toggleSymmetry() {
@@ -160,6 +115,9 @@ function toggleSymmetry() {
 // Eyedropper functions
 
 
+
+let isEyedropperActive = false;
+let isBrushEyedropperActive = false;
 
 function getPixelColor(x, y) {
   if (!currentCtx) {
@@ -278,17 +236,17 @@ window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
 // Exit functionality
-// const exitLink = document.getElementById('exitLink');
-// const doorSound = new Howl({
-//   src: ['sounds/door-close.wav']
-// });
+const exitLink = document.getElementById('exitLink');
+const doorSound = new Howl({
+  src: ['sounds/door-close.wav']
+});
 
-// exitLink.addEventListener('click', () => {
-//   doorSound.play();
-//   doorSound.once('end', () => {
-//     window.location.href = 'index.html';
-//   });
-// });
+exitLink.addEventListener('click', () => {
+  doorSound.play();
+  doorSound.once('end', () => {
+    window.location.href = 'index.html';
+  });
+});
 
 // add
 
@@ -303,116 +261,41 @@ function setDrawingColor(color) {
     }
 }
 
-        // setDrawingColor(document.getElementById('colorPicker').value);
 // add 
 // Функция отмены
-// function undo() {
-//     if (history[currentLayer] && history[currentLayer].length > 0) {
-//         if (history[currentLayer].length === 1) {
-//             // Если это последнее состояние, сохраняем текущее состояние перед очисткой
-//             const currentState = currentCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height);
-//             redoHistory[currentLayer].push(currentState);
-            
-//             // Очищаем холст
-//             currentCtx.clearRect(0, 0, layers[currentLayer].width, layers[currentLayer].height);
-//         } else {
-//             // Сохраняем текущее состояние в redoHistory
-//             const currentState = currentCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height);
-//             redoHistory[currentLayer].push(currentState);
-            
-//             // Возвращаемся к предыдущему состоянию
-//             const previousState = history[currentLayer].pop();
-//             currentCtx.putImageData(previousState, 0, 0);
-//         }
-//     }
-// }
-
-// // Функция повтора
-// function redo() {
-//     if (redoHistory[currentLayer] && redoHistory[currentLayer].length > 0) {
-//         const nextState = redoHistory[currentLayer].pop();
-        
-//         // Сохраняем текущее состояние в history перед применением redo
-//         const currentState = currentCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height);
-//         history[currentLayer].push(currentState);
-        
-//         currentCtx.putImageData(nextState, 0, 0);
-//     }
-// }
-
 function undo() {
     if (history[currentLayer] && history[currentLayer].length > 0) {
-        // Save current state to redo history before undoing
-        const currentState = currentCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height);
-        redoHistory[currentLayer].push(currentState);
-
         if (history[currentLayer].length === 1) {
-            // If this is the last state, clear the canvas
+            // Если это последнее состояние, сохраняем текущее состояние перед очисткой
+            const currentState = currentCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height);
+            redoHistory[currentLayer].push(currentState);
+            
+            // Очищаем холст
             currentCtx.clearRect(0, 0, layers[currentLayer].width, layers[currentLayer].height);
         } else {
-            // Revert to the previous state
+            // Сохраняем текущее состояние в redoHistory
+            const currentState = currentCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height);
+            redoHistory[currentLayer].push(currentState);
+            
+            // Возвращаемся к предыдущему состоянию
             const previousState = history[currentLayer].pop();
             currentCtx.putImageData(previousState, 0, 0);
         }
     }
 }
 
+// Функция повтора
 function redo() {
     if (redoHistory[currentLayer] && redoHistory[currentLayer].length > 0) {
-        // Save current state to history before redoing
+        const nextState = redoHistory[currentLayer].pop();
+        
+        // Сохраняем текущее состояние в history перед применением redo
         const currentState = currentCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height);
         history[currentLayer].push(currentState);
-
-        // Apply the next state from redo history
-        const nextState = redoHistory[currentLayer].pop();
+        
         currentCtx.putImageData(nextState, 0, 0);
     }
 }
-
-// Function to handle image loading
-function loadImageToLayer(imageFile) {
-    const reader = new FileReader();
-    reader.onload = function(event) {
-        const img = new Image();
-        img.onload = function() {
-            // Save the current state before loading the image
-            saveState();
-
-            // Clear the current layer
-            currentCtx.clearRect(0, 0, layers[currentLayer].width, layers[currentLayer].height);
-
-            // Draw the loaded image onto the current layer
-            currentCtx.drawImage(img, 0, 0, layers[currentLayer].width, layers[currentLayer].height);
-
-            // Save the state after loading the image
-            saveState();
-        }
-        img.src = event.target.result;
-    }
-    reader.readAsDataURL(imageFile);
-}
-
-// Modify your existing image upload handler to use this function
-document.getElementById('UploadButton').addEventListener('click', function() {
-    const input = document.getElementById('imageInput');
-    input.click();
-    input.onchange = function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            loadImageToLayer(file);
-        }
-    }
-});
-
-
-
-
-
-
-
-
-
-
 
 // Обновленная функция saveState
 
