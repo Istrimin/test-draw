@@ -284,23 +284,23 @@ input[type="range"]::-webkit-slider-runnable-track {
 	background: rgb(56, 93, 130);
 	height: 100%;
 }
-
+/* 
 .slider {
-  position: relative; /* Делаем slider позиционирующим родителем */
-  display: inline-block; /* Чтобы slider занимал только необходимое место */
-}
+  position: relative;
+  display: inline-block;
+} */
 
-.slider-value {
-  position: absolute; /* Позиционируем значение относительно slider */
-  top: -25px; /* Размещаем над слайдером */
+/* .slider-value {
+  position: absolute;
+  top: -25px;
   left: 50%;
-  transform: translateX(-50%); /* Центрируем по горизонтали */
-  background-color: rgba(0, 0, 0, 0.7); /* Делаем фон полупрозрачным */
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.7);
   color: white;
   padding: 2px 5px;
   border-radius: 3px;
   font-size: 12px;
-}
+} */
 
 
 
