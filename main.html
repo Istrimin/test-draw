@@ -76,12 +76,42 @@ color:transparent;
             border-radius: 0;
         }
 
-/* ... your other styles ... */
 
 #floodFillBtn.active { 
   background-color: lightblue; /* Example: Change background color when active */
   /* Add any other styles you want for the active state */
 }
+
+img{
+  /* transform: scale(1.1); */
+  border-radius: 100px;
+}
+
+
+img:hover {
+  transform: scale(1.01);
+  box-shadow: 
+    0px 0px 100px rgba(23, 201, 0, 0.5), /* Outer shadow (green) */
+    inset 0px 0px 150px rgba(23, 201, 0, 0.5); /* Inner shadow (black) */
+  border-radius: 100px;
+}
+
+
+.icon-hover:hover {
+  transform: scale(1.31);
+  box-shadow: 
+    0px 0px 100px rgba(23, 201, 0, 0.5), /* Outer shadow (green) */
+    inset 0px 0px 150px rgba(23, 201, 0, 0.5); /* Inner shadow (green) */
+  border-radius: 100px; 
+}
+
+.icon-hover { /* Styles applied in the normal state */
+  /* transform: scale(1.01); */
+  box-shadow: 
+    0px 0px 100px rgba(225, 0, 255, 0.201), /* Outer shadow (green) */
+    inset 0px 0px 150px rgba(255, 0, 255, 0.217); /* Inner shadow (green) */
+  border-radius: 100px; 
+} 
 
     </style>
 </head>
@@ -776,7 +806,17 @@ floodFillBtn.addEventListener('click', () => {
   }
 });
 
-// ... (rest of your code) ...
+// добавляем класс для красивых иконок
+document.addEventListener('DOMContentLoaded', () => {
+  // Select all icon elements. 
+  // Modify this selector to accurately target your icons if needed.
+  const icons = document.querySelectorAll('a, button'); 
+
+  // Add the class to each icon
+  icons.forEach(icon => {
+    icon.classList.add('icon-hover');
+  });
+});
 
     </script>
     <script src="cursors.js" defer></script>
