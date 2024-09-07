@@ -1,62 +1,61 @@
-function loadCursors() {
-    cursorList.innerHTML = '';
-    for (let i = 1; i <= 1000; i++) {
-        const cursorUrl = `cursors/${i}.png`;
+// 
+		document.addEventListener('DOMContentLoaded', () => {
+			const cursorPanel = document.getElementById('cursorPanel');
+			const cursorList = document.getElementById('cursorList');
+			const changeCursorBtn = document.getElementById('changeCursorBtn');
 
-        const image = new Image();
-        image.src = cursorUrl;
-        image.onload = () => {
-            // --- Resizing Logic ---
-            let targetWidth = image.width;
-            let targetHeight = image.height;
+			function loadCursors() {
+				cursorList.innerHTML = '';
+				for (let i = 1; i <= 1000; i++) {
+					const cursorUrl = `cursors/${i}.png`;
 
-            // Set maximum size to 32 pixels for testing
-            const maxSize = 32;
+					const image = new Image();
+					image.src = cursorUrl;
+					image.onload = () => {
 
-            if (targetWidth > maxSize || targetHeight > maxSize) {
-                const aspectRatio = targetWidth / targetHeight;
-                if (targetWidth > targetHeight) {
-                    targetWidth = maxSize;
-                    targetHeight = maxSize / aspectRatio;
-                } else {
-                    targetHeight = maxSize;
-                    targetWidth = maxSize * aspectRatio;
-                }
-            }
+						let targetWidth = image.width;
+						let targetHeight = image.height;
 
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = targetWidth;
-            canvas.height = targetHeight;
-            ctx.drawImage(image, 0, 0, targetWidth, targetHeight);
-            const resizedCursorUrl = canvas.toDataURL();
-            // --- End of Resizing Logic ---
 
-            const cursorImg = document.createElement('img');
-            cursorImg.src = resizedCursorUrl; // Use resized image for preview
-            cursorImg.alt = `cursor${i}`;
-            cursorImg.style.maxWidth = `${maxSize}px`; // Limit preview size in the panel
+						const maxSize = 64;
 
-            cursorImg.addEventListener('click', () => {
-                drawingCanvas.style.cursor = `url(${resizedCursorUrl}), auto`; // Use resized URL for cursor
-                cursorPanel.style.display = 'none';
-            });
+						if (targetWidth > maxSize || targetHeight > maxSize) {
+							const aspectRatio = targetWidth / targetHeight;
+							if (targetWidth > targetHeight) {
+								targetWidth = maxSize;
+								targetHeight = maxSize / aspectRatio;
+							} else {
+								targetHeight = maxSize;
+								targetWidth = maxSize * aspectRatio;
+							}
+						}
 
-            cursorList.appendChild(cursorImg);
-        };
-    }
-}
+						const canvas = document.createElement('canvas');
+						const ctx = canvas.getContext('2d');
+						canvas.width = targetWidth;
+						canvas.height = targetHeight;
+						ctx.drawImage(image, 0, 0, targetWidth, targetHeight);
+						const resizedCursorUrl = canvas.toDataURL();
 
-// Function to initialize the cursor change button handler
-function initChangeCursorButton() {
-    document.getElementById('changeCursorBtn').addEventListener('click', function() {
-        const cursorPanel = document.getElementById('cursorPanel');
-        if (cursorPanel.style.display === 'none') {
-            cursorPanel.style.display = 'block';
-            loadCursors();
-        } else {
-            cursorPanel.style.display = 'none';
-        }
-    });
-}
 
+						const cursorImg = document.createElement('img');
+						cursorImg.src = resizedCursorUrl;
+						cursorImg.alt = `cursor${i}`;
+						cursorImg.style.maxWidth = `${maxSize}px`;
+
+						cursorImg.addEventListener('click', () => {
+							drawingCanvas.style.cursor = `url(${resizedCursorUrl}), auto`;
+							cursorPanel.style.display = 'none';
+						});
+
+						cursorList.appendChild(cursorImg);
+					};
+				}
+			}
+
+			changeCursorBtn.addEventListener('click', () => {
+				cursorPanel.style.display = cursorPanel.style.display === 'none' ? 'block' : 'none';
+			});
+
+			loadCursors();
+		});
