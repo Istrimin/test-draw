@@ -19,9 +19,11 @@ body {
 	-moz-user-select: none;
 	-ms-user-select: none;
 }
+
 #canvas {
-  cursor: url('cursors/pipette.png'), auto;
+	cursor: url('cursors/pipette.png'), auto;
 }
+
 .drawingCursor {
 	cursor: url('../cursors/pencil.png'), auto;
 }
@@ -41,7 +43,7 @@ button {
 	color: var(--button-text-color);
 	font-style: bold;
 	font-size: 30px;
-	border-radius: 20px;	
+	border-radius: 20px;
 	border: none;
 }
 
@@ -158,11 +160,11 @@ canvas {
 	cursor: pointer;
 }
 
-.color-picker {
+/* .color-picker {
 	display: flex;
 	background-color: gold;
 	margin-bottom: 10px;
-}
+} */
 
 .tools input,
 .tools button {
@@ -268,7 +270,7 @@ input[type="range"]::-webkit-slider-thumb {
 	border-radius: 20px;
 
 	box-shadow: -100vw 0 0 100vw rgb(0, 93, 186);
-}	
+}
 
 input[type="range"]::-moz-range-thumb {
 	width: 20px;
@@ -282,121 +284,157 @@ input[type="range"]::-moz-range-thumb {
 
 
 input[type="range"]::-webkit-slider-runnable-track {
-    background: rgb(56, 93, 130); 
-    height: 100%; 
+	background: rgb(56, 93, 130);
+	height: 100%;
 }
 
-	/* Стили для панели курсоров */
-		#cursorPanel {
-			position: absolute;
-			top: 0;
-			left: 0;
-			right: 0;
-			bottom: 0;
-			background-color: transparent;
-			border-radius: 20px;
-			display: none;
-			z-index: 10;
-			padding: 10px;
-			box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-			overflow-y: auto;
-		}
+/* Стили для панели курсоров */
+#cursorPanel {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: transparent;
+	border-radius: 20px;
+	display: none;
+	z-index: 10;
+	padding: 10px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	overflow-y: auto;
+}
 
-		.cursor-item {
-			display: inline-block;
-			margin: 5px;
-			cursor: pointer;
-		}
+.cursor-item {
+	display: inline-block;
+	margin: 5px;
+	cursor: pointer;
+}
 
-		.cursor-preview {
-			width: 64px;
-			height: 64px;
-			border: 1px solid #00cc4100;
-			padding: 2px;
-		}
+.cursor-preview {
+	width: 64px;
+	height: 64px;
+	border: 1px solid #00cc4100;
+	padding: 2px;
+}
 
-		.cursor-item:hover .cursor-preview {
-			border-color: hsl(69, 100%, 52%);
-		}
+.cursor-item:hover .cursor-preview {
+	border-color: hsl(69, 100%, 52%);
+}
 
-		.canvas-container {
-			position: relative;
-		}
+.canvas-container {
+	position: relative;
+}
 
-		.canv-container {
-			position: relative;
-		}
-
-
-
-		.word-navigation {
-			display: flex;
-			align-items: center;
-			/* justify-content: center; */
-			margin-bottom: 10px;
-			z-index: 10;
-		}
+.canv-container {
+	position: relative;
+}
 
 
-		/* Стили для колорпикеров */
-		.color-picker-group {
-			display: flex;
-			flex-direction: row;
-			justify-content: space-around;
-			margin-bottom: 10px;
-			align-items: center; /* Выравнивание по вертикали */
-		}
+
+.word-navigation {
+	display: flex;
+	align-items: center;
+	/* justify-content: center; */
+	margin-bottom: 10px;
+	z-index: 10;
+}
 
 
-		.color-picker-group input[type="color"] {
-			width: 50px;
-			/* height: 30px	; */
-			padding: 0;
-			/* border: 20px solid black; */
-			border-radius: 5px;
-		}
 
 #eyedropperBtn.active {
-  background-color: rgb(0, 255, 0); 
+	background-color: rgb(0, 255, 0);
 }
 
-button.active { 
-    background-color: var(--button-active-color);
+button.active {
+	background-color: var(--button-active-color);
 }
 
-#cursorList img { 
+#cursorList img {
 	max-width: 64px;
 	max-height: 64px;
 }
 
-img{
-  /* transform: scale(1.1); */
-  border-radius: 100px;
+img {
+	/* transform: scale(1.1); */
+	border-radius: 100px;
 }
 
 
 img:hover {
-  transform: scale(1.01);
-  box-shadow: 
-    0px 0px 100px rgba(23, 201, 0, 0.5), /* Outer shadow (green) */
-    inset 0px 0px 150px rgba(23, 201, 0, 0.5); /* Inner shadow (black) */
-  border-radius: 100px;
+	transform: scale(1.01);
+	box-shadow:
+		0px 0px 100px rgba(23, 201, 0, 0.5),
+		/* Outer shadow (green) */
+		inset 0px 0px 150px rgba(23, 201, 0, 0.5);
+	/* Inner shadow (black) */
+	border-radius: 100px;
 }
 
 
 .icon-hover:hover {
-  transform: scale(1.31);
-  box-shadow: 
-    0px 0px 100px rgba(23, 201, 0, 0.5), /* Outer shadow (green) */
-    inset 0px 0px 150px rgba(23, 201, 0, 0.5); /* Inner shadow (green) */
-  border-radius: 100px; 
+	transform: scale(1.31);
+	box-shadow:
+		0px 0px 100px rgba(23, 201, 0, 0.5),
+		/* Outer shadow (green) */
+		inset 0px 0px 150px rgba(23, 201, 0, 0.5);
+	/* Inner shadow (green) */
+	border-radius: 100px;
 }
 
-.icon-hover { /* Styles applied in the normal state */
-  /* transform: scale(1.01); */
-  box-shadow: 
-    0px 0px 100px rgba(225, 0, 255, 0.201), /* Outer shadow (green) */
-    inset 0px 0px 150px rgba(255, 0, 255, 0.217); /* Inner shadow (green) */
-  border-radius: 100px; 
-} 
+.icon-hover {
+	/* Styles applied in the normal state */
+	/* transform: scale(1.01); */
+	box-shadow:
+		0px 0px 100px rgba(225, 0, 255, 0.201),
+		/* Outer shadow (green) */
+		inset 0px 0px 150px rgba(255, 0, 255, 0.217);
+	/* Inner shadow (green) */
+	border-radius: 100px;
+}
 
+
+
+
+/* Стили для колорпикеров */
+.color-picker-group {
+	display: flex;
+	flex-direction: row;
+	/* justify-content: space-around; */
+	margin-bottom: 10px;
+	align-items: center;
+}
+
+
+.color-picker-group input[type="color"] {
+	appearance: none;
+	-webkit-appearance: none;
+	border: none;
+	padding: 0;
+	cursor: pointer;
+	overflow: hidden;
+
+	width: 50px;
+	height: 50px;
+	border-radius: 50%;
+}
+
+.color-picker-group input[type="color"]::-webkit-color-swatch-wrapper {
+	padding: 0;
+
+}
+
+.color-picker-group input[type="color"]::-webkit-color-swatch {
+	border: none;
+	border-radius: 0;
+	border-radius: 50%;
+}
+
+.color-picker-group input[type="color"]::-moz-color-swatch {
+	border: none;
+	border-radius: 0;
+}
+
+.color-picker-group {
+	display: flex;
+	gap: 5px;
+}

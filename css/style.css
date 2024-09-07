@@ -438,32 +438,58 @@ input[type="range"]::-moz-range-thumb {
             display: flex;
         }
 
-        .color-picker-group {
-            display: flex;
-            gap: 5px;
-        }
 
-        .color-picker-group input[type="color"] {
-            appearance: none;
-            -webkit-appearance: none;
-            border: none;
-            width: 15px;
-            height: 10px;
-            border-radius: 50%;
-            padding: 0;
-            cursor: pointer;
-            overflow: hidden;
-        }
+.color-picker-group-two input[type="color"],
+.color-picker-group input[type="color"] {
+  appearance: none;
+  -webkit-appearance: none; 
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  overflow: hidden; 
+}
 
-        .color-picker-group input[type="color"]::-webkit-color-swatch-wrapper {
-            padding: 0;
-        }
+.color-picker-group-two input[type="color"] {
+  width: 20px;
+  height: 20px;
+}
 
-        .color-picker-group input[type="color"]::-webkit-color-swatch {
-            border: none;
-            border-radius: 50%;
-        }
+.color-picker-group input[type="color"] {
+  width: 15px;
+  height: 10px;
+  border-radius: 50%; 
+}
 
+.color-picker-group-two input[type="color"]::-webkit-color-swatch-wrapper,
+.color-picker-group input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.color-picker-group-two input[type="color"]::-webkit-color-swatch,
+.color-picker-group input[type="color"]::-webkit-color-swatch {
+  border: none;
+}
+
+.color-picker-group-two input[type="color"]::-webkit-color-swatch {
+  border-radius: 0; 
+}
+
+.color-picker-group input[type="color"]::-webkit-color-swatch {
+  border-radius: 50%;
+}
+
+/* Для Firefox */
+.color-picker-group-two input[type="color"]::-moz-color-swatch,
+.color-picker-group input[type="color"]::-moz-color-swatch {
+  border: none;
+  border-radius: 0; 
+}
+
+.color-picker-group {
+  display: flex;
+  gap: 5px;
+}
+    
         .color-picker-and-word {
             display: flex;
             align-items: center;

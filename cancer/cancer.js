@@ -6,13 +6,7 @@ if (window.PointerEvent) {
 
 
 // ---------- UI Elements ----------
-// const backgroundPicker = document.getElementById('backgroundPicker');
-
-// const brushSizeInput = document.getElementById('brushSize');
 const opacityInput = document.getElementById('opacity');
-// const undoBtn = document.getElementById('undo');
-// const redoBtn = document.getElementById('redo');
-// const clearBtn = document.getElementById('clear');
 const inviteFriendsBtn = document.getElementById('inviteFriends');
 const saveImageBtn = document.getElementById('saveImageBtn');
 const imageInput = document.getElementById('imageInput');
@@ -38,7 +32,7 @@ let isFillMode = false;
 
 // ---------- Initialization ----------
 ctx.fillStyle = '#' + Math.floor(Math.random() * 16777215).toString(16);
-ctx.fillRect(0, 0, Canvasdrawing .width, Canvasdrawing .height);
+ctx.fillRect(0, 0, drawingCanvas .width, drawingCanvas .height);
 brushSizeInput.value = 3;
 brushSizeValue.textContent = brushSizeInput.value;
 
@@ -48,7 +42,7 @@ brushSizeValue.textContent = brushSizeInput.value;
 
 
 backgroundPicker.addEventListener('input', (event) => {
-    Canvasdrawing .style.backgroundColor = event.target.value;
+    drawingCanvas .style.backgroundColor = event.target.value;
     redrawCanvasdrawing ();
 });
 
@@ -60,26 +54,26 @@ brushSizeInput.addEventListener('input', () => {
 // ---------- Functions ----------
 
 // function resizeCanvasdrawing () {
-//     const rect = Canvasdrawing .getBoundingClientRect();
-//     Canvasdrawing .width = rect.width * devicePixelRatio;
-//     Canvasdrawing .height = rect.height * devicePixelRatio;
+//     const rect = drawingCanvas .getBoundingClientRect();
+//     drawingCanvas .width = rect.width * devicePixelRatio;
+//     drawingCanvas .height = rect.height * devicePixelRatio;
 //     ctx.scale(devicePixelRatio, devicePixelRatio);
 // }
 
 function resizeCanvasdrawing () {
-  // Get the Canvasdrawing  element's dimensions relative to the viewport
-  const rect = Canvasdrawing .getBoundingClientRect();
+  // Get the drawingCanvas  element's dimensions relative to the viewport
+  const rect = drawingCanvas .getBoundingClientRect();
 
-  // Update the Canvasdrawing 's internal width and height, taking device pixel ratio into account
-  // This ensures the Canvasdrawing  renders sharply on high-resolution displays
-  Canvasdrawing .width = rect.width * devicePixelRatio;
-  Canvasdrawing .height = rect.height * devicePixelRatio;
+  // Update the drawingCanvas 's internal width and height, taking device pixel ratio into account
+  // This ensures the drawingCanvas  renders sharply on high-resolution displays
+  drawingCanvas .width = rect.width * devicePixelRatio;
+  drawingCanvas .height = rect.height * devicePixelRatio;
 
-  // Adjust the Canvasdrawing  context's scaling to match the device pixel ratio
+  // Adjust the drawingCanvas  context's scaling to match the device pixel ratio
   // This ensures that drawing operations are scaled appropriately for the display
   ctx.scale(devicePixelRatio, devicePixelRatio);
 
-  // Redraw the Canvasdrawing  content after resizing
+  // Redraw the drawingCanvas  content after resizing
   // This prevents the drawing from being stretched or distorted
   redrawCanvasdrawing (); 
 }
@@ -92,9 +86,9 @@ resizeCanvasdrawing ();
 function redrawCanvasdrawing () {
     ctx.fillStyle = 
 backgroundPicker.value;
-    ctx.fillRect(0, 0, Canvasdrawing .width, Canvasdrawing .height);
+    ctx.fillRect(0, 0, drawingCanvas .width, drawingCanvas .height);
     if (uploadedImage) {
-      ctx.drawImage(uploadedImage, 0, 0, Canvasdrawing .width, Canvasdrawing .height);
+      ctx.drawImage(uploadedImage, 0, 0, drawingCanvas .width, drawingCanvas .height);
     }
     history.forEach(imageData => ctx.putImageData(imageData, 0, 0));
 }
@@ -106,14 +100,14 @@ backgroundPicker.value;
 saveImageBtn.addEventListener('click', () => {
   const link = document.createElement('a');
   link.download = 'my-drawing.png';
-  link.href = Canvasdrawing .toDataURL('image/png');
+  link.href = drawingCanvas .toDataURL('image/png');
   link.click();
 });
 
 // new
-Canvasdrawing .style.cursor = 'url(../cursors/pipette.png), auto';
+drawingCanvas .style.cursor = 'url(../cursors/pipette.png), auto';
 function toggleEyedropper() {
   isEyedropperActive = !isEyedropperActive;
   isBrushEyedropperActive = false;
-  Canvasdrawing .style.cursor = isEyedropperActive ? 'url(cursors/pipette.png), auto' : 'default';
+  drawingCanvas .style.cursor = isEyedropperActive ? 'url(cursors/pipette.png), auto' : 'default';
 }
