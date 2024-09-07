@@ -1,271 +1,246 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Draw</title>
-	<link rel="stylesheet" href="cancer.css">
-	<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
-	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-	<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jscolor/2.4.5/jscolor.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
-	<script src="cancerCursors.js" defer></script>
-	<style>
-
-#drawingCanvas {
-  cursor: url('cursors/1.png'), auto; 
-}
-
-
-	</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Draw</title>
+    <link rel="stylesheet" href="cancer.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jscolor/2.4.5/jscolor.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+    <script src="cancerCursors.js" defer></script>
+    <style>
+        #drawingCanvas { cursor: url('cursors/1.png'), auto; }
+    </style>
 </head>
-
 <body>
+    <main class="base-container">
+        <aside class="sidebar">
+            <a href="../index.html" target="_self" title="Выйти из команты" id="exitLink" style="font-size: 50px;">🚪</a>
+            <div id="message-container" style="display: none;">
+                <p id="message"></p>
+            </div>
+            <button id="undo" title="Отменить (Z)">⟲</button>
+            <button id="redo" title="Повторить (X)">⟳</button>
+            <button id="symmetry" title="Симметрия (S)">🦋</button>
+            <button id="eyedropperBtn" title="Пипетка заливки (A)">💧</button>
+            <button id="changeCursorBtn" title="Сменить курсор">🎨</button>
+            <button id="clearBtn" title="Очистить">💀</button>
+            <button id="saveImageBtn" title="Сохранить изображение">💾</button>
+            <button id="eraserBtn" title="Стерка">🧽</button>
+        </aside>
+        <div class="canvas-and-sliders">
+            <div class="canvas-container">
+                <div class="color-picker-group">
+                    <input type="color" id="colorPicker" value="#000000" title="Цвет заливки (C)">
+                    <input type="color" id="backgroundPicker" value="#ffffff" title="Цвет фона (B)">
+                    <button id="previousWord" title="Предыдущее слово">&lt;</button>
+                    <p id="Quizz"></p>
+                    <button id="nextWord" title="Следующее слово">&gt;</button>
+                    <div id="elapsedTime" class="time"></div>
+                </div>
+                <div class="canv-container">
+                    <canvas id="backgroundCanvas" width="700" height="500" style="width:700px;height:500px; position: absolute; z-index: -1;"></canvas>
+                    <canvas id="drawingCanvas" width="700" height="500" style="width:700px;height:500px;"></canvas>
+                    <div id="cursorPanel" class="cursor-panel" style="display: none;">
+                        <div id="cursorList"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="slider-group">
+                <div class="slider">
+                    <div class="pressure-bar" id="pressureBar"></div>
+                    <label for="brushSize" title="Размер кисти">🖌️</label>
+                    <input type="range" id="brushSize" min="1" max="100" value="3">
+                    <span class="slider-value" id="rangeValue">3</span>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script>
+        const colorPicker = document.getElementById('colorPicker');
+        const backgroundPicker = document.getElementById('backgroundPicker');
+        const drawingCanvas = document.getElementById('drawingCanvas');
+        const backgroundCanvas = document.getElementById('backgroundCanvas');
+        const ctx = drawingCanvas.getContext('2d');
+        const bgCtx = backgroundCanvas.getContext('2d');
+        const symmetryButton = document.getElementById('symmetry');
+        const brushSizeInput = document.getElementById('brushSize');
+        const eyedropperBtn = document.getElementById('eyedropperBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const eraserBtn = document.getElementById('eraserBtn');
+        const undoBtn = document.getElementById('undo');
+        const redoBtn = document.getElementById('redo');
+        const saveImageBtn = document.getElementById('saveImageBtn');
 
-	<main class="base-container">
-		<aside class="sidebar">
-			<a href="../index.html" target="_self" title="Выйти из команты" id="exitLink"
-				style="font-size: 50px;">🚪</a>
-			<div id="message-container" style="display: none;">
-				<p id="message"></p>
-			</div>
-			<input type="file" id="imageInput" accept="image/*" style="display: none;">
-			<button id="undo" title="Отменить (Z)">⟲</button>
-			<button id="redo" title="Повторить (X)">⟳</button>
-			<button id="symmetry" title="Симметрия (S)">🦋</button>
-			<button id="eyedropperBtn" title="Пипетка заливки (A)">💧</button>
-			<button id="changeCursorBtn" title="Сменить курсор">🎨</button>
-			<button id="clearBtn" title="Очистить">💀</button>
-			<button id="saveImageBtn" title="Сохранить изображение">💾</button>
-			<!-- <button id="eraserBtn" title="Стерка">🧽</button> -->
-			<button id="eraserBtn" title="Стерка">
-				<img src="cursors/2.png" alt="Стерка" width="50">
-		</aside>
-		<div class="canvas-and-sliders">
-			<div class="canvas-container">
-				<div class="color-picker-group">
-					<input type="color" id="colorPicker" value="#000000" title="Цвет заливки (C)">
-					<input type="color" id="backgroundPicker" value="#ffffff" title="Цвет фона (B)">
-					<button id="previousWord" title="Предыдущее слово">&lt;</button>
-					<p id="Quizz"></p>
-					<button id="nextWord" title="Следующее слово">&gt;</button>
-					<div id="elapsedTime" class="time"></div>
-				</div>
-				<div class="canv-container">
-					<canvas id="backgroundCanvas" width="700" height="500"
-						style="width:700px;height:500px; position: absolute; z-index: -1;"></canvas>
-					<canvas id="drawingCanvas" width="700" height="500" style="width:700px;height:500px;">
-					</canvas>
-					<div id="cursorPanel" class="cursor-panel" style="display: none;">
-						<div id="cursorList"></div>
-					</div>
-				</div>
-			</div>
-			<div class="slider-group">
-				<div class="slider">
-					<div class="pressure-bar" id="pressureBar"></div>
-					<label for="brushSize" title="Размер кисти">🖌️</label>
-					<input type="range" id="brushSize" min="1" max="100" value="1">
-    <span class="slider-value" id="rangeValue">50</span> 
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+        let isEyedropperActive = false;
+        let symmetry = true;
+        let isErasing = false;
+        let history = [];
+        let redoHistory = [];
 
-				</div>
-			</div>
-		</div>
-	</main>
-	<script>
-		const colorPicker = document.getElementById('colorPicker');
-		const backgroundPicker = document.getElementById('backgroundPicker');
-		const drawingCanvas = document.getElementById('drawingCanvas');
-		const backgroundCanvas = document.getElementById('backgroundCanvas');
-		const ctx = drawingCanvas.getContext('2d');
-		const bgCtx = backgroundCanvas.getContext('2d');
-		const symmetryButton = document.getElementById('symmetry');
-		const brushSizeInput = document.getElementById('brushSize');
-		const eyedropperBtn = document.getElementById('eyedropperBtn');
-		const clearBtn = document.getElementById('clearBtn');
-		const eraserBtn = document.getElementById('eraserBtn');
+        ctx.imageSmoothingEnabled = false;
+        ctx.willReadFrequently = true;
 
-		let isDrawing = false;
-		let lastX = 0;
-		let lastY = 0;
-		let isEyedropperActive = false;
-		let symmetry = true;
-		let isErasing = false;
+        function initializeCanvas() {
+            bgCtx.fillStyle = backgroundPicker.value;
+            bgCtx.fillRect(0, 0, backgroundCanvas.width, backgroundCanvas.height);
+            saveState();
+        }
 
-		ctx.imageSmoothingEnabled = false;
-		ctx.willReadFrequently = true;
+        function saveState() {
+            history.push(ctx.getImageData(0, 0, drawingCanvas.width, drawingCanvas.height));
+            redoHistory = [];
+            updateUndoRedoButtons();
+        }
 
-		colorPicker.addEventListener('input', () => {
-			ctx.strokeStyle = colorPicker.value;
-		});
+        function updateUndoRedoButtons() {
+            undoBtn.disabled = history.length <= 1;
+            redoBtn.disabled = redoHistory.length === 0;
+        }
 
-		backgroundPicker.addEventListener('input', () => {
-			bgCtx.fillStyle = backgroundPicker.value;
-			bgCtx.fillRect(0, 0, backgroundCanvas.width, backgroundCanvas.height);
-		});
+        function startDrawing(e) {
+            isDrawing = true;
+            [lastX, lastY] = [e.offsetX, e.offsetY];
+        }
 
-		drawingCanvas.addEventListener('pointerdown', startDrawing);
-		drawingCanvas.addEventListener('pointermove', draw);
-		drawingCanvas.addEventListener('pointerup', stopDrawing);
-		drawingCanvas.addEventListener('pointerout', stopDrawing);
-		drawingCanvas.addEventListener('pointercancel', stopDrawing);
+        function draw(e) {
+            if (!isDrawing) return;
+            e.preventDefault();
+            const rect = drawingCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const pressure = e.pressure || 1;
 
-		symmetryButton.addEventListener('click', toggleSymmetry);
+            ctx.lineWidth = brushSizeInput.value * pressure;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
 
-		function saveState() {
-			history.push(ctx.getImageData(0, 0, drawingCanvas.width, drawingCanvas.height));
-			redoHistory = [];
-		}
+            if (isErasing) {
+                ctx.globalCompositeOperation = 'destination-out';
+            } else {
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.strokeStyle = colorPicker.value;
+            }
 
-		function startDrawing(e) {
-			isDrawing = true;
-			[lastX, lastY] = [e.offsetX, e.offsetY];
-		}
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(x, y);
+            ctx.stroke();
 
-		function draw(e) {
-			if (!isDrawing) return;
+            if (symmetry) {
+                const centerX = drawingCanvas.width / 2;
+                const symmetricX = 2 * centerX - x;
+                ctx.beginPath();
+                ctx.moveTo(2 * centerX - lastX, lastY);
+                ctx.lineTo(symmetricX, y);
+                ctx.stroke();
+            }
 
-			e.preventDefault();
-			const rect = drawingCanvas.getBoundingClientRect();
-			const x = e.clientX - rect.left;
-			const y = e.clientY - rect.top;
-			const pressure = e.pressure || 1;
+            [lastX, lastY] = [x, y];
+        }
 
-			ctx.lineWidth = brushSizeInput.value * pressure;
-			ctx.lineCap = 'round';
-			ctx.lineJoin = 'round';
+        function stopDrawing() {
+            if (isDrawing) {
+                isDrawing = false;
+                saveState();
+            }
+        }
 
-			if (isErasing) {
-				ctx.globalCompositeOperation = 'destination-out';
-			} else {
-				ctx.globalCompositeOperation = 'source-over';
-				ctx.strokeStyle = colorPicker.value;
-			}
+        function toggleSymmetry() {
+            symmetry = !symmetry;
+            symmetryButton.classList.toggle('active', symmetry);
+        }
 
-			ctx.beginPath();
-			ctx.moveTo(lastX, lastY);
-			ctx.lineTo(x, y);
-			ctx.stroke();
+        function undo() {
+            if (history.length > 1) {
+                redoHistory.push(history.pop());
+                ctx.putImageData(history[history.length - 1], 0, 0);
+                updateUndoRedoButtons();
+            }
+        }
 
-			if (symmetry) {
-				const centerX = drawingCanvas.width / 2;
-				const symmetricX = 2 * centerX - x;
+        function redo() {
+            if (redoHistory.length > 0) {
+                const state = redoHistory.pop();
+                history.push(state);
+                ctx.putImageData(state, 0, 0);
+                updateUndoRedoButtons();
+            }
+        }
 
-				ctx.beginPath();
-				ctx.moveTo(2 * centerX - lastX, lastY);
-				ctx.lineTo(symmetricX, y);
-				ctx.stroke();
-			}
+        function clearCanvas() {
+            ctx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+            saveState();
+        }
 
-			[lastX, lastY] = [x, y];
-		}
+        function toggleEraser() {
+            isErasing = !isErasing;
+            eraserBtn.classList.toggle('active', isErasing);
+            drawingCanvas.style.cursor = isErasing ? 'url(cursors/2.png), auto' : 'default';
+        }
 
+        function saveImage() {
+            const link = document.createElement('a');
+            link.download = 'my-drawing.png';
+            link.href = drawingCanvas.toDataURL('image/png');
+            link.click();
+        }
 
-		function stopDrawing() {
-			if (isDrawing) {
-				isDrawing = false;
-				saveState();
-			}
-		}
+        function resizeCanvas() {
+            const rect = backgroundCanvas.getBoundingClientRect();
+            backgroundCanvas.width = rect.width * devicePixelRatio;
+            backgroundCanvas.height = rect.height * devicePixelRatio;
+            drawingCanvas.width = rect.width * devicePixelRatio;
+            drawingCanvas.height = rect.height * devicePixelRatio;
+            ctx.scale(devicePixelRatio, devicePixelRatio);
+            bgCtx.scale(devicePixelRatio, devicePixelRatio);
+            initializeCanvas();
+        }
 
-		function toggleSymmetry() {
-			symmetry = !symmetry;
-			symmetryButton.classList.toggle('active', symmetry);
-		}
+        // Event Listeners
+        colorPicker.addEventListener('input', () => ctx.strokeStyle = colorPicker.value);
+        backgroundPicker.addEventListener('input', () => {
+            bgCtx.fillStyle = backgroundPicker.value;
+            bgCtx.fillRect(0, 0, backgroundCanvas.width, backgroundCanvas.height);
+        });
+        drawingCanvas.addEventListener('pointerdown', startDrawing);
+        drawingCanvas.addEventListener('pointermove', draw);
+        drawingCanvas.addEventListener('pointerup', stopDrawing);
+        drawingCanvas.addEventListener('pointerout', stopDrawing);
+        drawingCanvas.addEventListener('pointercancel', stopDrawing);
+        symmetryButton.addEventListener('click', toggleSymmetry);
+        undoBtn.addEventListener('click', undo);
+        redoBtn.addEventListener('click', redo);
+        clearBtn.addEventListener('click', clearCanvas);
+        eraserBtn.addEventListener('click', toggleEraser);
+        saveImageBtn.addEventListener('click', saveImage);
+        window.addEventListener('resize', resizeCanvas);
 
+        // Initialize
+        initializeCanvas();
+        resizeCanvas();
 
-		eyedropperBtn.addEventListener('click', toggleEyedropper);
+        // Add class for nice icons
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('a, button').forEach(icon => icon.classList.add('icon-hover'));
+        });
 
-		function toggleEyedropper() {
-			isEyedropperActive = !isEyedropperActive;
-			eyedropperBtn.classList.toggle('active', isEyedropperActive);
-
-			if (isEyedropperActive) {
-				drawingCanvas.style.cursor = 'url(cursors/4.png), auto';
-			} else {
-				drawingCanvas.style.cursor = 'default';
-			}
-		}
-
-		drawingCanvas.addEventListener('click', (e) => {
-			if (isEyedropperActive) {
-				const rect = drawingCanvas.getBoundingClientRect();
-				const x = e.clientX - rect.left;
-				const y = e.clientY - rect.top;
-				const pixelData = ctx.getImageData(x, y, 1, 1).data;
-				const color = `rgb(${pixelData[0]}, ${pixelData[1]}, ${pixelData[2]})`;
-
-				colorPicker.value = color;
-				ctx.strokeStyle = color;
-
-				isEyedropperActive = false;
-				drawingCanvas.style.cursor = 'default';
-			}
-		});
-
-		let history = [];
-		let redoHistory = [];
-
-		document.getElementById('undo').addEventListener('click', () => {
-			if (history.length > 0) {
-				redoHistory.push(history.pop());
-				const previousState = history[history.length - 1];
-				ctx.putImageData(previousState, 0, 0);
-			}
-		});
-
-		document.getElementById('redo').addEventListener('click', () => {
-			if (redoHistory.length > 0) {
-				history.push(redoHistory.pop());
-				const nextState = history[history.length - 1];
-				ctx.putImageData(nextState, 0, 0);
-			}
-		});
-
-		clearBtn.addEventListener('click', () => {
-			ctx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
-			saveState();
-		});
-
-		eraserBtn.addEventListener('click', () => {
-			isErasing = !isErasing;
-			eraserBtn.classList.toggle('active', isErasing);
-
-
-			if (isErasing) {
-				drawingCanvas.style.cursor = 'url(cursors/2.png), auto';
-			} else {
-				drawingCanvas.style.cursor = 'default';
-			}
-		});
-
-// добавляем класс для красивых иконок
-document.addEventListener('DOMContentLoaded', () => {
-  const icons = document.querySelectorAll('a, button'); 
-  icons.forEach(icon => {
-    icon.classList.add('icon-hover');
-  });
-});
-
-const slider = document.getElementById("brushSize"); // Объявляем переменные только один раз
-const output = document.getElementById("rangeValue");
-output.innerHTML = slider.value; // Изначально отображаем значение
-
-slider.oninput = function() {
-  output.innerHTML = this.value;
-  const percent = (this.value - this.min) / (this.max - this.min); // Вычисляем процент
-  const left = percent * (sliderWidth - output.offsetWidth); // Вычисляем позицию слева
-  output.style.left = left + 'px'; // Устанавливаем позицию слева
-}
-
-
-	</script>
-	<script  src="cancer.js" defer></script>
-	<script type="module" src="cancerSettings.js" defer></script>
-	<script type="module" src="cancerHelper.js" defer></script>
-	<script type="module" src="cancerHotkey.js" defer></script>
+        // Check for pointer events support
+        if (window.PointerEvent) {
+            console.log('Pointer events are supported');
+        } else {
+            console.log('Pointer events are not supported');
+        }
+    </script>
+    <script src="cancer.js" defer></script>
+    <script type="module" src="cancerSettings.js" defer></script>
+    <script type="module" src="cancerHelper.js" defer></script>
+    <script type="module" src="cancerHotkey.js" defer></script>
 </body>
-
 </html>
