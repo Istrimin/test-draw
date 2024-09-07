@@ -12,15 +12,24 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-}
 
-body {
   user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
+
+  /* Add transition for a smooth effect */
+  transition: box-shadow 0.3s ease; 
 }
 
+body:hover {
+  box-shadow: 0 0 10px 5px rgba(0, 128, 0, 0.5); /* Green, semi-transparent border */
+}
+
+
+.randomImage:hover{
+  box-shadow: 0 0 10px 5px rgba(0, 128, 0, 0.5); /* Green, semi-transparent border */
+}
 
 h1 {
   color: rgb(255, 255, 255);
@@ -76,25 +85,7 @@ a[title="Рисовать"] {
   align-items: center;
 }
 
-/* #cursorList {
-  background-color: transparent;
-  padding: 10px;
-  margin-top: 5px;
-  max-height: 200px;
-  overflow-y: auto;
-}
 
-#cursorList div {
-  padding: 5px;
-  margin-bottom: 2px;
-  border: 1px solid transparent;
-  cursor: pointer;
-}
-
-#cursorList div:hover {
-  background-color: #560000;
-  border-color: #999;
-} */
 
 .time {
   background-color: transparent;
