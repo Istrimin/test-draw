@@ -8,10 +8,9 @@ document.addEventListener('keydown', function(event) {
             document.getElementById('eyedropperBtn').click();
             break;
         case 'KeyZ':
-            undo();
-            break;
+            document.getElementById('undo').click();
+                break;
         case 'KeyX':
-            redo();
             event.preventDefault();
             document.getElementById('redo').click();
             break;

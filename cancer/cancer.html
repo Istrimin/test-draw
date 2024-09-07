@@ -13,25 +13,16 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
 	<script src="cancerCursors.js" defer></script>
 	<style>
-		/* Стили для активной кнопки */
-		.active {
-			background-color: lightblue;
-		}
 
 #drawingCanvas {
-  cursor: url('cursors/1.png'), auto; /* Предполагая, что 'cursors/1.png' - путь к изображению вашего карандаша */
+  cursor: url('cursors/1.png'), auto; 
 }
 
 	</style>
 </head>
 
 <body>
-	<header>
-		<div class="header-container">
-			<!-- <div id="time" class="time"></div>
-			<div id="startTime" class="time"></div> -->
-		</div>
-	</header>
+
 	<main class="base-container">
 		<aside class="sidebar">
 			<a href="../index.html" target="_self" title="Выйти из команты" id="exitLink"
@@ -306,75 +297,15 @@
 				drawingCanvas.style.cursor = 'default';
 			}
 		});
-// ... (your existing code) ...
 
-// // Flood Fill Functionality
-// function floodFill(e) {
-//   if (!currentCtx) {
-//     console.error('Error: currentCtx is undefined in floodFill. Current layer:', currentLayer);
-//     return;
-//   }
+// добавляем класс для красивых иконок
+document.addEventListener('DOMContentLoaded', () => {
+  const icons = document.querySelectorAll('a, button'); 
+  icons.forEach(icon => {
+    icon.classList.add('icon-hover');
+  });
+});
 
-//   const startX = e.offsetX;
-//   const startY = e.offsetY;
-//   const imageData = currentCtx.getImageData(0, 0, drawingCanvas.width, drawingCanvas.height); // Use drawingCanvas
-//   const data = imageData.data;
-//   const width = imageData.width;
-//   const height = imageData.height;
-
-//   const targetColor = getPixelColor(data, startX, startY, width);
-//   const fillColor = hexToRgba(colorPicker.value);
-//   const tolerance = 30;
-
-//   if (colorMatch(targetColor, fillColor, tolerance)) return;
-
-//   const stack = [[startX, startY]];
-//   const visited = new Uint8Array(width * height);
-
-//   while (stack.length) {
-//     const [x, y] = stack.pop();
-//     const index = y * width + x;
-
-//     if (visited[index]) continue;
-//     visited[index] = 1;
-
-//     const pixelIndex = index * 4;
-//     const currentColor = data.slice(pixelIndex, pixelIndex + 4);
-
-//     if (colorMatch(currentColor, targetColor, tolerance) || isContourPixel(x, y, data, width, height, targetColor, tolerance)) {
-//       setPixelColor(data, x, y, width, fillColor);
-
-//       if (x > 0) stack.push([x - 1, y]);
-//       if (x < width - 1) stack.push([x + 1, y]);
-//       if (y > 0) stack.push([x, y - 1]);
-//       if (y < height - 1) stack.push([x, y + 1]);
-//     }
-//   }
-
-//   // Оптимизированный дополнительный проход
-//   for (let y = 0; y < height; y++) {
-//     for (let x = 0; x < width; x++) {
-//       const index = (y * width + x) * 4;
-//       if (!colorMatch(data.slice(index, index + 4), fillColor, 0) && shouldFillPixel(x, y, data, width, height, fillColor)) {
-//         setPixelColor(data, x, y, width, fillColor);
-//       }
-//     }
-//   }
-
-//   currentCtx.putImageData(imageData, 0, 0);
-//   saveState();
-// }
-
-// // ... (rest of your flood fill helper functions) ...
-
-// // Modify the event listener for floodFill 
-// drawingCanvas.addEventListener('click', (e) => { // Use drawingCanvas here
-//   if (isFillMode) {
-//     floodFill(e);
-//   }
-// });
-
-// ... (your existing code) ...
 
 
 	</script>
