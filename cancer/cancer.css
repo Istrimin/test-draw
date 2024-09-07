@@ -111,9 +111,6 @@ a {
 
 
 
-.slider input[type="range"] {
-	width: 80%;
-}
 
 canvas {
 	border-radius: 20px;
@@ -250,10 +247,10 @@ body.no-drop {
 	cursor: not-allowed;
 }
 
-input[type="range"] {
+.slider input[type="range"] {
+	width: 80%;
 	-webkit-appearance: none;
 	appearance: none;
-	width: 100%;
 	outline: none;
 	overflow: hidden;
 	touch-action: pan-y;
@@ -287,6 +284,25 @@ input[type="range"]::-webkit-slider-runnable-track {
 	background: rgb(56, 93, 130);
 	height: 100%;
 }
+
+.slider {
+  position: relative; /* Делаем slider позиционирующим родителем */
+  display: inline-block; /* Чтобы slider занимал только необходимое место */
+}
+
+.slider-value {
+  position: absolute; /* Позиционируем значение относительно slider */
+  top: -25px; /* Размещаем над слайдером */
+  left: 50%;
+  transform: translateX(-50%); /* Центрируем по горизонтали */
+  background-color: rgba(0, 0, 0, 0.7); /* Делаем фон полупрозрачным */
+  color: white;
+  padding: 2px 5px;
+  border-radius: 3px;
+  font-size: 12px;
+}
+
+
 
 /* Стили для панели курсоров */
 #cursorPanel {
