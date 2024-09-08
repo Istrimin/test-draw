@@ -17,9 +17,9 @@ body {
     overscroll-behavior-x: none;
     overflow-x: hidden;
 
-/* ? */    
-overflow: hidden;
-/* отключил для проверки и это дало то, что могу теперь двигать кнопки планшетом */
+    /* ? */
+    overflow: hidden;
+    /* отключил для проверки и это дало то, что могу теперь двигать кнопки планшетом */
     /* -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -29,29 +29,25 @@ overflow: hidden;
 
 
     /* added     */
-/* проверка будет ли это влиять ну другие кнопки */
-    outline:#aa0404;
+    /* проверка будет ли это влиять ну другие кнопки */
+    outline: #aa0404;
 }
 
-
-.layer-button:focus {
-    /* outline: none; */
-    /* outline:#aa0404; */
-}
 
 /* .layer-button:focus-visible {
     outline: 3000px solid 
 } */
 
-button:focus{
+button:focus {
 
-outline:none}
+    outline: none
+}
 
 
 button {
     background-color: transparent;
     color: var(--button-text-color);
-    font-style: bold;
+    /* font-style: bold;                                                                                                                                                                                                                                                                                                                                                                                                                                                     */
     font-size: 30px;
 }
 
@@ -105,26 +101,9 @@ canvas {
     height: 100vh;
     /* width: 100%; */
 }
-/* 
-#fillModeBtn.active {
-    background-color: var(--button-active-color);
-}
-
-#symmetry.active {
-    background-color: var(--button-active-color);
-}
-
-#eyedropperBtn.active {
-    background-color: var(--button-active-color);
-}
-#eraserBtn.active{
-        background-color: var(--button-active-color);
-} */
 
 
-/* ... other styles ... */
-
-button.active { 
+button.active {
     background-color: var(--button-active-color);
 }
 
@@ -169,7 +148,7 @@ a {
 } */
 
 
-
+/* ? */
 .tools-column input[type="range"] {
     width: 60%;
 }
@@ -226,11 +205,43 @@ a {
     margin: 0 5px;
 }
 
-input[type="range"] {
-    width: 50%;
+
+
+
+input[type="range"]:hover {
+    opacity: 1;
+}
+
+input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    height: 10px;
+    width: 20px;
+    height: 20px;
+    background: #4CAF50;
+    cursor: pointer;
+    border-radius: 50%;
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: #4CAF50;
+    cursor: pointer;
+    border-radius: 50%;
+}
+
+input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 20px;
+    background: #363535;
+    outline: none;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+    border-radius: 5px;
+    /* width: 50%; */
+    -webkit-appearance: none;
+    appearance: none;
     background: #363535;
     outline: none;
     opacity: 0.7;
@@ -421,188 +432,222 @@ input[type="range"]::-moz-range-thumb {
 }
 
 /* new */
-        .canv-container {
-            position: relative;
-            width: 700px;
-            height: 500px;
-        }
+.canv-container {
+    position: relative;
+    width: 700px;
+    height: 500px;
+}
 
-        .canv-container canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            /* z-index: 1; */
-        }
+.canv-container canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    /* z-index: 1; */
+}
 
-        .canvas-and-sliders {
-            display: flex;
-        }
+.canvas-and-sliders {
+    display: flex;
+}
 
 
 .color-picker-group-two input[type="color"],
 .color-picker-group input[type="color"] {
-  appearance: none;
-  -webkit-appearance: none; 
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  overflow: hidden; 
+    appearance: none;
+    -webkit-appearance: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    overflow: hidden;
 }
 
 .color-picker-group-two input[type="color"] {
-  width: 20px;
-  height: 20px;
+    width: 20px;
+    height: 20px;
 }
 
 .color-picker-group input[type="color"] {
-  width: 15px;
-  height: 10px;
-  border-radius: 50%; 
+    width: 15px;
+    height: 10px;
+    border-radius: 50%;
 }
 
 .color-picker-group-two input[type="color"]::-webkit-color-swatch-wrapper,
 .color-picker-group input[type="color"]::-webkit-color-swatch-wrapper {
-  padding: 0;
+    padding: 0;
 }
 
 .color-picker-group-two input[type="color"]::-webkit-color-swatch,
 .color-picker-group input[type="color"]::-webkit-color-swatch {
-  border: none;
+    border: none;
 }
 
 .color-picker-group-two input[type="color"]::-webkit-color-swatch {
-  border-radius: 0; 
+    border-radius: 0;
 }
 
 .color-picker-group input[type="color"]::-webkit-color-swatch {
-  border-radius: 50%;
+    border-radius: 50%;
 }
 
 /* Для Firefox */
 .color-picker-group-two input[type="color"]::-moz-color-swatch,
 .color-picker-group input[type="color"]::-moz-color-swatch {
-  border: none;
-  border-radius: 0; 
+    border: none;
+    border-radius: 0;
 }
 
 .color-picker-group {
-  display: flex;
-  gap: 5px;
+    display: flex;
+    gap: 5px;
 }
-    
-        .color-picker-and-word {
-            display: flex;
-            align-items: center;
-            margin-bottom: 0;
-        }
 
-        .color-picker-and-word {
-            display: flex;
-            align-items: center;
-            margin-bottom: 0;
-        }
+.color-picker-and-word {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0;
+}
 
-        .word-navigation {
-            margin: 0;
-            cursor: pointer;
-        }
+.color-picker-and-word {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0;
+}
 
-        .time-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+.word-navigation {
+    margin: 0;
+    cursor: pointer;
+}
+
+.word-navigation button {
+    outline: none;
+    border: none;
+}
+
+.word-navigation button:focus {
+    outline: none;
+}
+
+
+.time-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 
 
 
 
-        .word-navigation {
-            display: flex;
-            align-items: center;
-            z-index: 10;
-        }
+.word-navigation {
+    display: flex;
+    align-items: center;
+    z-index: 10;
+}
 
-        .layer-panel {
-            /* gap: 50px; */
-            max-height: 600px;
-            overflow-y: auto;
-        }
 
-        .layer-button {
-            color: transparent;
-            /*цвет сердца*/
-            font-size: 10px;
-            flex-direction: column;
-            display: flex;
- 
-            /* padding: 50px; */
-            cursor: pointer;
-            border-radius: 20%;
-        }
-  
-        .layer-button.active-layer {
-color:transparent;
-        height: 50px;;
+.layer-panel {
+    overflow-y: auto;
+    /* flex-grow: 1; */
+    /* Allow layer panel to take up available space */
+    /* gap: 50px; */
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.layer-button:focus {
+    outline: none;
+}
+
+.layer-button.active-layer {
+    background-color: transparent;
+    color: transparent;
+    height: 50px;
+    border: none;
+    outline: none;
+}
+
+
+.layer-button {
+    background-color: transparent;
+    border: none;
+    outline: none;
+    color: transparent;
+    /*цвет сердца*/
+    font-size: 10px;
+    flex-direction: column;
+    display: flex;
+
+    /* padding: 50px; */
+    cursor: pointer;
+    border-radius: 20%;
+}
+
+.layer-button.active-layer {
+    color: transparent;
+    height: 50px;
+    ;
     /* border: none;  */
 
-        }
-
-
-        body {
-            cursor: url('../cursors/pencil.png'), auto;
-        }
-
-
-#floodFillBtn.active { 
-  background-color: lightblue; /* Example: Change background color when active */
-  /* Add any other styles you want for the active state */
 }
 
-img{
-  /* transform: scale(1.1); */
-  border-radius: 100px;
+
+body {
+    cursor: url('../cursors/pencil.png'), auto;
+}
+
+
+#floodFillBtn.active {
+    background-color: lightblue;
+    /* Example: Change background color when active */
+    /* Add any other styles you want for the active state */
+}
+
+img {
+    /* transform: scale(1.1); */
+    border-radius: 100px;
 }
 
 
 img:hover {
-  transform: scale(1.01);
-  box-shadow: 
-    0px 0px 100px rgba(23, 201, 0, 0.5), /* Outer shadow (green) */
-    inset 0px 0px 150px rgba(23, 201, 0, 0.5); /* Inner shadow (black) */
-  border-radius: 100px;
+    transform: scale(1.01);
+    box-shadow:
+        0px 0px 100px rgba(23, 201, 0, 0.5),
+        /* Outer shadow (green) */
+        inset 0px 0px 150px rgba(23, 201, 0, 0.5);
+    /* Inner shadow (black) */
+    border-radius: 100px;
 }
 
 
 .icon-hover:hover {
-  transform: scale(1.31);
-  box-shadow: 
-    0px 0px 100px rgba(23, 201, 0, 0.5), /* Outer shadow (green) */
-    inset 0px 0px 150px rgba(23, 201, 0, 0.5); /* Inner shadow (green) */
-  border-radius: 100px; 
+    transform: scale(1.31);
+    box-shadow:
+        0px 0px 100px rgba(23, 201, 0, 0.5),
+        /* Outer shadow (green) */
+        inset 0px 0px 150px rgba(23, 201, 0, 0.5);
+    /* Inner shadow (green) */
+    border-radius: 100px;
 }
 
-.icon-hover { /* Styles applied in the normal state */
-  /* transform: scale(1.01); */
-  box-shadow: 
-    0px 0px 100px rgba(225, 0, 255, 0.201), /* Outer shadow (green) */
-    inset 0px 0px 150px rgba(255, 0, 255, 0.217); /* Inner shadow (green) */
-  border-radius: 100px; 
-} 
+.icon-hover {
+    /* Styles applied in the normal state */
+    /* transform: scale(1.01); */
+    box-shadow:
+        0px 0px 100px rgba(225, 0, 255, 0.201),
+        /* Outer shadow (green) */
+        inset 0px 0px 150px rgba(255, 0, 255, 0.217);
+    /* Inner shadow (green) */
+    border-radius: 100px;
+}
 
 
-        .layer-panel-wrapper {
-            display: flex;
-            flex-direction: column;
-            /* gap: 50px; */
-            max-height: 600px; 
-            /* Adjust as needed */
-        }
+.layer-panel-wrapper {
+    display: flex;
+    flex-direction: column;
+    /* gap: 50px; */
+    max-height: 600px;
+    /* Adjust as needed */
+}
 
-        .layer-panel {
-            overflow-y: auto;
-            flex-grow: 1;
-            /* Allow layer panel to take up available space */
-        }
 
 /* зум */
 

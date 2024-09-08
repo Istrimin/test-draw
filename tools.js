@@ -1,34 +1,29 @@
-// export function exportImage() {
-//   // Create a temporary canvas to merge all layers
-//   const mergeCanvas = document.createElement('canvas');
-//   const mergeCtx = mergeCanvas.getContext('2d');
-//   mergeCanvas.width = layers[1].width;
-//   mergeCanvas.height = layers[1].height;
 
-//   // Get all layer buttons
-//   const layerButtons = Array.from(document.querySelectorAll('.layer-button'));
+export function exportImage() {
+    const mergeCanvas = document.createElement('canvas');
+    const mergeCtx = mergeCanvas.getContext('2d');
+    mergeCanvas.width = layers[1].width;
+    mergeCanvas.height = layers[1].height;
 
-//   // Sort layers based on their z-index (lowest to highest)
-//   layerButtons.sort((a, b) => {
-//     const layerA = layers[parseInt(a.dataset.layer)];
-//     const layerB = layers[parseInt(b.dataset.layer)];
-//     return parseInt(layerB.style.zIndex || 0) - parseInt(layerA.style.zIndex || 0);
-//   });
+    const layerButtons = Array.from(document.querySelectorAll('.layer-button'));
+    layerButtons.sort((a, b) => {
+        const layerA = layers[parseInt(a.dataset.layer)];
+        const layerB = layers[parseInt(b.dataset.layer)];
+        return parseInt(layerA.style.zIndex || 0) - parseInt(layerB.style.zIndex || 0);
+    });
 
-//   // Draw each layer onto the temporary canvas in the correct order (from bottom to top)
-//   layerButtons.forEach((button) => {
-//     const layerId = parseInt(button.dataset.layer);
-//     if (layers[layerId]) {
-//       mergeCtx.drawImage(layers[layerId], 0, 0);
-//     }
-//   });
+    layerButtons.forEach((button) => {
+        const layerId = parseInt(button.dataset.layer);
+        if (layers[layerId]) {
+            mergeCtx.drawImage(layers[layerId], 0, 0);
+        }
+    });
 
-//   // Create a link and trigger the download
-//   const link = document.createElement('a');
-//   link.download = 'my-drawing.png';
-//   link.href = mergeCanvas.toDataURL('image/png');
-//   link.click();
-// }
+    const link = document.createElement('a');
+    link.download = 'my-drawing.png';
+    link.href = mergeCanvas.toDataURL('image/png');
+    link.click();
+}
 
 
 // // Пипетка
@@ -111,6 +106,62 @@ function deleteAllLayers() {
 }
 
 
+// объединяем слои
+// Получаем ссылку на кнопку объединения слоев
+const mergeLayersBtn = document.getElementById('mergeLayers');
+
+// Добавляем обработчик события для кнопки
+mergeLayersBtn.addEventListener('click', mergeLayers);
+
+// Функция для объединения слоев
+function mergeLayers() {
+    // Создаем новый холст для объединенного изображения
+    const mergedCanvas = document.createElement('canvas');
+    const mergedCtx = mergedCanvas.getContext('2d');
+    mergedCanvas.width = layers[1].width;
+    mergedCanvas.height = layers[1].height;
+
+    // Получаем все кнопки слоев и сортируем их по z-index
+    const layerButtons = Array.from(document.querySelectorAll('.layer-button'));
+    layerButtons.sort((a, b) => {
+        const layerA = layers[parseInt(a.dataset.layer)];
+        const layerB = layers[parseInt(b.dataset.layer)];
+        return parseInt(layerA.style.zIndex || 0) - parseInt(layerB.style.zIndex || 0);
+    });
+
+    // Рисуем каждый слой на объединенном холсте
+    layerButtons.forEach((button) => {
+        const layerId = parseInt(button.dataset.layer);
+        if (layers[layerId]) {
+            mergedCtx.drawImage(layers[layerId], 0, 0);
+        }
+    });
+
+    // Удаляем все существующие слои
+    layerButtons.forEach((button) => {
+        const layerId = parseInt(button.dataset.layer);
+        if (layers[layerId]) {
+            canvasContainer.removeChild(layers[layerId]);
+            delete layers[layerId];
+            delete contexts[layerId];
+            delete layerColors[layerId];
+            delete history[layerId];
+            delete redoHistory[layerId];
+        }
+        button.remove();
+    });
+
+    // Сбрасываем счетчик слоев
+    layerCount = 0;
+
+    // Создаем новый слой с объединенным изображением
+    createLayer();
+    currentCtx.drawImage(mergedCanvas, 0, 0);
+
+    // Обновляем интерфейс
+    updateLayerOrder();
+    setCurrentLayer(1);
+}
 
 
 

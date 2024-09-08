@@ -67,6 +67,31 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
+// Отключение скроллинга колесиком мыши для всего документа, кроме слайдеров
+document.addEventListener('wheel', function(e) {
+    // Проверяем, находится ли курсор над слайдером
+    if (!e.target.closest('.slider')) {
+        e.preventDefault();
+    }
+}, {
+    passive: false,  // Важно для работы preventDefault в современных браузерах
+    capture: true    // Перехватываем событие на этапе перехвата
+});
+
+// Блокировка стандартного поведения для touchmove на мобильных устройствах
+document.addEventListener('touchmove', function(e) {
+    // Проверяем, происходит ли касание на слайдере
+    if (!e.target.closest('.slider')) {
+        e.preventDefault();
+    }
+}, {
+    passive: false,
+    capture: true
+});
+
+
+
+
 
 
 

@@ -13,8 +13,8 @@ imageInput.addEventListener('change', importImage);
 symmetryButton.addEventListener('click', toggleSymmetry);
 undoBtn.addEventListener('click', undo);
 redoBtn.addEventListener('click', redo);
-saveImageBtn.addEventListener('click', exportImage);
-// saveImageBtn.addEventListener('click', tools.exportImage);
+// saveImageBtn.addEventListener('click', exportImage);
+saveImageBtn.addEventListener('click', tools.exportImage);
 
 
 
