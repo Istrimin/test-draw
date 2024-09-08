@@ -32,3 +32,12 @@ Use @font-face: Define the font in your CSS:
             <p id="Quizz"></p>
         </div>
     </div>  -->
+
+
+// import { exportImage } from './tools.js'; // Assuming tools.js is in the same directory
+// import * from "./tools.js"
+
+// saveImageBtn.addEventListener('click', exportImage);
+
+fix перенести это
+    ctrl+e озвучка текста с qtranslate

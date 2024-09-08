@@ -1,3 +1,8 @@
+const layerCreationComplete = new Event('layerCreationComplete');
+document.dispatchEvent(layerCreationComplete); 
+
+
+
 //         // Disable the default context menu for the entire document
 //         document.addEventListener('contextmenu', event => event.preventDefault());
 

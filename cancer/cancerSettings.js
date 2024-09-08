@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // !блокировка контекстного меню
 
-        // document.addEventListener('contextmenu', event => event.preventDefault());
+        document.addEventListener('contextmenu', event => event.preventDefault());
 
         // $(function () {
         //     $("#message-container").resizable();

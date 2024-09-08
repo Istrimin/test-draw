@@ -1,22 +1,4 @@
-// Initialize canvases and contexts
 
-
-// Eyedropper functionality
-// let isBrushEyedropperActive = false;
-
-
-
-
-
-function rgbToHex(r, g, b) {
-  if (r > 255 || g > 255 || b > 255)
-    throw "Invalid color component";
-  return ((r << 16) | (g << 8) | b).toString(16);
-}
-
-const clearBtn = document.getElementById('clear');
-const saveImageBtn = document.getElementById('saveImageBtn');
-const imageInput = document.getElementById('imageInput');
 const UploadButton = document.getElementById('UploadButton');
 const symmetryButton = document.getElementById('symmetry');
 const fillModeBtn = document.getElementById('fillModeBtn');
@@ -33,14 +15,8 @@ let isFillMode = false;
 
 
 
-// Event listeners
-UploadButton.addEventListener('click', () => imageInput.click());
-imageInput.addEventListener('change', importImage);
-symmetryButton.addEventListener('click', toggleSymmetry);
-saveImageBtn.addEventListener('click', exportImage);
-undoBtn.addEventListener('click', undo);
-redoBtn.addEventListener('click', redo);
-clearBtn.addEventListener('click', clearCanvas);
+
+
 
 
 backgroundPicker.addEventListener('input', (event) => {
@@ -50,6 +26,21 @@ backgroundPicker.addEventListener('input', (event) => {
 
 
 });
+
+// *toggle eraser
+        eraserBtn.addEventListener('click', toggleEraser);
+        function toggleEraser() {
+            isErasing = !isErasing;
+            eraserBtn.classList.toggle('active', isErasing);
+            // Change the cursor to indicate eraser mode
+            if (isErasing) {
+                document.body.style.cursor = 'url(cursors/eraser.png), auto'; // Assuming you have an eraser cursor image
+            } else {
+                document.body.style.cursor = 'default';
+            }
+        }
+
+
 
 
 // backgroundPicker.addEventListener('input', (event) => {
@@ -97,7 +88,8 @@ function importImage(event) {
   const reader = new FileReader();
   reader.onload = (e) => {
     uploadedImage = new Image();
-    uploadedImage.onload = () => {currentCtx.drawImage(uploadedImage, 0, 0, layer2.width, layer2.height);
+    uploadedImage.onload = () => {
+      currentCtx.drawImage(uploadedImage, 0, 0, layer2.width, layer2.height);
     };
     uploadedImage.src = e.target.result;
   };
@@ -109,117 +101,6 @@ function toggleSymmetry() {
   symmetry = !symmetry;
   symmetryButton.classList.toggle('active', symmetry);
 }
-
-
-// Drawing functions
-// Eyedropper functions
-
-
-
-let isEyedropperActive = false;
-let isBrushEyedropperActive = false;
-
-function getPixelColor(x, y) {
-  if (!currentCtx) {
-    console.error('Error: currentCtx is undefined in getPixelColor. Current layer:', currentLayer);
-    return;
-  }
-  const pixelData = currentCtx.getImageData(x, y, 1, 1).data;
-  return `#${pixelData[0].toString(16).padStart(2, '0')}${pixelData[1].toString(16).padStart(2, '0')}${pixelData[2].toString(16).padStart(2, '0')}`;
-}
-
-function handleEyedropperClick(e) {
-  if (isEyedropperActive || isBrushEyedropperActive) {
-    const rect = layers[currentLayer].getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const pickedColor = getPixelColor(x, y);
-
-    if (isEyedropperActive) {
-      document.getElementById('colorPicker').value = pickedColor;
-      setDrawingColor(pickedColor); // Update the drawing color
-    } else if (isBrushEyedropperActive) {
-      document.getElementById('colorPicker3').value = pickedColor; // Assuming you want to set colorPicker3
-      setDrawingColor(pickedColor); // Update the drawing color
-    }
-  }
-}
-
-canvasContainer.addEventListener('click', handleEyedropperClick);
-
-function toggleEyedropper() {
-  isEyedropperActive = !isEyedropperActive;
-  isBrushEyedropperActive = false; // Ensure only one eyedropper is active at a time
-  if (isEyedropperActive) {
-    canvasContainer.style.cursor = 'url(cursors/pipette.png), auto'; // Assuming you have a pipette cursor image
-  } else {
-    canvasContainer.style.cursor = 'default';
-  }
-}
-
-function toggleBrushEyedropper() {
-  isBrushEyedropperActive = !isBrushEyedropperActive;
-  isEyedropperActive = false; // Ensure only one eyedropper is active at a time
-  if (isBrushEyedropperActive) {
-    canvasContainer.style.cursor = 'url(cursors/pipette.png), auto'; // Assuming you have a pipette cursor image
-  } else {
-    canvasContainer.style.cursor = 'default';
-  }
-}
-
-function toggleEyedropper() {
-  isEyedropperActive = !isEyedropperActive;
-  document.body.style.cursor = isEyedropperActive ? 'url(cursors/pipette.png), auto' : 'default';
-}
-
-function toggleBrushEyedropper() {
-  isBrushEyedropperActive = !isBrushEyedropperActive;
-  document.body.style.cursor = isBrushEyedropperActive ? 'url(cursors/pipette.png), auto' : 'default';
-}
-
-
-// function undo() {
-//   if (history[currentLayer].length > 1) {
-//     redoHistory[currentLayer].push(history[currentLayer].pop());
-//     let previousState = history[currentLayer][history[currentLayer].length - 1];
-//     contexts[currentLayer].clearRect(0, 0, layers[currentLayer].width, layers[currentLayer].height);
-//     contexts[currentLayer].putImageData(previousState, 0, 0);
-//   }
-// }
-
-// function redo() {
-//   if (redoHistory[currentLayer].length > 0) {
-//     history[currentLayer].push(redoHistory[currentLayer].pop());
-//     let nextState = history[currentLayer][history[currentLayer].length - 1];
-//     contexts[currentLayer].clearRect(0, 0, layers[currentLayer].width, layers[currentLayer].height);
-//     contexts[currentLayer].putImageData(nextState, 0, 0);
-//   }
-// }
-
-
-
-
-
-
-function exportImage() {
-  // Create a temporary canvas to merge all layers
-  const mergeCanvas = document.createElement('canvas');
-  const mergeCtx = mergeCanvas.getContext('2d');
-  mergeCanvas.width = layers[2].width; // Assuming all layers have the same size
-  mergeCanvas.height = layers[2].height;
-
-  // Draw each layer onto the temporary canvas
-  for (let i = 2; i <= layerCount; i++) {
-    mergeCtx.drawImage(layers[i], 0, 0);
-  }
-
-  // Create a link and trigger the download
-  const link = document.createElement('a');
-  link.download = 'my-drawing.png';
-  link.href = mergeCanvas.toDataURL('image/png');
-  link.click();
-}
-
 
 function resizeCanvas() {
   const rect = canvasContainer.getBoundingClientRect();
@@ -251,57 +132,59 @@ exitLink.addEventListener('click', () => {
 // add
 
 function setDrawingColor(color) {
-    if (currentCtx) {
-        // Store the color for the current layer
-        layerColors[currentLayer] = color;
-        // Update the current context's color for immediate visual feedback
-        currentCtx.strokeStyle = color;
-        // Update button color when drawing color changes
-        updateLayerButtonColor(currentLayer);
-    }
+  if (currentCtx) {
+    // Store the color for the current layer
+    layerColors[currentLayer] = color;
+    // Update the current context's color for immediate visual feedback
+    currentCtx.strokeStyle = color;
+    // Update button color when drawing color changes
+    updateLayerButtonColor(currentLayer);
+  }
 }
 
 // add 
 // Функция отмены
 function undo() {
-    if (history[currentLayer] && history[currentLayer].length > 0) {
-        if (history[currentLayer].length === 1) {
-            // Если это последнее состояние, сохраняем текущее состояние перед очисткой
-            const currentState = currentCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height);
-            redoHistory[currentLayer].push(currentState);
-            
-            // Очищаем холст
-            currentCtx.clearRect(0, 0, layers[currentLayer].width, layers[currentLayer].height);
-        } else {
-            // Сохраняем текущее состояние в redoHistory
-            const currentState = currentCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height);
-            redoHistory[currentLayer].push(currentState);
-            
-            // Возвращаемся к предыдущему состоянию
-            const previousState = history[currentLayer].pop();
-            currentCtx.putImageData(previousState, 0, 0);
-        }
+  if (history[currentLayer] && history[currentLayer].length > 0) {
+    if (history[currentLayer].length === 1) {
+      // Если это последнее состояние, сохраняем текущее состояние перед очисткой
+      const currentState = currentCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height);
+      redoHistory[currentLayer].push(currentState);
+
+      // Очищаем холст
+      currentCtx.clearRect(0, 0, layers[currentLayer].width, layers[currentLayer].height);
+    } else {
+      // Сохраняем текущее состояние в redoHistory
+      const currentState = currentCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height);
+      redoHistory[currentLayer].push(currentState);
+
+      // Возвращаемся к предыдущему состоянию
+      const previousState = history[currentLayer].pop();
+      currentCtx.putImageData(previousState, 0, 0);
     }
+  }
 }
 
 // Функция повтора
 function redo() {
-    if (redoHistory[currentLayer] && redoHistory[currentLayer].length > 0) {
-        const nextState = redoHistory[currentLayer].pop();
-        
-        // Сохраняем текущее состояние в history перед применением redo
-        const currentState = currentCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height);
-        history[currentLayer].push(currentState);
-        
-        currentCtx.putImageData(nextState, 0, 0);
-    }
+  if (redoHistory[currentLayer] && redoHistory[currentLayer].length > 0) {
+    const nextState = redoHistory[currentLayer].pop();
+
+    // Сохраняем текущее состояние в history перед применением redo
+    const currentState = currentCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height);
+    history[currentLayer].push(currentState);
+
+    currentCtx.putImageData(nextState, 0, 0);
+  }
 }
 
-// Обновленная функция saveState
+// fix 
 
 
 
 
+
+// fix
 // flood fill
 
 // // Flood Fill Functionality
@@ -312,7 +195,7 @@ function redo() {
 //   const data = imageData.data;
 //   const width = imageData.width;
 //   const height = imageData.height;
-  
+
 //   const targetColor = getPixelColor(data, startX, startY, width);
 //   const fillColor = hexToRgba(colorPicker.value);
 //   const tolerance = 30;
