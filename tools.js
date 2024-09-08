@@ -1,27 +1,34 @@
-export function exportImage() {
-  // Create a temporary canvas to merge all layers
-  const mergeCanvas = document.createElement('canvas');
-  const mergeCtx = mergeCanvas.getContext('2d');
-  mergeCanvas.width = layers[1].width;
-  mergeCanvas.height = layers[1].height;
+// export function exportImage() {
+//   // Create a temporary canvas to merge all layers
+//   const mergeCanvas = document.createElement('canvas');
+//   const mergeCtx = mergeCanvas.getContext('2d');
+//   mergeCanvas.width = layers[1].width;
+//   mergeCanvas.height = layers[1].height;
 
-  // Get all layer buttons in their current order
-  const layerButtons = document.querySelectorAll('.layer-button');
+//   // Get all layer buttons
+//   const layerButtons = Array.from(document.querySelectorAll('.layer-button'));
 
-  // Draw each layer onto the temporary canvas in the correct order
-  layerButtons.forEach((button) => {
-    const layerId = parseInt(button.dataset.layer);
-    if (layers[layerId]) {
-      mergeCtx.drawImage(layers[layerId], 0, 0);
-    }
-  });
+//   // Sort layers based on their z-index (lowest to highest)
+//   layerButtons.sort((a, b) => {
+//     const layerA = layers[parseInt(a.dataset.layer)];
+//     const layerB = layers[parseInt(b.dataset.layer)];
+//     return parseInt(layerB.style.zIndex || 0) - parseInt(layerA.style.zIndex || 0);
+//   });
 
-  // Create a link and trigger the download
-  const link = document.createElement('a');
-  link.download = 'my-drawing.png';
-  link.href = mergeCanvas.toDataURL('image/png');
-  link.click();
-}
+//   // Draw each layer onto the temporary canvas in the correct order (from bottom to top)
+//   layerButtons.forEach((button) => {
+//     const layerId = parseInt(button.dataset.layer);
+//     if (layers[layerId]) {
+//       mergeCtx.drawImage(layers[layerId], 0, 0);
+//     }
+//   });
+
+//   // Create a link and trigger the download
+//   const link = document.createElement('a');
+//   link.download = 'my-drawing.png';
+//   link.href = mergeCanvas.toDataURL('image/png');
+//   link.click();
+// }
 
 
 // // Пипетка
@@ -69,65 +76,6 @@ function handleEyedropperClick(e) {
 // Add event listeners for both click and touchstart on the canvas container
 canvasContainer.addEventListener('click', handleEyedropperClick);
 canvasContainer.addEventListener('touchstart', handleEyedropperClick);
-
-
-
-// ~Двигаем слой
-// переход по слоям
-const moveLayerUpBtn = document.getElementById('moveLayerUp');
-const moveLayerDownBtn = document.getElementById('moveLayerDown');
-moveLayerUpBtn.addEventListener('click', () => {
-  moveLayerInStack(-1);
-});
-moveLayerDownBtn.addEventListener('click', () => {
-  moveLayerInStack(1);
-});
-
-function moveLayerInStack(direction) {
-  const currentLayerButton = document.querySelector(`.layer-button[data-layer="${currentLayer}"]`);
-  const targetLayerButton = direction === -1 ? currentLayerButton.previousElementSibling : currentLayerButton.nextElementSibling;
-  if (targetLayerButton) {
-    // Swap button positions in the DOM
-    if (direction === -1) {
-      currentLayerButton.parentNode.insertBefore(currentLayerButton, targetLayerButton);
-    } else {
-      currentLayerButton.parentNode.insertBefore(targetLayerButton, currentLayerButton);
-    }
-    // Update z-index of canvases
-    updateLayerOrder();
-    // Simulate click to update active layer
-    currentLayerButton.click();
-  }
-}
-// Получаем контейнер для кнопок слоёв
-const layerButtonsContainer = document.getElementById('layerButtons');
-// Делаем кнопки слоёв перетаскиваемыми
-$(function () {
-  $(layerButtonsContainer).sortable({
-    // Обновляем порядок слоёв после перетаскивания
-    update: function (event, ui) {
-      updateLayerOrder();
-    }
-  });
-  $(layerButtonsContainer).disableSelection();
-});
-// Функция для обновления порядка слоёв
-function updateLayerOrder() {
-  // Получаем все кнопки слоёв в новом порядке
-  const layerButtons = layerButtonsContainer.querySelectorAll('.layer-button');
-  // Обновляем z-index каждого слоя в соответствии с новым порядком кнопок
-  layerButtons.forEach((button, index) => {
-    const layerId = `layer${button.dataset.layer}`;
-    const canvas = document.getElementById(layerId);
-    canvas.style.zIndex = index + 1; // z-index начинается с 1
-  });
-}
-
-
-
-
-
-
 
 
 
@@ -183,7 +131,25 @@ function updateLayerOrder() {
 // }
 
 
-// // tools.js
+// очистка канваса
+const clearBtn = document.getElementById('clear');
+clearBtn.addEventListener('click', clearCanvas);
+function clearCanvas() {
+    saveState();
+    if (!currentCtx) return; 
+    currentCtx.clearRect(0, 0, layers[currentLayer].width, layers[currentLayer].height);
+    saveState();
+}
+
+
+
+
+
+
+
+
+
+
 // // // Flood Fill Functionality
 // // fillModeBtn.addEventListener('click', toggleFillMode);
 // // function toggleFillMode() {

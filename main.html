@@ -13,7 +13,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
     <script type="module" src="tools.js" defer></script>
     <style>
-
     </style>
 </head>
 
@@ -34,12 +33,10 @@
             <button id="undoBtn" title="Отменить (Z)">⟲</button>
             <button id="redoBtn" title="Повторить (X)">⟳</button>
             <button id="clear" title="Очистить">💀</button>
-
             <button id="fillModeBtn" title="Заливка (F)">🌊</button>
             <button id="floodFillBtn" title="Залить цветом">✨</button>
             <button id="eyedropperBtn" title="Пипетка заливки (A)">💧</button>
             <button id="brushEyedropperBtn" title="Пипетка кисти (D)">🖌️</button>
-
             <div id="cursorPanel" class="cursor-panel" style="display: none;">
                 <h3>Выберите курсор</h3>
                 <div id="cursorList"></div>
@@ -47,7 +44,7 @@
             <button id="settings" title="Настройки">⚙️</button>
         </div>
         <div class="canvas-and-sliders">
-            <div class="layer-panel-wrapper"> 
+            <div class="layer-panel-wrapper">
                 <button id="moveLayerUp" title="Слой вверх">▲</button>
                 <div class="layer-panel">
                     <div id="layerButtons"></div>
@@ -68,9 +65,8 @@
                         <input type="color" id="colorPicker9" value="#800080" title="Цвет кисти 9">
                         <div class="color-picker-group-two">
                             <input type="color" id="backgroundPicker" value="#ffffff" title="Цвет фона (B)">
-            <button id="symmetry" title="Симметрия (S)">🦋</button>
+                            <button id="symmetry" title="Симметрия (S)">🦋</button>
                         </div>
-
                     </div>
                     <div class="word-navigation">
                         <button id="previousWord" title="Предыдущее слово">&lt;</button>
@@ -92,28 +88,24 @@
                         <label for="opacity" title="Прозрачность">👻</label>
                         <input type="range" id="opacity" min="1" max="100" value="100">
                         <span id="opacityValue" style="color: red;">100</span>
-
                     </div>
                     <div class="tools-column">
                         <label for="brushSize" title="Размер кисти">🖌️</label>
                         <input type="range" id="brushSize" min="1" max="300" value="3">
                         <span id="brushSizeValue" style="color: red;">3</span>
-
                     </div>
                     <div class="tools-column">
                         <div class="pressure-bar-container">
                             <label for="pressureBar" title="Нажим">🎯</label>
                             <progress id="pressureBar" value="0" max="4000"></progress>
-<span id="pressureValue" class="pressure-value"></span> 
-
-<style>
- .pressure-value {
-    font-size: 12px;
-    color: blue; 
-    margin-left: 5px; 
-}
-</style>
-
+                            <span id="pressureValue" class="pressure-value"></span>
+                            <style>
+                                .pressure-value {
+                                    font-size: 12px;
+                                    color: blue;
+                                    margin-left: 5px;
+                                }
+                            </style>
                         </div>
                     </div>
                 </div>
@@ -124,227 +116,6 @@
     </div>
     </div>
     <script>
-
-
-const clearBtn = document.getElementById('clear');
-clearBtn.addEventListener('click', clearCanvas);
-function clearCanvas() {
-    saveState();
-    if (!currentCtx) return; 
-    currentCtx.clearRect(0, 0, layers[currentLayer].width, layers[currentLayer].height);
-    saveState();
-}
-
-
-
-
-
-
-
-        // Initialize layers and contexts
-        const layers = {};
-        const contexts = {};
-        const layerColors = {}; // Example: { 1: '#000000', 2: '#ff0000', ... }
-        let currentLayer = 1;
-        let currentCtx;
-        let layerCount = 0;
-
-        // Initialize other variables
-        let isDrawing = false;
-        let lastX = 0;
-        let lastY = 0;
-        let symmetry = false;
-        let isErasing = false;
-
-        let history = {};
-        let redoHistory = {};
-        let previousLayer = 1;
-
-        // Get DOM elements
-        const brushSizeInput = document.getElementById('brushSize');
-        const opacityInput = document.getElementById('opacity');
-        const pressureBar = document.getElementById('pressureBar');
-        const backgroundPicker = document.getElementById('backgroundPicker');
-        const canvasContainer = document.getElementById('canvasContainer');
-        const layerButtons = document.getElementById('layerButtons');
-        const addLayerBtn = document.getElementById('addLayerBtn');
-        const removeLayerBtn = document.getElementById('removeLayerBtn');
-        const eraserBtn = document.getElementById('eraserBtn');
-
-
-        const isPressureSupported = 'onpointermove' in window;
-
-
-
-function createLayer() {
-    layerCount++;
-    layerColors[layerCount] = '#' + Math.floor(Math.random() * 16777215).toString(16);
-    
-    const canvas = document.createElement('canvas');
-    canvas.id = `layer${layerCount}`;
-    if (layerCount === 1) {
-        canvas.style.visibility = 'hidden'; // Hide the first layer
-    }
-    canvas.width = 700;
-    canvas.height = 500;
-    canvas.style.position = 'absolute';
-    canvas.style.top = '0';
-    canvas.style.left = '0';
-    
-    // Insert the new canvas at the beginning of the container
-    canvasContainer.insertBefore(canvas, canvasContainer.firstChild);
-    
-    layers[layerCount] = canvas;
-    contexts[layerCount] = canvas.getContext('2d');
-    
-    const button = document.createElement('button');
-    button.textContent = " ❤ ";
-    button.classList.add('layer-button');
-    button.dataset.layer = layerCount;
-    
-    // Insert the new button at the beginning of the layer buttons
-    layerButtons.insertBefore(button, layerButtons.firstChild);
-    
-    button.addEventListener('click', function () {
-        setCurrentLayer(parseInt(this.dataset.layer));
-    });
-    
-    addEventListenersToLayer(canvas);
-    setCurrentLayer(layerCount);
-    initializeLayer(layerCount);
-    
-    history[layerCount] = [];
-    redoHistory[layerCount] = [];
-    
-    updateLayerButtonColor(layerCount);
-    updateLayerOrder();
-}
-
-
-
-        function setCurrentLayer(layerNum) {
-            // Update previousLayer ONLY if the layer is actually changing
-            if (currentLayer !== layerNum) {
-                previousLayer = currentLayer;
-            }
-
-            currentLayer = layerNum;
-            currentCtx = contexts[currentLayer];
-
-            document.querySelectorAll('.layer-button').forEach(btn => {
-                btn.classList.remove('active-layer');
-                if (parseInt(btn.dataset.layer) === currentLayer) {
-                    btn.classList.add('active-layer');
-                }
-            });
-
-            // Update button colors when switching layers
-            if (!isErasing) {
-                updateLayerButtonColor(layerNum);
-            }
-
-            if (layerColors[layerNum]) {
-                currentCtx.strokeStyle = layerColors[layerNum];
-            }
-        }
-
-
-
-
-
-        function updateLayerButtonColor(layerNum) {
-            const button = document.querySelector(`.layer-button[data-layer="${layerNum}"]`);
-            if (button && layerColors[layerNum]) {
-                button.style.backgroundColor = layerColors[layerNum];
-            }
-        }
-
-        // !!!??? почему тут 1 леер указан не пойму.
-        function initializeLayer(layerNum) {
-            if (layerNum === 0) {
-                contexts[layerNum].fillStyle = '#' + Math.floor(Math.random() * 16777215).toString(16);
-            } else {
-                contexts[layerNum].fillStyle = 'rgba(0,0,0,0)'; // Transparent
-            }
-            contexts[layerNum].fillRect(0, 0, layers[layerNum].width, layers[layerNum].height);
-        }
-
-        function saveState() {
-            if (!currentCtx) {
-                console.error('ошибка в функции saveState', currentLayer);
-                return;
-            }
-            history[currentLayer].push(currentCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height));
-            redoHistory[currentLayer] = [];
-        }
-
-
-        function startDrawing(e) {
-            if (!currentCtx) {
-                console.error('Error: currentCtx is undefined in startDrawing.', currentLayer);
-                return;
-            }
-            isDrawing = true;
-            const rect = layers[currentLayer].getBoundingClientRect();
-            [lastX, lastY] = [e.clientX - rect.left, e.clientY - rect.top];
-
-            saveState();
-        }
-
-        function draw(e) {
-            if (!isDrawing || !currentCtx) {
-                if (!currentCtx) {
-                    console.error('Error: currentCtx is undefined in draw. Current layer:', currentLayer);
-                }
-                return;
-            }
-            e.preventDefault();
-            const rect = layers[currentLayer].getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            const pressure = e.pressure || 1;
-
-            currentCtx.lineWidth = brushSizeInput.value * pressure;
-            currentCtx.lineCap = 'round';
-            currentCtx.lineJoin = 'round';
-            currentCtx.globalAlpha = opacityInput.value / 100;
-
-            if (isErasing) {
-                currentCtx.globalCompositeOperation = 'destination-out';
-            } else {
-                currentCtx.globalCompositeOperation = 'source-over';
-            }
-
-            currentCtx.beginPath();
-            currentCtx.moveTo(lastX, lastY);
-            currentCtx.lineTo(x, y);
-            currentCtx.stroke();
-
-            if (symmetry) {
-                const centerX = layers[currentLayer].width / 2;
-                const symmetricLastX = centerX + (centerX - lastX);
-                const symmetricX = centerX + (centerX - x);
-                currentCtx.beginPath();
-                currentCtx.moveTo(symmetricLastX, lastY);
-                currentCtx.lineTo(symmetricX, y);
-                currentCtx.stroke();
-            }
-
-            [lastX, lastY] = [x, y];
-
-            if (isPressureSupported) {
-                pressureBar.value = pressure * 10000;
-    pressureBar.nextElementSibling.textContent = Math.round(pressure * 100); // Add this line
-
-            }
-        }
-
-        function stopDrawing() {
-            if (isDrawing) {
-                isDrawing = false;
-            }
-        }
-
         const colorPickers = document.querySelectorAll('input[type="color"]');
         colorPickers.forEach((picker, index) => {
             picker.addEventListener('input', (event) => {
@@ -358,128 +129,267 @@ function createLayer() {
             });
         });
 
-        function addEventListenersToLayer(layer) {
-            layer.addEventListener('pointerdown', startDrawing);
-            layer.addEventListener('pointermove', draw);
-            layer.addEventListener('pointerup', stopDrawing);
-            layer.addEventListener('pointerout', stopDrawing);
-            layer.addEventListener('pointercancel', stopDrawing);
+
+
+
+
+        // Get DOM elements
+        const brushSizeInput = document.getElementById('brushSize');
+        const opacityInput = document.getElementById('opacity');
+        const pressureBar = document.getElementById('pressureBar');
+        const backgroundPicker = document.getElementById('backgroundPicker');
+        const addLayerBtn = document.getElementById('addLayerBtn');
+        const removeLayerBtn = document.getElementById('removeLayerBtn');
+        const eraserBtn = document.getElementById('eraserBtn');
+
+
+        const isPressureSupported = 'onpointermove' in window;
+
+let layerCount = 0;
+const layers = {};
+const contexts = {};
+const layerColors = {};
+const history = {};
+const redoHistory = {};
+let currentLayer = 1;
+let previousLayer = 1;
+let currentCtx;
+let isDrawing = false;
+let lastX, lastY;
+let isErasing = false;
+const canvasContainer = document.getElementById('canvasContainer');
+const layerButtons = document.getElementById('layerButtons');
+
+function createLayer() {
+    layerCount++;
+    layerColors[layerCount] = '#' + Math.floor(Math.random() * 16777215).toString(16);
+    const canvas = document.createElement('canvas');
+    canvas.id = `layer${layerCount}`;
+    if (layerCount === 1) {
+        canvas.style.visibility = 'hidden'; // Hide the first layer
+    }
+    canvas.width = 700;
+    canvas.height = 500;
+    canvas.style.position = 'absolute';
+    canvas.style.top = '0';
+    canvas.style.left = '0';
+    canvas.style.zIndex = layerCount;
+    canvasContainer.appendChild(canvas);
+    layers[layerCount] = canvas;
+    contexts[layerCount] = canvas.getContext('2d');
+
+    const button = document.createElement('button');
+    button.textContent = " ❤ ";
+    button.classList.add('layer-button');
+    button.dataset.layer = layerCount;
+    layerButtons.appendChild(button);
+
+    button.addEventListener('click', function () {
+        setCurrentLayer(parseInt(this.dataset.layer));
+    });
+
+    addEventListenersToLayer(canvas);
+    setCurrentLayer(layerCount);
+    initializeLayer(layerCount);
+    history[layerCount] = [];
+    redoHistory[layerCount] = [];
+    updateLayerButtonColor(layerCount);
+    updateLayerOrder();
+}
+
+function setCurrentLayer(layerNum) {
+    if (currentLayer !== layerNum) {
+        previousLayer = currentLayer;
+    }
+    currentLayer = layerNum;
+    currentCtx = contexts[currentLayer];
+    document.querySelectorAll('.layer-button').forEach(btn => {
+        btn.classList.remove('active-layer');
+        if (parseInt(btn.dataset.layer) === currentLayer) {
+            btn.classList.add('active-layer');
         }
+    });
+    if (!isErasing) {
+        updateLayerButtonColor(layerNum);
+    }
+    if (layerColors[layerNum]) {
+        currentCtx.strokeStyle = layerColors[layerNum];
+    }
+}
 
-        document.querySelectorAll('button, input').forEach(element => {
-            element.addEventListener('pointerdown', (e) => {
-                e.stopPropagation();
-            });
-        });
+function updateLayerButtonColor(layerNum) {
+    const button = document.querySelector(`.layer-button[data-layer="${layerNum}"]`);
+    if (button && layerColors[layerNum]) {
+        button.style.backgroundColor = layerColors[layerNum];
+    }
+}
 
+function initializeLayer(layerNum) {
+    if (layerNum === 0) {
+        contexts[layerNum].fillStyle = '#' + Math.floor(Math.random() * 16777215).toString(16);
+    } else {
+        contexts[layerNum].fillStyle = 'rgba(0,0,0,0)'; // Transparent
+    }
+    contexts[layerNum].fillRect(0, 0, layers[layerNum].width, layers[layerNum].height);
+}
 
-        // Initialize the first layer
-        createLayer();
+function saveState() {
+    if (!currentCtx) {
+        console.error('Error in saveState function', currentLayer);
+        return;
+    }
+    history[currentLayer].push(currentCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height));
+    redoHistory[currentLayer] = [];
+}
 
+function startDrawing(e) {
+    if (!currentCtx) {
+        console.error('Error: currentCtx is undefined in startDrawing.', currentLayer);
+        return;
+    }
+    isDrawing = true;
+    const rect = layers[currentLayer].getBoundingClientRect();
+    [lastX, lastY] = [e.clientX - rect.left, e.clientY - rect.top];
+    saveState();
+}
 
-        // Добавляем слушатели событий к существующим слоям
-        Object.values(layers).forEach(addEventListenersToLayer);
-
-
-
-
-        function togglePreviousLayer() {
-            // Swap currentLayer and previousLayer
-            [currentLayer, previousLayer] = [previousLayer, currentLayer];
-
-            // Simulate a click on the corresponding layer button
-            const layerButton = document.querySelector(`.layer-button[data-layer="${currentLayer}"]`);
-            if (layerButton) {
-                layerButton.click(); // This will trigger the button's click event
-            }
+function draw(e) {
+    if (!isDrawing || !currentCtx) {
+        if (!currentCtx) {
+            console.error('Error: currentCtx is undefined in draw. Current layer:', currentLayer);
         }
+        return;
+    }
+    const rect = layers[currentLayer].getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const pressure = e.pressure || 1;
+    currentCtx.lineWidth = brushSizeInput.value * pressure;
+    currentCtx.lineCap = 'round';
+    currentCtx.lineJoin = 'round';
+    currentCtx.globalAlpha = opacityInput.value / 100;
+    if (isErasing) {
+        currentCtx.globalCompositeOperation = 'destination-out';
+    } else {
+        currentCtx.globalCompositeOperation = 'source-over';
+    }
+    currentCtx.beginPath();
+    currentCtx.moveTo(lastX, lastY);
+    currentCtx.lineTo(x, y);
+    currentCtx.stroke();
+    if (symmetry) {
+        const centerX = layers[currentLayer].width / 2;
+        const symmetricLastX = centerX + (centerX - lastX);
+        const symmetricX = centerX + (centerX - x);
+        currentCtx.beginPath();
+        currentCtx.moveTo(symmetricLastX, lastY);
+        currentCtx.lineTo(symmetricX, y);
+        currentCtx.stroke();
+    }
+    [lastX, lastY] = [x, y];
+    if (isPressureSupported) {
+        pressureBar.value = pressure * 10000;
+        pressureBar.nextElementSibling.textContent = Math.round(pressure * 100);
+    }
+}
 
-        function redrawCanvas() {
-            currentCtx.fillStyle = backgroundPicker.value;
-            currentCtx.fillRect(0, 0, layer2.width, layer2.height);
-            if (uploadedImage) {
-                currentCtx.drawImage(uploadedImage, 0, 0, layer2.width, layer2.height);
-            }
+function stopDrawing() {
+    if (isDrawing) {
+        isDrawing = false;
+    }
+}
+
+function addEventListenersToLayer(layer) {
+    layer.addEventListener('pointerdown', startDrawing);
+    layer.addEventListener('pointermove', draw);
+    layer.addEventListener('pointerup', stopDrawing);
+    layer.addEventListener('pointerout', stopDrawing);
+    layer.addEventListener('pointercancel', stopDrawing);
+}
+
+document.querySelectorAll('button, input').forEach(element => {
+    element.addEventListener('pointerdown', (e) => {
+        e.stopPropagation();
+    });
+});
+
+createLayer();
+
+Object.values(layers).forEach(addEventListenersToLayer);
+
+function togglePreviousLayer() {
+    [currentLayer, previousLayer] = [previousLayer, currentLayer];
+    const layerButton = document.querySelector(`.layer-button[data-layer="${currentLayer}"]`);
+    if (layerButton) {
+        layerButton.click();
+    }
+}
+
+function redrawCanvas() {
+    currentCtx.fillStyle = backgroundPicker.value;
+    currentCtx.fillRect(0, 0, layer2.width, layer2.height);
+    if (uploadedImage) {
+        currentCtx.drawImage(uploadedImage, 0, 0, layer2.width, layer2.height);
+    }
+}
+
+function setBackground() {
+    if (contexts[1]) {
+        contexts[1].fillStyle = backgroundPicker.value;
+        contexts[1].fillRect(0, 0, layers[1].width, layers[1].height);
+        saveState();
+    }
+}
+
+let isIdentifyingLayer = false;
+let wasDrawing = false;
+const identifyLayerBtn = document.getElementById('identifyLayerBtn');
+
+canvasContainer.addEventListener('click', (e) => {
+    if (isIdentifyingLayer) {
+        identifyLayerClickHandler(e);
+        canvasContainer.style.cursor = 'default';
+        isDrawing = wasDrawing;
+        isIdentifyingLayer = false;
+        identifyLayerBtn.classList.remove('active');
+    }
+});
+
+identifyLayerBtn.addEventListener('click', () => {
+    isIdentifyingLayer = !isIdentifyingLayer;
+    identifyLayerBtn.classList.toggle('active', isIdentifyingLayer);
+    if (isIdentifyingLayer) {
+        wasDrawing = isDrawing;
+        isDrawing = false;
+        canvasContainer.style.cursor = 'crosshair';
+    } else {
+        canvasContainer.style.cursor = 'default';
+        isDrawing = wasDrawing;
+    }
+});
+
+function identifyLayerClickHandler(e) {
+    const rect = layers[1].getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    for (let i = layerCount; i >= 1; i--) {
+        const ctx = contexts[i];
+        const pixelData = ctx.getImageData(x, y, 1, 1).data;
+        if (pixelData[3] > 0) {
+            setCurrentLayer(i);
+            console.log('Found drawing on layer:', i);
+            updateLayerButtonColor(i);
+            break;
         }
-        function setBackground() {
-            if (contexts[1]) {
-                contexts[1].fillStyle = backgroundPicker.value;
-                contexts[1].fillRect(0, 0, layers[1].width, layers[1].height);
-                saveState();
-            }
-        }
-
-        // идентификатор слоев
-        let isIdentifyingLayer = false;
-        let wasDrawing = false;  // Moved `wasDrawing` to global scope
-
-        const identifyLayerBtn = document.getElementById('identifyLayerBtn');
-
-        // Add a single click event listener to the canvas container
-
-        // Canvas container click event to identify layers
-        canvasContainer.addEventListener('click', (e) => {
-            if (isIdentifyingLayer) {
-                identifyLayerClickHandler(e);
-
-                // Reset cursor and drawing state AFTER layer identification
-                canvasContainer.style.cursor = 'default';
-                isDrawing = wasDrawing;  // Restore drawing state
-
-                // Deactivate layer identification mode
-                isIdentifyingLayer = false;
-                identifyLayerBtn.classList.remove('active');
-            }
-        });
-
-        // Button click event to toggle layer identification mode
-        identifyLayerBtn.addEventListener('click', () => {
-
-
-            if (isIdentifyingLayer) {
-                // Temporarily disable drawing when identifying the layer
-                wasDrawing = isDrawing;  // Save current drawing state
-                isDrawing = false;
-
-                canvasContainer.style.cursor = 'crosshair';
-            } else {
-                // Restore default cursor when exiting identification mode
-                canvasContainer.style.cursor = 'default';
-                isDrawing = wasDrawing;  // Restore drawing state
-            }
-        });
-
-        // Handler to identify the clicked layer
-        function identifyLayerClickHandler(e) {
-
-            isIdentifyingLayer = !isIdentifyingLayer;
-
-            identifyLayerBtn.classList.toggle('active', isIdentifyingLayer);
-            const rect = layers[1].getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-
-            for (let i = layerCount; i >= 1; i--) {
-                const ctx = contexts[i];
-                const pixelData = ctx.getImageData(x, y, 1, 1).data;
-
-                if (pixelData[3] > 0) {  // Alpha value > 0 means something is drawn
-                    setCurrentLayer(i);
-                    console.log('Found drawing on layer:', i);
-                    updateLayerButtonColor(i);
-                    break;  // Exit the loop after finding the top-most layer
-                }
-            }
-        }
-
+    }
+}
 
 const layerPanel = document.querySelector('.layer-panel');
-
 let isDraggingScroll = false;
 let startY;
 
 layerPanel.addEventListener('pointerdown', (e) => {
-    e.preventDefault(); // Prevents drawing from interfering with scrolling
+    e.preventDefault();
     isDraggingScroll = true;
     startY = e.clientY;
 });
@@ -496,41 +406,19 @@ layerPanel.addEventListener('pointerup', () => {
     isDraggingScroll = false;
 });
 
-
-
 canvasContainer.addEventListener('mousedown', handleCanvasClick);
 canvasContainer.addEventListener('pointerdown', handleCanvasClick);
 
 function handleCanvasClick(e) {
     if (e.altKey) {
-        e.preventDefault(); 
+        e.preventDefault();
         identifyLayerClickHandler(e);
     }
 }
 
-function identifyLayerClickHandler(e) {
-    const rect = layers[1].getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    for (let i = layerCount; i >= 1; i--) {
-        const ctx = contexts[i];
-        const pixelData = ctx.getImageData(x, y, 1, 1).data;
-        if (pixelData[3] > 0) { 
-            setCurrentLayer(i);
-            console.log('Switched to layer:', i);
-            updateLayerButtonColor(i);
-            break; 
-        }
-    }
-}
-
-
-// Добавьте этот код в начало вашего скрипта или в подходящее место
-document.addEventListener('keydown', function(e) {
-    // Проверяем, была ли нажата клавиша Tab
+document.addEventListener('keydown', function (e) {
     if (e.key === 'Tab') {
-        e.preventDefault(); // Предотвращаем стандартное поведение Tab
+        e.preventDefault();
         createLayerBelowCurrent();
     }
 });
@@ -538,10 +426,8 @@ document.addEventListener('keydown', function(e) {
 function createLayerBelowCurrent() {
     const layerButtons = Array.from(document.querySelectorAll('.layer-button'));
     const currentIndex = layerButtons.findIndex(btn => parseInt(btn.dataset.layer) === currentLayer);
-    
     layerCount++;
     const newLayerNum = layerCount;
-    
     const canvas = document.createElement('canvas');
     canvas.id = `layer${newLayerNum}`;
     canvas.width = 700;
@@ -549,42 +435,39 @@ function createLayerBelowCurrent() {
     canvas.style.position = 'absolute';
     canvas.style.top = '0';
     canvas.style.left = '0';
-    
-    // Insert the new canvas at the correct position
+    canvas.style.zIndex = newLayerNum;
+
     if (currentIndex !== -1) {
         canvasContainer.insertBefore(canvas, layers[currentLayer]);
     } else {
         canvasContainer.appendChild(canvas);
     }
-    
+
     layers[newLayerNum] = canvas;
     contexts[newLayerNum] = canvas.getContext('2d');
     layerColors[newLayerNum] = '#' + Math.floor(Math.random() * 16777215).toString(16);
-    
+
     const button = document.createElement('button');
     button.textContent = " ❤ ";
     button.classList.add('layer-button');
     button.dataset.layer = newLayerNum;
-    
-    // Insert the button at the correct position
+
     if (currentIndex !== -1) {
         layerButtons[currentIndex].parentNode.insertBefore(button, layerButtons[currentIndex].nextSibling);
     } else {
         layerButtons.appendChild(button);
     }
-    
+
     button.addEventListener('click', function () {
         setCurrentLayer(parseInt(this.dataset.layer));
     });
+
     addEventListenersToLayer(canvas);
-    
     history[newLayerNum] = [];
     redoHistory[newLayerNum] = [];
-    
     setCurrentLayer(newLayerNum);
     initializeLayer(newLayerNum);
     updateLayerButtonColor(newLayerNum);
-    
     updateLayerOrder();
 }
 
@@ -598,106 +481,160 @@ function updateLayerOrder() {
     });
 }
 
+const moveLayerUpBtn = document.getElementById('moveLayerUp');
+const moveLayerDownBtn = document.getElementById('moveLayerDown');
 
-
-
-
-
-
-// Flood Fill Functionality
-const floodFillBtn = document.getElementById('floodFillBtn'); 
-let isFloodFillActive = false; // Флаг для отслеживания состояния заливки
-
-
-floodFillBtn.addEventListener('click', () => {
-  isFloodFillActive = !isFloodFillActive; 
-  floodFillBtn.classList.toggle('active', isFloodFillActive);
-
+moveLayerUpBtn.addEventListener('click', () => {
+    moveLayerInStack(-1);
 });
 
-function floodFill(e) {
-  if (!currentCtx) {
-    console.error('Error: currentCtx is undefined in floodFill. Current layer:', currentLayer);
-    return;
-  }
+moveLayerDownBtn.addEventListener('click', () => {
+    moveLayerInStack(1);
+});
 
-  const startX = e.offsetX;
-  const startY = e.offsetY;
-  const imageData = currentCtx.getImageData(0, 0, drawingCanvas.width, drawingCanvas.height); // Use drawingCanvas
-  const data = imageData.data;
-  const width = imageData.width;
-  const height = imageData.height;
-
-  const targetColor = getPixelColor(data, startX, startY, width);
-  const fillColor = hexToRgba(colorPicker.value);
-  const tolerance = 30;
-
-  if (colorMatch(targetColor, fillColor, tolerance)) return;
-
-  const stack = [[startX, startY]];
-  const visited = new Uint8Array(width * height);
-
-  while (stack.length) {
-    const [x, y] = stack.pop();
-    const index = y * width + x;
-
-    if (visited[index]) continue;
-    visited[index] = 1;
-
-    const pixelIndex = index * 4;
-    const currentColor = data.slice(pixelIndex, pixelIndex + 4);
-
-    if (colorMatch(currentColor, targetColor, tolerance) || isContourPixel(x, y, data, width, height, targetColor, tolerance)) {
-      setPixelColor(data, x, y, width, fillColor);
-
-      if (x > 0) stack.push([x - 1, y]);
-      if (x < width - 1) stack.push([x + 1, y]);
-      if (y > 0) stack.push([x, y - 1]);
-      if (y < height - 1) stack.push([x, y + 1]);
+function moveLayerInStack(direction) {
+    const currentLayerButton = document.querySelector(`.layer-button[data-layer="${currentLayer}"]`);
+    const targetLayerButton = direction === -1 ? currentLayerButton.previousElementSibling : currentLayerButton.nextElementSibling;
+    if (targetLayerButton) {
+        if (direction === -1) {
+            currentLayerButton.parentNode.insertBefore(currentLayerButton, targetLayerButton);
+        } else {
+            currentLayerButton.parentNode.insertBefore(targetLayerButton, currentLayerButton);
+        }
+        updateLayerOrder();
+        currentLayerButton.click();
     }
-  }
+}
 
-  // Оптимизированный дополнительный проход
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      const index = (y * width + x) * 4;
-      if (!colorMatch(data.slice(index, index + 4), fillColor, 0) && shouldFillPixel(x, y, data, width, height, fillColor)) {
-        setPixelColor(data, x, y, width, fillColor);
-      }
-    }
-  }
+const layerButtonsContainer = document.getElementById('layerButtons');
 
-  currentCtx.putImageData(imageData, 0, 0);
-  saveState();
+$(function () {
+    $(layerButtonsContainer).sortable({
+        update: function (event, ui) {
+            updateLayerOrder();
+        }
+    });
+    $(layerButtonsContainer).disableSelection();
+});
+
+function exportImage() {
+    const mergeCanvas = document.createElement('canvas');
+    const mergeCtx = mergeCanvas.getContext('2d');
+    mergeCanvas.width = layers[1].width;
+    mergeCanvas.height = layers[1].height;
+
+    const layerButtons = Array.from(document.querySelectorAll('.layer-button'));
+    layerButtons.sort((a, b) => {
+        const layerA = layers[parseInt(a.dataset.layer)];
+        const layerB = layers[parseInt(b.dataset.layer)];
+        return parseInt(layerA.style.zIndex || 0) - parseInt(layerB.style.zIndex || 0);
+    });
+
+    layerButtons.forEach((button) => {
+        const layerId = parseInt(button.dataset.layer);
+        if (layers[layerId]) {
+            mergeCtx.drawImage(layers[layerId], 0, 0);
+        }
+    });
+
+    const link = document.createElement('a');
+    link.download = 'my-drawing.png';
+    link.href = mergeCanvas.toDataURL('image/png');
+    link.click();
 }
 
 
-// Modify the event listener for floodFill 
-// drawingCanvas.addEventListener('click', (e) => { // Use drawingCanvas here
-//   if (isFillMode) {
-//     floodFill(e);
-//   }
-// });
+
+
+        // Flood Fill Functionality
+        const floodFillBtn = document.getElementById('floodFillBtn');
+        let isFloodFillActive = false; // Флаг для отслеживания состояния заливки
+
+
+        floodFillBtn.addEventListener('click', () => {
+            isFloodFillActive = !isFloodFillActive;
+            floodFillBtn.classList.toggle('active', isFloodFillActive);
+
+        });
+
+        function floodFill(e) {
+            if (!currentCtx) {
+                console.error('Error: currentCtx is undefined in floodFill. Current layer:', currentLayer);
+                return;
+            }
+
+            const startX = e.offsetX;
+            const startY = e.offsetY;
+            const imageData = currentCtx.getImageData(0, 0, drawingCanvas.width, drawingCanvas.height); // Use drawingCanvas
+            const data = imageData.data;
+            const width = imageData.width;
+            const height = imageData.height;
+
+            const targetColor = getPixelColor(data, startX, startY, width);
+            const fillColor = hexToRgba(colorPicker.value);
+            const tolerance = 30;
+
+            if (colorMatch(targetColor, fillColor, tolerance)) return;
+
+            const stack = [[startX, startY]];
+            const visited = new Uint8Array(width * height);
+
+            while (stack.length) {
+                const [x, y] = stack.pop();
+                const index = y * width + x;
+
+                if (visited[index]) continue;
+                visited[index] = 1;
+
+                const pixelIndex = index * 4;
+                const currentColor = data.slice(pixelIndex, pixelIndex + 4);
+
+                if (colorMatch(currentColor, targetColor, tolerance) || isContourPixel(x, y, data, width, height, targetColor, tolerance)) {
+                    setPixelColor(data, x, y, width, fillColor);
+
+                    if (x > 0) stack.push([x - 1, y]);
+                    if (x < width - 1) stack.push([x + 1, y]);
+                    if (y > 0) stack.push([x, y - 1]);
+                    if (y < height - 1) stack.push([x, y + 1]);
+                }
+            }
+
+            // Оптимизированный дополнительный проход
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    const index = (y * width + x) * 4;
+                    if (!colorMatch(data.slice(index, index + 4), fillColor, 0) && shouldFillPixel(x, y, data, width, height, fillColor)) {
+                        setPixelColor(data, x, y, width, fillColor);
+                    }
+                }
+            }
+
+            currentCtx.putImageData(imageData, 0, 0);
+            saveState();
+        }
+
+
+        // Modify the event listener for floodFill 
+        // drawingCanvas.addEventListener('click', (e) => { // Use drawingCanvas here
+        //   if (isFillMode) {
+        //     floodFill(e);
+        //   }
+        // });
 
 
 
     </script>
     <script type="module" src="constants.js" defer></script>
-
     <script src="cursors.js" defer></script>
     <script src="script.js" defer></script>
     <script type="module" src="tools.js" defer></script>
     <script type="module" src="main.js" defer></script>
-
     <script type="module" src="test.js" defer></script>
     <script type="module" src="settings.js" defer></script>
     <script type="module" src="helperFunction.js" defer></script>
-
-
-    <script  type="module" src="listners.js" defer ></script>
+    <script type="module" src="listners.js" defer></script>
     <script type="module" src="buttons.js" defer></script>
     <script type="module" src="hotkey.js" defer></script>
-
 </body>
 
 </html>
