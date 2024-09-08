@@ -79,6 +79,135 @@ canvasContainer.addEventListener('touchstart', handleEyedropperClick);
 
 
 
+
+// Удаление всего
+const deleteAllBtn = document.getElementById('deleteAllBtn');
+
+deleteAllBtn.addEventListener('click', () => {
+    if (confirm('Вы уверены, что хотите удалить содержимое всех слоев?')) {
+        deleteAllLayers();
+    }
+});
+
+function deleteAllLayers() {
+    Object.keys(layers).forEach(layerNum => {
+        const ctx = contexts[layerNum];
+        ctx.clearRect(0, 0, layers[layerNum].width, layers[layerNum].height);
+        
+        // Если это первый слой (фон), заполняем его белым цветом
+        if (layerNum === '1') {
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, layers[layerNum].width, layers[layerNum].height);
+        }
+        
+        // Сохраняем состояние после очистки
+        saveState();
+    });
+    
+    // Обновляем отображение
+    Object.values(layers).forEach(layer => {
+        layer.style.display = 'block';
+    });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+// fill 
+// add fill (не удалять)
+
+
+// // Flood Fill Functionality
+//         const floodFillBtn = document.getElementById('floodFillBtn');
+//         let isFloodFillActive = false; // Флаг для отслеживания состояния заливки
+
+
+//         floodFillBtn.addEventListener('click', () => {
+//             isFloodFillActive = !isFloodFillActive;
+//             floodFillBtn.classList.toggle('active', isFloodFillActive);
+
+//         });
+
+//         function floodFill(e) {
+//             if (!currentCtx) {
+//                 console.error('Error: currentCtx is undefined in floodFill. Current layer:', currentLayer);
+//                 return;
+//             }
+
+//             const startX = e.offsetX;
+//             const startY = e.offsetY;
+//             const imageData = currentCtx.getImageData(0, 0, drawingCanvas.width, drawingCanvas.height); // Use drawingCanvas
+//             const data = imageData.data;
+//             const width = imageData.width;
+//             const height = imageData.height;
+
+//             const targetColor = getPixelColor(data, startX, startY, width);
+//             const fillColor = hexToRgba(colorPicker.value);
+//             const tolerance = 30;
+
+//             if (colorMatch(targetColor, fillColor, tolerance)) return;
+
+//             const stack = [[startX, startY]];
+//             const visited = new Uint8Array(width * height);
+
+//             while (stack.length) {
+//                 const [x, y] = stack.pop();
+//                 const index = y * width + x;
+
+//                 if (visited[index]) continue;
+//                 visited[index] = 1;
+
+//                 const pixelIndex = index * 4;
+//                 const currentColor = data.slice(pixelIndex, pixelIndex + 4);
+
+//                 if (colorMatch(currentColor, targetColor, tolerance) || isContourPixel(x, y, data, width, height, targetColor, tolerance)) {
+//                     setPixelColor(data, x, y, width, fillColor);
+
+//                     if (x > 0) stack.push([x - 1, y]);
+//                     if (x < width - 1) stack.push([x + 1, y]);
+//                     if (y > 0) stack.push([x, y - 1]);
+//                     if (y < height - 1) stack.push([x, y + 1]);
+//                 }
+//             }
+
+//             // Оптимизированный дополнительный проход
+//             for (let y = 0; y < height; y++) {
+//                 for (let x = 0; x < width; x++) {
+//                     const index = (y * width + x) * 4;
+//                     if (!colorMatch(data.slice(index, index + 4), fillColor, 0) && shouldFillPixel(x, y, data, width, height, fillColor)) {
+//                         setPixelColor(data, x, y, width, fillColor);
+//                     }
+//                 }
+//             }
+
+//             currentCtx.putImageData(imageData, 0, 0);
+//             saveState();
+//         }
+
+
+//         // Modify the event listener for floodFill 
+//         // drawingCanvas.addEventListener('click', (e) => { // Use drawingCanvas here
+//         //   if (isFillMode) {
+//         //     floodFill(e);
+//         //   }
+//         // });
+
+
+// add лупа (не удалять)
+
+
+
+
+
+
 // // ~Двигаем слой
 // // переход по слоям
 // const moveLayerUpBtn = document.getElementById('moveLayerUp');

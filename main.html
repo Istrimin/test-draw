@@ -37,6 +37,9 @@
             <button id="floodFillBtn" title="Залить цветом">✨</button>
             <button id="eyedropperBtn" title="Пипетка заливки (A)">💧</button>
             <button id="brushEyedropperBtn" title="Пипетка кисти (D)">🖌️</button>
+            <button id="deleteAllBtn" title="Удалить все">🗑️</button>
+            <button id="zoomBtn" title="Лупа">🔍</button>
+
             <div id="cursorPanel" class="cursor-panel" style="display: none;">
                 <h3>Выберите курсор</h3>
                 <div id="cursorList"></div>
@@ -155,10 +158,22 @@ let currentLayer = 1;
 let previousLayer = 1;
 let currentCtx;
 let isDrawing = false;
-let lastX, lastY;
 let isErasing = false;
-const canvasContainer = document.getElementById('canvasContainer');
 const layerButtons = document.getElementById('layerButtons');
+
+
+
+const zoomBtn = document.getElementById('zoomBtn');
+const canvasContainer = document.getElementById('canvasContainer');
+let isZoomActive = false;
+let zoomLevel = 1;
+
+
+
+const MAX_ZOOM = 3;
+const MIN_ZOOM = 0.5;
+const ZOOM_STEP = 0.01;
+
 
 function createLayer() {
     layerCount++;
@@ -253,30 +268,66 @@ function startDrawing(e) {
     saveState();
 }
 
+// function draw(e) {
+//     if (!isDrawing || !currentCtx) {
+//         if (!currentCtx) {
+//             console.error('Error: currentCtx is undefined in draw. Current layer:', currentLayer);
+//         }
+//         return;
+//     }
+//     const rect = layers[currentLayer].getBoundingClientRect();
+//     const x = e.clientX - rect.left;
+//     const y = e.clientY - rect.top;
+//     const pressure = e.pressure || 1;
+//     currentCtx.lineWidth = brushSizeInput.value * pressure;
+//     currentCtx.lineCap = 'round';
+//     currentCtx.lineJoin = 'round';
+//     currentCtx.globalAlpha = opacityInput.value / 100;
+//     if (isErasing) {
+//         currentCtx.globalCompositeOperation = 'destination-out';
+//     } else {
+//         currentCtx.globalCompositeOperation = 'source-over';
+//     }
+//     currentCtx.beginPath();
+//     currentCtx.moveTo(lastX, lastY);
+//     currentCtx.lineTo(x, y);
+//     currentCtx.stroke();
+//     if (symmetry) {
+//         const centerX = layers[currentLayer].width / 2;
+//         const symmetricLastX = centerX + (centerX - lastX);
+//         const symmetricX = centerX + (centerX - x);
+//         currentCtx.beginPath();
+//         currentCtx.moveTo(symmetricLastX, lastY);
+//         currentCtx.lineTo(symmetricX, y);
+//         currentCtx.stroke();
+//     }
+//     [lastX, lastY] = [x, y];
+//     if (isPressureSupported) {
+//         pressureBar.value = pressure * 10000;
+//         pressureBar.nextElementSibling.textContent = Math.round(pressure * 100);
+//     }
+// }
+
 function draw(e) {
-    if (!isDrawing || !currentCtx) {
-        if (!currentCtx) {
-            console.error('Error: currentCtx is undefined in draw. Current layer:', currentLayer);
-        }
-        return;
-    }
+    if (!isDrawing || !currentCtx) return;
+
     const rect = layers[currentLayer].getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const x = (e.clientX - rect.left) / zoomLevel;
+    const y = (e.clientY - rect.top) / zoomLevel;
+
     const pressure = e.pressure || 1;
     currentCtx.lineWidth = brushSizeInput.value * pressure;
     currentCtx.lineCap = 'round';
     currentCtx.lineJoin = 'round';
     currentCtx.globalAlpha = opacityInput.value / 100;
-    if (isErasing) {
-        currentCtx.globalCompositeOperation = 'destination-out';
-    } else {
-        currentCtx.globalCompositeOperation = 'source-over';
-    }
+
+    currentCtx.globalCompositeOperation = isErasing ? 'destination-out' : 'source-over';
+
     currentCtx.beginPath();
     currentCtx.moveTo(lastX, lastY);
     currentCtx.lineTo(x, y);
     currentCtx.stroke();
+
     if (symmetry) {
         const centerX = layers[currentLayer].width / 2;
         const symmetricLastX = centerX + (centerX - lastX);
@@ -286,7 +337,9 @@ function draw(e) {
         currentCtx.lineTo(symmetricX, y);
         currentCtx.stroke();
     }
+
     [lastX, lastY] = [x, y];
+
     if (isPressureSupported) {
         pressureBar.value = pressure * 10000;
         pressureBar.nextElementSibling.textContent = Math.round(pressure * 100);
@@ -298,6 +351,9 @@ function stopDrawing() {
         isDrawing = false;
     }
 }
+
+
+
 
 function addEventListenersToLayer(layer) {
     layer.addEventListener('pointerdown', startDrawing);
@@ -406,7 +462,7 @@ layerPanel.addEventListener('pointerup', () => {
     isDraggingScroll = false;
 });
 
-canvasContainer.addEventListener('mousedown', handleCanvasClick);
+// canvasContainer.addEventListener('mousedown', handleCanvasClick);
 canvasContainer.addEventListener('pointerdown', handleCanvasClick);
 
 function handleCanvasClick(e) {
@@ -544,83 +600,130 @@ function exportImage() {
 }
 
 
+zoomBtn.addEventListener('click', toggleZoom);
 
 
-        // Flood Fill Functionality
-        const floodFillBtn = document.getElementById('floodFillBtn');
-        let isFloodFillActive = false; // Флаг для отслеживания состояния заливки
+// Zoom functions
+function toggleZoom() {
+    isZoomActive = !isZoomActive;
+    zoomBtn.classList.toggle('active', isZoomActive);
+    updateCursor();
+}
+
+function updateZoom() {
+    Object.values(layers).forEach(layer => {
+        layer.style.transform = `scale(${zoomLevel})`;
+    });
+    canvasContainer.style.overflow = 'auto';
+}
+
+function updateCursor() {
+    canvasContainer.style.cursor = isZoomActive && isCtrlPressed ? 'ew-resize' : 'default';
+}
 
 
-        floodFillBtn.addEventListener('click', () => {
-            isFloodFillActive = !isFloodFillActive;
-            floodFillBtn.classList.toggle('active', isFloodFillActive);
+let isCtrlPressed = false;
 
-        });
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Control') {
+        isCtrlPressed = true;
+        updateCursor();
+    }
+});
 
-        function floodFill(e) {
-            if (!currentCtx) {
-                console.error('Error: currentCtx is undefined in floodFill. Current layer:', currentLayer);
-                return;
-            }
+document.addEventListener('keyup', (e) => {
+    if (e.key === 'Control') {
+        isCtrlPressed = false;
+        updateCursor();
+    }
+});
 
-            const startX = e.offsetX;
-            const startY = e.offsetY;
-            const imageData = currentCtx.getImageData(0, 0, drawingCanvas.width, drawingCanvas.height); // Use drawingCanvas
-            const data = imageData.data;
-            const width = imageData.width;
-            const height = imageData.height;
+let lastX = 0;
 
-            const targetColor = getPixelColor(data, startX, startY, width);
-            const fillColor = hexToRgba(colorPicker.value);
-            const tolerance = 30;
+// canvasContainer.addEventListener('mousemove', (e) => {
+//     if (isZoomActive && isCtrlPressed) {
+//         const deltaX = e.clientX - lastX;
+//         zoomLevel = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoomLevel + deltaX * ZOOM_STEP));
+//         updateZoom();
+//     }
+//     lastX = e.clientX;
+// });
 
-            if (colorMatch(targetColor, fillColor, tolerance)) return;
-
-            const stack = [[startX, startY]];
-            const visited = new Uint8Array(width * height);
-
-            while (stack.length) {
-                const [x, y] = stack.pop();
-                const index = y * width + x;
-
-                if (visited[index]) continue;
-                visited[index] = 1;
-
-                const pixelIndex = index * 4;
-                const currentColor = data.slice(pixelIndex, pixelIndex + 4);
-
-                if (colorMatch(currentColor, targetColor, tolerance) || isContourPixel(x, y, data, width, height, targetColor, tolerance)) {
-                    setPixelColor(data, x, y, width, fillColor);
-
-                    if (x > 0) stack.push([x - 1, y]);
-                    if (x < width - 1) stack.push([x + 1, y]);
-                    if (y > 0) stack.push([x, y - 1]);
-                    if (y < height - 1) stack.push([x, y + 1]);
-                }
-            }
-
-            // Оптимизированный дополнительный проход
-            for (let y = 0; y < height; y++) {
-                for (let x = 0; x < width; x++) {
-                    const index = (y * width + x) * 4;
-                    if (!colorMatch(data.slice(index, index + 4), fillColor, 0) && shouldFillPixel(x, y, data, width, height, fillColor)) {
-                        setPixelColor(data, x, y, width, fillColor);
-                    }
-                }
-            }
-
-            currentCtx.putImageData(imageData, 0, 0);
-            saveState();
-        }
+canvasContainer.addEventListener('mousemove', (e) => {
+    if (isZoomActive && isCtrlPressed) {
+        const deltaX = e.movementX;
+        zoomLevel = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoomLevel + deltaX * ZOOM_STEP));
+        updateZoom();
+    }
+});
 
 
-        // Modify the event listener for floodFill 
-        // drawingCanvas.addEventListener('click', (e) => { // Use drawingCanvas here
-        //   if (isFillMode) {
-        //     floodFill(e);
-        //   }
-        // });
 
+
+zoomBtn.addEventListener('click', toggleZoom);
+
+// Модифицируем функцию draw для учета масштабирования
+function draw(e) {
+    if (!isDrawing || !currentCtx) {
+        return;
+    }
+    
+    const rect = layers[currentLayer].getBoundingClientRect();
+    const x = (e.clientX - rect.left) / zoomLevel;
+    const y = (e.clientY - rect.top) / zoomLevel;
+    
+    const pressure = e.pressure || 1;
+    currentCtx.lineWidth = brushSizeInput.value * pressure;
+    currentCtx.lineCap = 'round';
+    currentCtx.lineJoin = 'round';
+    currentCtx.globalAlpha = opacityInput.value / 100;
+    
+    if (isErasing) {
+        currentCtx.globalCompositeOperation = 'destination-out';
+    } else {
+        currentCtx.globalCompositeOperation = 'source-over';
+    }
+    
+    currentCtx.beginPath();
+    currentCtx.moveTo(lastX, lastY);
+    currentCtx.lineTo(x, y);
+    currentCtx.stroke();
+    
+    if (symmetry) {
+        const centerX = layers[currentLayer].width / 2;
+        const symmetricLastX = centerX + (centerX - lastX);
+        const symmetricX = centerX + (centerX - x);
+        currentCtx.beginPath();
+        currentCtx.moveTo(symmetricLastX, lastY);
+        currentCtx.lineTo(symmetricX, y);
+        currentCtx.stroke();
+    }
+    
+    [lastX, lastY] = [x, y];
+    
+    if (isPressureSupported) {
+        pressureBar.value = pressure * 10000;
+        pressureBar.nextElementSibling.textContent = Math.round(pressure * 100);
+    }
+}
+
+// Модифицируем функцию startDrawing для учета масштабирования
+function startDrawing(e) {
+    if (!currentCtx) {
+        console.error('Error: currentCtx is undefined in startDrawing.', currentLayer);
+        return;
+    }
+    isDrawing = true;
+    const rect = layers[currentLayer].getBoundingClientRect();
+    [lastX, lastY] = [(e.clientX - rect.left) / zoomLevel, (e.clientY - rect.top) / zoomLevel];
+    saveState();
+}
+
+document.querySelectorAll('button, input').forEach(element => {
+    element.addEventListener('pointerdown', (e) => {
+        e.stopPropagation();
+    });
+});
 
 
     </script>

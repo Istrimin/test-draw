@@ -603,3 +603,15 @@ img:hover {
             flex-grow: 1;
             /* Allow layer panel to take up available space */
         }
+
+/* зум */
+
+#zoomBtn.active {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.canvas-container {
+    overflow: hidden;
+    position: relative;
+}
