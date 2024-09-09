@@ -13,6 +13,11 @@
     <script src="cancerCursors.js" defer></script>
     <style>
         #drawingCanvas { cursor: url('cursors/1.png'), auto; }
+        #backgroundCanvas { 	
+
+            background-image: url('./images/bg.jpg');
+        }
+
     </style>
 </head>
 <body>
@@ -87,11 +92,14 @@
         ctx.imageSmoothingEnabled = false;
         ctx.willReadFrequently = true;
 
-        function initializeCanvas() {
-            bgCtx.fillStyle = backgroundPicker.value;
-            bgCtx.fillRect(0, 0, backgroundCanvas.width, backgroundCanvas.height);
-            saveState();
-        }
+function initializeCanvas() {
+    const backgroundImage = new Image();
+    backgroundImage.src = '/images/bg.jpg'; // Path to your background image
+    backgroundImage.onload = () => {
+        bgCtx.drawImage(backgroundImage, 0, 0, backgroundCanvas.width, backgroundCanvas.height);
+    };
+    saveState();
+}
 
         function saveState() {
             history.push(ctx.getImageData(0, 0, drawingCanvas.width, drawingCanvas.height));
