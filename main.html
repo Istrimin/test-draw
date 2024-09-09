@@ -548,20 +548,22 @@ function updateZoom() {
     document.getElementById('zoomLevelDisplay').textContent = `: ${(zoomLevel * 100).toFixed(0)}%`;
     }
 
+let currentCursor = 'auto'; // Variable to store the currently selected cursor
 
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Control') {
-            isCtrlPressed = true;
-            canvasContainer.style.cursor = 'zoom-in';
-        }
-    });
+// Assuming this is part of the cursor selection code in cursors.js
+cursorItem.addEventListener('click', function() {
+    currentCursor = `url('cursors/${cursor.file}'), auto`; // Store the selected cursor
+    document.getElementById('drawingCanvas').style.cursor = currentCursor;
+    document.getElementById('cursorPanel').style.display = 'none';
+});
 
-    document.addEventListener('keyup', (e) => {
-        if (e.key === 'Control') {
-            isCtrlPressed = false;
-            canvasContainer.style.cursor = 'default';
-        }
-    });
+// In your main.html file, update the keyup event listener
+document.addEventListener('keyup', (e) => {
+    if (e.key === 'Control') {
+        isCtrlPressed = false;
+        canvasContainer.style.cursor = currentCursor; // Reset to the custom cursor
+    }
+});
 
 // function draw(e) {
 //             if (!isDrawing || !currentCtx) {
