@@ -40,10 +40,7 @@
             <button id="deleteAllBtn" title="Удалить все">🗑️</button>
             <button id="zoomBtn" title="Лупа">🔍</button>
             <button id="mergeLayers" title="Объединить слои">🔗</button>
-            <div id="cursorPanel" class="cursor-panel" style="display: none;">
-                <h3>Выберите курсор</h3>
-                <div id="cursorList"></div>
-            </div>
+
             <button id="settings" title="Настройки">⚙️</button>
         </div>
         <div class="canvas-and-sliders">
@@ -85,6 +82,10 @@
                     </div>
                 </div>
                 <div class="canv-container" id="canvasContainer">
+    <div id="cursorPanel" class="cursor-panel" style="display: none;">
+        <h3>Выберите курсор</h3>
+        <div id="cursorList"></div>
+    </div>
                 </div>
                 <div class="slider-group">
                     <div class="tools-column">
@@ -119,18 +120,7 @@
     </div>
     </div>
     <script>
-        const colorPickers = document.querySelectorAll('input[type="color"]');
-        colorPickers.forEach((picker, index) => {
-            picker.addEventListener('input', (event) => {
-                setDrawingColor(event.target.value);
-            });
-            // Назначаем горячие клавиши для выбора цветов
-            document.addEventListener('keydown', (e) => {
-                if (e.key === (index + 1).toString()) {
-                    setDrawingColor(picker.value);
-                }
-            });
-        });
+
         // Get DOM elements
         const brushSizeInput = document.getElementById('brushSize');
         const opacityInput = document.getElementById('opacity');

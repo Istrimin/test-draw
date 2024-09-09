@@ -22,13 +22,14 @@ body {
   transition: box-shadow 0.3s ease; 
 }
 
-body:hover {
-  box-shadow: 0 0 10px 5px rgba(0, 128, 0, 0.5); /* Green, semi-transparent border */
+/* body:hover {
+  box-shadow: 0 0 10px 5px rgba(0, 128, 0, 0.5);
 }
-
+ */
 
 .randomImage:hover{
-  box-shadow: 0 0 10px 5px rgba(0, 128, 0, 0.5); /* Green, semi-transparent border */
+  background-color:transparent;
+  box-shadow: 0 0 10px 5px rgba(0, 128, 0, 0.5); 
 }
 
 h1 {
@@ -80,6 +81,7 @@ a[title="Рисовать"] {
 }
 
 .column-container {
+  background-color:transparent;
   display: flex;
   flex-direction: column;
   align-items: center;
