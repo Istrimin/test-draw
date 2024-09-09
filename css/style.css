@@ -55,11 +55,8 @@ button:hover,
 .custom-file-upload:hover,
 input[type="color"]:hover,
 input[type="range"]:hover {
-
     cursor: url('/cursors/pipette32.png'), auto;
-
     color: rgb(0, 255, 13);
-    /* font-size: xx-large;  */
 }
 
 

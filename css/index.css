@@ -93,11 +93,33 @@ a[title="Рисовать"] {
   background-color: transparent;
   color: #ffffff;
   font-family: monospace;
-  font-size: 10px;
+  font-size: 20px;
   margin: 0;
   padding: 0;
+  /* box-shadow: 
+    0px 0px 100px rgba(0, 18, 155, 0.5), 
+    inset 0px 0px 100px rgba(0, 110, 255, 0.228);  */
+}
+#time:hover {
+  background-color: transparent;
+  color: #ffffff;
+  font-family: monospace;
+  font-size: 20px;
+  margin: 0;
+  padding: 0;
+  box-shadow: 
+    0px 0px 1000px rgb(90, 109, 255), 
+    inset 0px 0px 0px rgba(0, 110, 255, 0.228)
+; 
 }
 
 body.no-drop {
   cursor: not-allowed;
 }
+
+/* Была я значит гусеница.
+Зеленая была.
+Но вот пришла лягушка.
+Проворливое брюшко
+Проворливое брюшко
+И съела там меня */
