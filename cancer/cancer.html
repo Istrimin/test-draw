@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,21 +13,21 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
     <script src="cancerCursors.js" defer></script>
     <style>
-        #drawingCanvas { cursor: url('cursors/1.png'), auto; }
-        #backgroundCanvas { 	
-
-            background-image: url('./images/bg.jpg');
+        #drawingCanvas {
+            cursor: url('cursors/1.png'), auto;
         }
 
+        .canvas-container {
+            position: relative;
+        }
     </style>
 </head>
+
 <body>
     <main class="base-container">
         <aside class="sidebar" style="z-index: 10;">
-            <a href="../index.html" target="_self" title="Выйти из команты" id="exitLink" style="font-size: 50px;">🚪</a>
-            <div id="message-container" style="display: none;">
-                <p id="message"></p>
-            </div>
+            <a href="../index.html" target="_self" title="Выйти из команты" id="exitLink"
+                style="font-size: 50px;">🚪</a>
             <button id="undo" title="Отменить (Z)">⟲</button>
             <button id="redo" title="Повторить (X)">⟳</button>
             <button id="symmetry" title="Симметрия (S)">🦋</button>
@@ -46,22 +47,26 @@
                     <button id="nextWord" title="Следующее слово">&gt;</button>
                     <div id="elapsedTime" class="time"></div>
                 </div>
-                <div class="canv-container">
-                    <canvas id="backgroundCanvas" width="700" height="500" style="width:700px;height:500px; position: absolute; z-index: -1;"></canvas>
-                    <canvas id="drawingCanvas" width="700" height="500" style="width:700px;height:500px;"></canvas>
-                    <div id="cursorPanel" class="cursor-panel" style="display: none;">
-                        <div id="cursorList"></div>
-                    </div>
+                <div class="canv-container" style="position: relative; width: 700px; height: 500px;">
+                    <canvas id="backgroundCanvas" width="700" height="500"
+                        style="position: absolute; top: 0; left: 0; z-index: 1;"></canvas>
+                    <canvas id="drawingCanvas" width="700" height="500"
+                        style="position: absolute; top: 0; left: 0; z-index: 3;"></canvas>
+                    <canvas id="overlayCanvas" width="700" height="500"
+                        style="position: absolute; top: 0; left: 0; z-index: 2; opacity: 0.5;"></canvas>
+                </div>
+                <div id="cursorPanel" class="cursor-panel" style="display: none;">
+                    <div id="cursorList"></div>
                 </div>
             </div>
-            <div class="slider-group">
-                <div class="slider">
-                    <div class="pressure-bar" id="pressureBar"></div>
-                    <label for="brushSize" title="Размер кисти">🖌️</label>
-                    <input type="range" id="brushSize" min="1" max="100" value="3">
-                    <span class="slider-value" id="rangeValue">3</span>
-                </div>
-            </div>
+    <div class="slider-group">
+        <div class="slider">
+            <div class="pressure-bar" id="pressureBar"></div>
+            <label for="brushSize" title="Размер кисти">🖌️</label>
+            <input type="range" id="brushSize" min="1" max="100" value="3">
+            <span class="slider-value" id="rangeValue">3</span>
+        </div>
+    </div>
         </div>
     </main>
     <script>
@@ -79,7 +84,6 @@
         const undoBtn = document.getElementById('undo');
         const redoBtn = document.getElementById('redo');
         const saveImageBtn = document.getElementById('saveImageBtn');
-
         let isDrawing = false;
         let lastX = 0;
         let lastY = 0;
@@ -88,18 +92,15 @@
         let isErasing = false;
         let history = [];
         let redoHistory = [];
-
         ctx.imageSmoothingEnabled = false;
         ctx.willReadFrequently = true;
 
-function initializeCanvas() {
-    const backgroundImage = new Image();
-    backgroundImage.src = '/images/bg.jpg'; // Path to your background image
-    backgroundImage.onload = () => {
-        bgCtx.drawImage(backgroundImage, 0, 0, backgroundCanvas.width, backgroundCanvas.height);
-    };
-    saveState();
-}
+        function initializeCanvas() {
+            const backgroundImage = new Image();
+            backgroundImage.onload = () => {
+            };
+            saveState();
+        }
 
         function saveState() {
             history.push(ctx.getImageData(0, 0, drawingCanvas.width, drawingCanvas.height));
@@ -124,23 +125,19 @@ function initializeCanvas() {
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
             const pressure = e.pressure || 1;
-
             ctx.lineWidth = brushSizeInput.value * pressure;
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
-
             if (isErasing) {
                 ctx.globalCompositeOperation = 'destination-out';
             } else {
                 ctx.globalCompositeOperation = 'source-over';
                 ctx.strokeStyle = colorPicker.value;
             }
-
             ctx.beginPath();
             ctx.moveTo(lastX, lastY);
             ctx.lineTo(x, y);
             ctx.stroke();
-
             if (symmetry) {
                 const centerX = drawingCanvas.width / 2;
                 const symmetricX = 2 * centerX - x;
@@ -149,7 +146,6 @@ function initializeCanvas() {
                 ctx.lineTo(symmetricX, y);
                 ctx.stroke();
             }
-
             [lastX, lastY] = [x, y];
         }
 
@@ -158,20 +154,20 @@ function initializeCanvas() {
                 isDrawing = false;
                 saveState();
             }
-        }
-
+         }
+ 
         function toggleSymmetry() {
             symmetry = !symmetry;
             symmetryButton.classList.toggle('active', symmetry);
-        }
-
+         }
+ 
         function undo() {
             if (history.length > 1) {
                 redoHistory.push(history.pop());
                 ctx.putImageData(history[history.length - 1], 0, 0);
                 updateUndoRedoButtons();
             }
-        }
+         }
 
         function redo() {
             if (redoHistory.length > 0) {
@@ -187,16 +183,46 @@ function initializeCanvas() {
             saveState();
         }
 
-        function toggleEraser() {
-            isErasing = !isErasing;
-            eraserBtn.classList.toggle('active', isErasing);
-            drawingCanvas.style.cursor = isErasing ? 'url(cursors/2.png), auto' : 'default';
-        }
 
+function toggleEraser() {
+    isErasing = !isErasing;
+    eraserBtn.classList.toggle('active', isErasing);
+    if (isErasing) {
+        previousCursor = drawingCanvas.style.cursor;
+        drawingCanvas.style.cursor = 'url(cursors/2.png), auto';
+    } else {
+        drawingCanvas.style.cursor = previousCursor;
+    }
+}
+
+
+        // function saveImage() {
+        // const link = document.createElement('a');
+        // link.download = 'my-drawing.png';
+        // link.href = drawingCanvas.toDataURL('image/png');
+        // link.click();
+        // }
         function saveImage() {
+            // Создаем временный canvas для объединения слоев
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = drawingCanvas.width;
+            tempCanvas.height = drawingCanvas.height;
+            const tempCtx = tempCanvas.getContext('2d');
+
+            // Рисуем основной холст
+            tempCtx.drawImage(drawingCanvas, 0, 0);
+
+            // Рисуем оверлей, если он активен
+            if (overlayActive) {
+                tempCtx.globalAlpha = parseFloat(overlayCanvas.style.opacity);
+                tempCtx.drawImage(overlayCanvas, 0, 0);
+                tempCtx.globalAlpha = 1.0;
+            }
+
+            // Создаем ссылку для скачивания
             const link = document.createElement('a');
             link.download = 'my-drawing.png';
-            link.href = drawingCanvas.toDataURL('image/png');
+            link.href = tempCanvas.toDataURL('image/png');
             link.click();
         }
 
@@ -211,7 +237,6 @@ function initializeCanvas() {
             initializeCanvas();
         }
 
-        // Event Listeners
         colorPicker.addEventListener('input', () => ctx.strokeStyle = colorPicker.value);
         backgroundPicker.addEventListener('input', () => {
             bgCtx.fillStyle = backgroundPicker.value;
@@ -230,25 +255,136 @@ function initializeCanvas() {
         saveImageBtn.addEventListener('click', saveImage);
         window.addEventListener('resize', resizeCanvas);
 
-        // Initialize
         initializeCanvas();
         resizeCanvas();
 
-        // Add class for nice icons
         document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('a, button').forEach(icon => icon.classList.add('icon-hover'));
         });
 
-        // Check for pointer events support
         if (window.PointerEvent) {
             console.log('Pointer events are supported');
         } else {
             console.log('Pointer events are not supported');
         }
+
+        const overlayCanvas = document.getElementById('overlayCanvas');
+        const overlayCtx = overlayCanvas.getContext('2d');
+        let overlayActive = false;
+
+        document.addEventListener('keydown', (e) => {
+            const key = e.code.toLowerCase();
+            if (key === 'keyd') {
+                createOverlayLayer();
+            } else if (key === 'keyg') {
+                toggleOverlayOpacity();
+            }
+        });
+
+        function createOverlayLayer() {
+            overlayActive = true;
+            overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+            overlayCtx.drawImage(drawingCanvas, 0, 0);
+            overlayCanvas.style.opacity = '0.5';
+            clearCanvas();
+        }
+
+        function toggleOverlayOpacity() {
+            if (overlayActive) {
+                overlayCanvas.style.opacity = overlayCanvas.style.opacity === '0.5' ? '1' : '0.5';
+            }
+        }
+// CURSORS PANEL
+// 
+
+let currentCursor = 'url(cursors/1.png), auto';
+let previousCursor = currentCursor;
+
+
+cursorImg.addEventListener('click', () => {
+    currentCursor = `url(${resizedCursorUrl}), auto`;
+    if (!isErasing) {
+        drawingCanvas.style.cursor = currentCursor;
+    }
+    previousCursor = currentCursor;
+    cursorPanel.style.display = 'none';
+});
+
+function initializeCursor() {
+    drawingCanvas.style.cursor = currentCursor;
+}
+
+		document.addEventListener('DOMContentLoaded', () => {
+			const cursorPanel = document.getElementById('cursorPanel');
+			const cursorList = document.getElementById('cursorList');
+			const changeCursorBtn = document.getElementById('changeCursorBtn');
+
+			function loadCursors() {
+				cursorList.innerHTML = '';
+				for (let i = 1; i <= 1000; i++) {
+					const cursorUrl = `cursors/${i}.png`;
+
+					const image = new Image();
+					image.src = cursorUrl;
+					image.onload = () => {
+
+						let targetWidth = image.width;
+						let targetHeight = image.height;
+
+
+						const maxSize = 64;
+
+						if (targetWidth > maxSize || targetHeight > maxSize) {
+							const aspectRatio = targetWidth / targetHeight;
+							if (targetWidth > targetHeight) {
+								targetWidth = maxSize;
+								targetHeight = maxSize / aspectRatio;
+							} else {
+								targetHeight = maxSize;
+								targetWidth = maxSize * aspectRatio;
+							}
+						}
+
+						const canvas = document.createElement('canvas');
+						const ctx = canvas.getContext('2d');
+						canvas.width = targetWidth;
+						canvas.height = targetHeight;
+						ctx.drawImage(image, 0, 0, targetWidth, targetHeight);
+						const resizedCursorUrl = canvas.toDataURL();
+
+
+						const cursorImg = document.createElement('img');
+						cursorImg.src = resizedCursorUrl;
+						cursorImg.alt = `cursor${i}`;
+						cursorImg.style.maxWidth = `${maxSize}px`;
+
+						cursorImg.addEventListener('click', () => {
+							drawingCanvas.style.cursor = `url(${resizedCursorUrl}), auto`;
+							cursorPanel.style.display = 'none';
+						});
+
+						cursorList.appendChild(cursorImg);
+					};
+				}
+			}
+
+			changeCursorBtn.addEventListener('click', () => {
+				cursorPanel.style.display = cursorPanel.style.display === 'none' ? 'block' : 'none';
+			});
+
+			loadCursors();
+		});
+
+
+initializeCanvas();
+resizeCanvas();
+initializeCursor();
+
     </script>
     <script src="cancer.js" defer></script>
     <script type="module" src="cancerSettings.js" defer></script>
     <script type="module" src="cancerHelper.js" defer></script>
     <script type="module" src="cancerHotkey.js" defer></script>
 </body>
+
 </html>

@@ -1,0 +1,15 @@
+const images = [
+        //         '../images/cancer.jpg',
+        //         '../images/cancer3.jpg', 
+
+        //     ];
+
+        //     let currentImageIndex = 0;
+
+        //     function changeBackgroundImage() {
+        //         document.body.style.backgroundImage = `url(${images[currentImageIndex]})`;
+        //         currentImageIndex = (currentImageIndex + 1) % images.length; 
+        //     }
+        // var timing=1
+        // changeBackgroundImage(); // Set the initial background image
+        // setInterval(changeBackgroundImage, timing * 60 * 1000); // Change every 5 minutes (5 * 60 * 1000 milliseconds)

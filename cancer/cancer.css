@@ -1,6 +1,5 @@
 body {
 	background-image: url('../images/cancer.jpg');
-	/* background-image: url('./images/bg.jpg'); */
 	background-color: black;
 	background-size: cover;
 	background-position: center;
@@ -333,13 +332,7 @@ input[type="range"]::-moz-range-thumb {
 	border-color: hsl(69, 100%, 52%);
 }
 
-.canvas-container {
-	position: relative;
-}
 
-.canv-container {
-	position: relative;
-}
 
 
 
@@ -446,4 +439,48 @@ img:hover {
 .color-picker-group {
 	display: flex;
 	gap: 5px;
+}
+
+/* замена анимации */
+body {
+  background-size: cover; /* или contain, в зависимости от желаемого эффекта */
+  animation: changeBg 60s linear infinite; /* 60s - длительность анимации, linear - тип анимации, infinite - бесконечный повтор */
+}
+
+@keyframes changeBg {
+  0% { background-image: url('../images/cancer.jpg'); }
+  50% { background-image: url('../images/cancer3.jpg'); }
+  100% { background-image: url('../images/cancer.jpg'); }
+}
+
+/* #backgroundCanvas { */
+  /* background-size: cover;  */
+/* или contain, в зависимости от желаемого эффекта */
+  /* animation: changeBg 60s linear infinite;  */
+/* 60s - длительность анимации, linear - тип анимации, infinite - бесконечный повтор */
+/* } */
+
+/* @keyframes changeBg {
+  0% { background-image: url('./images/bg.jpg') }
+  50% { background-image: url('../images/cancer.jpg'); }
+  100% { background-image: url('./images/bg.jpg'); }
+} */
+
+#backgroundCanvas {
+  width: 100%; /* Занимает всю ширину родительского элемента */
+
+  background-size: cover;
+  animation: changeBgOpacity 120s linear infinite; 
+} 
+
+@keyframes changeBgOpacity {
+  /* 0% { background-color: rgba(255, 255, 255, 1); }
+  50% { background-color: rgba(255, 255, 255, 0.5); } 
+  80% { background-color: rgb(215, 215, 215); } 
+  100% { background-color: rgba(255, 255, 255, 1); }  */
+  0% { background-image: url('./images/canvas1.jpg') }
+  50% { background-image: url('./images/canvas2.jpg'); }
+  100% { background-image: url('./images/canvas1.jpg') }
+	/* 80% {background-image: url('./images/canvas3.jpg');}
+  100% { background-image: url('./images/canvas4.jpg'); } */
 }
