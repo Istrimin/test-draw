@@ -184,16 +184,6 @@
         }
 
 
-function toggleEraser() {
-    isErasing = !isErasing;
-    eraserBtn.classList.toggle('active', isErasing);
-    if (isErasing) {
-        previousCursor = drawingCanvas.style.cursor;
-        drawingCanvas.style.cursor = 'url(cursors/2.png), auto';
-    } else {
-        drawingCanvas.style.cursor = previousCursor;
-    }
-}
 
 
         // function saveImage() {
@@ -300,6 +290,36 @@ function toggleEraser() {
 let currentCursor = 'url(cursors/1.png), auto';
 let previousCursor = currentCursor;
 
+// стерка
+
+function toggleEraser() {
+    isErasing = !isErasing;
+    eraserBtn.classList.toggle('active', isErasing);
+    if (isErasing) {
+        previousCursor = drawingCanvas.style.cursor;
+        drawingCanvas.style.cursor = 'url(cursors/2.png), auto';
+    } else {
+        drawingCanvas.style.cursor = previousCursor;
+    }
+}
+// new
+
+// пипетка
+
+function toggleEyedropper() {
+  isEyedropperActive = !isEyedropperActive;
+  eyedropperBtn.classList.toggle('active', isEyedropperActive);
+
+  if (isEyedropperActive) {
+        previousCursor = drawingCanvas.style.cursor;
+        drawingCanvas.style.cursor = 'url(cursors/3.png), auto';
+
+    drawingCanvas.addEventListener('click', pickColor, { once: true });
+    } else {
+        drawingCanvas.style.cursor = previousCursor;
+    }
+}
+
 
 cursorImg.addEventListener('click', () => {
     currentCursor = `url(${resizedCursorUrl}), auto`;
@@ -381,7 +401,7 @@ resizeCanvas();
 initializeCursor();
 
     </script>
-    <script src="cancer.js" defer></script>
+    <script type="module" src="cancer.js" defer></script>
     <script type="module" src="cancerSettings.js" defer></script>
     <script type="module" src="cancerHelper.js" defer></script>
     <script type="module" src="cancerHotkey.js" defer></script>

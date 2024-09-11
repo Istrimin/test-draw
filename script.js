@@ -64,17 +64,17 @@ function toggleSymmetry() {
   symmetry = !symmetry;
   symmetryButton.classList.toggle('active', symmetry);
 }
-function resizeCanvas() {
-  const rect = canvasContainer.getBoundingClientRect();
-  Object.values(layers).forEach(layer => {
-    layer.width = rect.width * devicePixelRatio;
-    layer.height = rect.height * devicePixelRatio;
-    layer.getContext('2d').scale(devicePixelRatio, devicePixelRatio);
-  });
-  Object.keys(layers).forEach(layerNum => initializeLayer(parseInt(layerNum)));
-  }
-  window.addEventListener('resize', resizeCanvas);
-  resizeCanvas();
+// function resizeCanvas() {
+//   const rect = canvasContainer.getBoundingClientRect();
+//   Object.values(layers).forEach(layer => {
+//     layer.width = rect.width * devicePixelRatio;
+//     layer.height = rect.height * devicePixelRatio;
+//     layer.getContext('2d').scale(devicePixelRatio, devicePixelRatio);
+//   });
+//   Object.keys(layers).forEach(layerNum => initializeLayer(parseInt(layerNum)));
+//   }
+//   window.addEventListener('resize', resizeCanvas);
+//   resizeCanvas();
 // Exit functionality
   const exitLink = document.getElementById('exitLink');
   const doorSound = new Howl({

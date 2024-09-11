@@ -1,26 +1,4 @@
 
-// new
-
-// пипетка
-backgroundCanvas.style.cursor = 'url(../cursors/pipette.png), auto';
-function toggleEyedropper() {
-  isEyedropperActive = !isEyedropperActive;
-  isBrushEyedropperActive = false;
-  backgroundCanvas.style.cursor = isEyedropperActive ? 'url(cursors/pipette.png), auto' : 'default';
-}
-
-function toggleEyedropper() {
-  isEyedropperActive = !isEyedropperActive;
-  eyedropperBtn.classList.toggle('active', isEyedropperActive);
-
-  if (isEyedropperActive) {
-    drawingCanvas.style.cursor = 'url(cursors/3.png), auto';
-
-    drawingCanvas.addEventListener('click', pickColor, { once: true });
-  } else {
-    drawingCanvas.style.cursor = 'default';
-  }
-}
 
 function pickColor(e) {
   const rect = drawingCanvas.getBoundingClientRect();

@@ -36,6 +36,10 @@
   {
       e.preventDefault();
   });
+  document.addEventListener('mouseleave',function(e)
+  {
+      e.preventDefault();
+  });
 // блокируем контекстное меню
         document.addEventListener('contextmenu', event => event.preventDefault());
 // добавляем класс для красивых иконок

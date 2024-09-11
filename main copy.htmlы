@@ -18,19 +18,17 @@
     color: red; /* Set text color to red */
     font-weight: bold; /* Make the text bold */
     font-size: 16px; /* Adjust font size */
-    margin-top: 10px; 
+    margin-top: 10px; /* Add some space above */
  }
-/* пофиксить панель курсоров для планшета */
-
     </style>
 <body>
     <div class="base-container">
-        <div class="sidebar">
+    <div class="sidebar">
             <a href="index.html" target="_self" title="Выйти из команты" id="exitLink">🚪</a>
             <button id="message" title="Сообщение">✉️</button>
             <div id="message-container" style="display: none;">
                 <p id="message"></p>
-             </div>
+            </div>
             <button id="identifyLayerBtn" title="Определить слой">🔍</button>
             <input type="file" id="imageInput" accept="image/*" style="display: none;">
             <button id="UploadButton" title="Загрузить изображение (U)">🌺</button>
@@ -45,22 +43,20 @@
             <button id="eyedropperBtn" title="Пипетка заливки (A)">💧</button>
             <button id="brushEyedropperBtn" title="Пипетка кисти (D)">🖌️</button>
             <button id="deleteAllBtn" title="Удалить все">🗑️</button>
+            <button id="zoomBtn" title="Лупа">🔍</button>
+            <div id="zoomLevelDisplay" title="Уровень зума">100%</div>
 
             <button id="mergeLayers" title="Объединить слои">🔗</button>
             <button id="settings" title="Настройки">⚙️</button>
-          </div>
-       <div class="canvas-and-sliders">
+        </div>
+    <div class="canvas-and-sliders">
             <div class="layer-panel-wrapper">
-
                 <button id="moveLayerUp" title="Слой вверх">▲</button>
                 <div class="layer-panel">
                     <div id="layerButtons"></div>
                 </div>
                 <button id="moveLayerDown" title="Слой вниз">▼</button>
-             </div>
-            <div class="canvas-container">
-                <div class="color-picker-and-word">
-
+            </div>
                     <div class="color-picker-group">
                         <input type="color" id="colorPicker" value="#000000" title="Цвет заливки (C)">
                         <input type="color" id="colorPicker2" value="#ffffff" title="булый">
@@ -74,9 +70,8 @@
                         <div class="color-picker-group-two">
                             <input type="color" id="backgroundPicker" value="#ffffff" title="Цвет фона (B)">
                             <button id="symmetry" title="Симметрия (S)">🦋</button>
-                        </div>
-                    </div>
-                    <div class="word-navigation">
+                    </div>  
+                <div class="word-navigation">
                         <button id="previousWord" title="Предыдущее слово">&lt;</button>
                         <p id="Quizz"></p>
                         <button id="nextWord" title="Следующее слово">&gt;</button>
@@ -86,20 +81,18 @@
                             <span id="time" class="time"></span>
                             <span id="startTime" class="time"></span>
                             <span id="elapsedTime" class="time"></span>
-            <button id="zoomBtn" title="Лупа"></button>
-            <div id="zoomLevelDisplay" title="Уровень зума"></div>
-
                         </div>
-
                     </div>
                 </div>
-                <div class="canv-container" id="canvasContainer">
+    <div class="canv-container" id="canvasContainer">
+    <div id="layersContainer"> <div id="cursorPanel" class="cursor-panel" style="display: none;">
+
     <div id="cursorPanel" class="cursor-panel" style="display: none;">
         <h3>Выберите курсор</h3>
         <div id="cursorList"></div>
-     </div>
+    </div>
                 </div>
-    <div class="slider-group">
+                <div class="slider-group">
                     <div class="tools-column">
                         <label for="opacity" title="Прозрачность">👻</label>
                         <input type="range" id="opacity" min="1" max="100" value="100">
@@ -127,10 +120,10 @@
                 </div>
             </div>
         </div>
-        </div>
-        </div>
-        </div>
-        </div>
+    </div>
+    </div>
+    </div>
+    </div>
 <script>
         // Get DOM elements
         const brushSizeInput = document.getElementById('brushSize');
@@ -140,13 +133,13 @@
         const addLayerBtn = document.getElementById('addLayerBtn');
         const removeLayerBtn = document.getElementById('removeLayerBtn');
         const eraserBtn = document.getElementById('eraserBtn');
-        // const isPressureSupported = 'onpointermove' in window;
+        const isPressureSupported = 'onpointermove' in window;
         let layerCount = 0;
-        const layers = [];
+        const layers = {};
         const contexts = {};
-        const layerColors = [];
+        const layerColors = {};
         const history = {};
-        const redoHistory = [];
+        const redoHistory = {};
         let currentLayer = 1;
         let previousLayer = 1;
         let currentCtx;
@@ -155,91 +148,87 @@
         const layerButtons = document.getElementById('layerButtons');
         const zoomBtn = document.getElementById('zoomBtn');
         const canvasContainer = document.getElementById('canvasContainer');
-        
-        // ZOOM CONSTANTS
-        let zoomLevel =     10; // 1000% = 10
+        let zoomLevel =     5;
         const MAX_ZOOM = 100;
-        const MIN_ZOOM = 1;
-        const ZOOM_STEP = 0.02;
-        let offsetX = 0;
-        let offsetY = 0;
-
+        const MIN_ZOOM = 0.1;
+        const ZOOM_STEP = 0.01;
         Object.values(layers).forEach(addEventListenersToLayer);
         let isIdentifyingLayer = false;
         let wasDrawing = false;
         const identifyLayerBtn = document.getElementById('identifyLayerBtn');
         const layerPanel = document.querySelector('.layer-panel');
-        const sidebar =document.querySelector(".sidebar")
         let isDraggingScroll = false;
         let startY;
         let lastX = 0;
-        let currentCursor = 'auto'; 
-        let isZoomActive = false;
-        // ИНИЦИАЛИЗАЦИЯ 
+    let currentCursor = 'auto'; 
+    let isZoomActive = false;
+        // add нужно проверить сработал ли этот способ
         document.addEventListener('DOMContentLoaded', function () {
             initializeApp();
-          });
+         });
         function createLayer() {
-            updateZoom();
-                layerCount++;
-                layerColors[layerCount] = '#' + Math.floor(Math.random() * 16777215).toString(16);
-                const canvas = document.createElement('canvas');
-                canvas.id = `layer${layerCount}`;
-                if (layerCount === 1) {
-                    canvas.style.visibility = 'hidden'; // Hide the first layer
-                }
-                canvas.width = 600;
-                canvas.height = 400;
-                canvas.style.position = 'absolute';
-                canvas.style.top = '0';
-                canvas.style.left = '0';
-                canvas.style.zIndex = layerCount;
-                canvasContainer.appendChild(canvas);
-                layers[layerCount] = canvas;
-                contexts[layerCount] = canvas.getContext('2d');
-                const button = document.createElement('button');
-                button.textContent = " ❤ ";
-                button.classList.add('layer-button');
-                button.dataset.layer = layerCount;
-                layerButtons.appendChild(button);
-                button.addEventListener('click', function () {
-                    setCurrentLayer(parseInt(this.dataset.layer));
-                });
-                addEventListenersToLayer(canvas);
-                setCurrentLayer(layerCount);
-                initializeLayer(layerCount);
-                history[layerCount] = [];
-                redoHistory[layerCount] = [];
-                updateLayerButtonColor(layerCount);
-                updateLayerOrder();
+        updateZoom();
+        simulateCtrlPress();
+            layerCount++;
+            layerColors[layerCount] = '#' + Math.floor(Math.random() * 16777215).toString(16);
+            const canvas = document.createElement('canvas');
+            canvas.id = `layer${layerCount}`;
+            if (layerCount === 1) {
+                canvas.style.visibility = 'hidden'; // Hide the first layer
+            }
+            canvas.width = 600;
+            canvas.height = 400;
+            canvas.style.position = 'absolute';
+            canvas.style.top = '0';
+            canvas.style.left = '0';
+            canvas.style.zIndex = layerCount;
+            canvasContainer.appendChild(canvas);
+            layers[layerCount] = canvas;
+            contexts[layerCount] = canvas.getContext('2d');
+            const button = document.createElement('button');
+            button.textContent = " ❤ ";
+            button.classList.add('layer-button');
+            button.dataset.layer = layerCount;
+            layerButtons.appendChild(button);
+            button.addEventListener('click', function () {
+                setCurrentLayer(parseInt(this.dataset.layer));
+            });
+            addEventListenersToLayer(canvas);
+            setCurrentLayer(layerCount);
+            initializeLayer(layerCount);
+        simulateCtrlPress();
+            history[layerCount] = [];
+            redoHistory[layerCount] = [];
+            updateLayerButtonColor(layerCount);
+            updateLayerOrder();
 
-             }
+         }
         function setCurrentLayer(layerNum) {
-                if (currentLayer !== layerNum) {
-                    previousLayer = currentLayer;
+            if (currentLayer !== layerNum) {
+                previousLayer = currentLayer;
+            }
+            currentLayer = layerNum;
+            currentCtx = contexts[currentLayer];
+            document.querySelectorAll('.layer-button').forEach(btn => {
+                btn.classList.remove('active-layer');
+                if (parseInt(btn.dataset.layer) === currentLayer) {
+                    btn.classList.add('active-layer');
                 }
-                currentLayer = layerNum;
-                currentCtx = contexts[currentLayer];
-                document.querySelectorAll('.layer-button').forEach(btn => {
-                    btn.classList.remove('active-layer');
-                    if (parseInt(btn.dataset.layer) === currentLayer) {
-                        btn.classList.add('active-layer');
-                    }
-                });
-                if (!isErasing) {
-                    updateLayerButtonColor(layerNum);
-                }
-                if (layerColors[layerNum]) {
-                    currentCtx.strokeStyle = layerColors[layerNum];
-                }
-             }
+            });
+            if (!isErasing) {
+                updateLayerButtonColor(layerNum);
+            }
+            if (layerColors[layerNum]) {
+                currentCtx.strokeStyle = layerColors[layerNum];
+            }
+         }
         function updateLayerButtonColor(layerNum) {
             const button = document.querySelector(`.layer-button[data-layer="${layerNum}"]`);
             if (button && layerColors[layerNum]) {
                 button.style.backgroundColor = layerColors[layerNum];
             }
          }
-        function initializeLayer(layerNum) {
+            function initializeLayer(layerNum) {
                 if (layerNum === 0) {
                     contexts[layerNum].fillStyle = '#' + Math.floor(Math.random() * 16777215).toString(16);
                 } else {
@@ -248,182 +237,144 @@
                 contexts[layerNum].fillRect(0, 0, layers[layerNum].width, layers[layerNum].height);
             }
         function initializeApp() {
-             createLayer();
-               }
+        createLayer();
+         }
         function saveState() {
-             if (!currentCtx) {
-                 console.error('Error in saveState function', currentLayer);
-                 return;
-             }
-             history[currentLayer].push(currentCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer]
-                 .height));
-             redoHistory[currentLayer] = [];
-          }
+            if (!currentCtx) {
+                console.error('Error in saveState function', currentLayer);
+                return;
+            }
+            history[currentLayer].push(currentCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer]
+                .height));
+            redoHistory[currentLayer] = [];
+         }
         function startDrawing(e) {
-             if (!currentCtx) {
-                 console.error('Error: currentCtx is undefined in startDrawing.', currentLayer);
-                 return;
-             }
-             isDrawing = true;
-             const rect = layers[currentLayer].getBoundingClientRect();
-             [lastX, lastY] = [(e.clientX - rect.left) / zoomLevel, (e.clientY - rect.top) / zoomLevel];
-             saveState();
-          }
+            if (!currentCtx) {
+                console.error('Error: currentCtx is undefined in startDrawing.', currentLayer);
+                return;
+            }
+            isDrawing = true;
+            const rect = layers[currentLayer].getBoundingClientRect();
+            // Adjust the coordinates based on the zoom level
+            [lastX, lastY] = [(e.clientX - rect.left) / zoomLevel, (e.clientY - rect.top) / zoomLevel];
+            saveState();
+         }
 
-    
-        function draw(e) {
- 
-             if (!isDrawing || !currentCtx) {
-                 return;
-             }
-             const rect = layers[currentLayer].getBoundingClientRect();
-             // Adjust the coordinates based on the zoom level
-             const x = (e.clientX - rect.left) / zoomLevel;
-             const y = (e.clientY - rect.top) / zoomLevel;
-             const pressure = e.pressure || 1;
-             currentCtx.lineWidth = brushSizeInput.value * pressure;
-             currentCtx.lineCap = 'round';
-             currentCtx.lineJoin = 'round';
-             currentCtx.globalAlpha = opacityInput.value / 100;
-             currentCtx.globalCompositeOperation = isErasing ? 'destination-out' : 'source-over';
-             currentCtx.beginPath();
-             currentCtx.moveTo(lastX, lastY);
-             currentCtx.lineTo(x, y);
-             currentCtx.stroke();
-             if (symmetry) {
-                 const centerX = layers[currentLayer].width / 2;
-                 const symmetricLastX = centerX + (centerX - lastX);
-                 const symmetricX = centerX + (centerX - x);
-                 currentCtx.beginPath();
-                 currentCtx.moveTo(symmetricLastX, lastY);
-                 currentCtx.lineTo(symmetricX, y);
-                 currentCtx.stroke();
-             }
-             [lastX, lastY] = [x, y];
+    canvasContainer.addEventListener('mousemove', (e) => {
+        const rect = canvasContainer.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / zoomLevel;
+        const y = (e.clientY - rect.top) / zoomLevel;
 
-                 pressureBar.value = pressure * 10000;
-                 pressureBar.nextElementSibling.textContent = Math.round(pressure * 100);
-          }
+        if (isCtrlPressed) {
+            lastX = x; // Anchor cursor to current pixel
+            lastY = y; // Anchor cursor to current pixel
+            canvasContainer.style.cursor = 'none'; // Hide cursor
+        } else {
+            canvasContainer.style.cursor = currentCursor; 
+        }
+    });
+        function stopDrawing() {
+            if (isDrawing) {
+                isDrawing = false;
+            }
+         }
         function addEventListenersToLayer(layer) {
-             layer.addEventListener('pointerdown', startDrawing);
-             layer.addEventListener('pointermove', draw);
-             layer.addEventListener('pointerup', function() {
-                    if (isDrawing) {
-                        isDrawing = false;
-                    }
-                });
-          }
-         document.querySelectorAll('button, input').forEach(element => {
-             element.addEventListener('pointerdown', (e) => {
-                 e.stopPropagation();
-             });
-          });
-        function togglePreviousLayer() {
-             [currentLayer, previousLayer] = [previousLayer, currentLayer];
-             const layerButton = document.querySelector(`.layer-button[data-layer="${currentLayer}"]`);
-             if (layerButton) {
-                 layerButton.click();
-             }
-          }
-        function redrawCanvas() {
-             currentCtx.fillStyle = backgroundPicker.value;
-             currentCtx.fillRect(0, 0, layer2.width, layer2.height);
-             if (uploadedImage) {
-                 currentCtx.drawImage(uploadedImage, 0, 0, layer2.width, layer2.height);
-             }
-          }
-
-        // идентификатор слоя
-            canvasContainer.addEventListener('click', (e) => {
-                 if (isIdentifyingLayer) {
-                     identifyLayerClickHandler(e);
-                     canvasContainer.style.cursor = 'default';
-                     isDrawing = wasDrawing;
-                     isIdentifyingLayer = false;
-                     identifyLayerBtn.classList.remove('active');
-                 }
-              });
-            identifyLayerBtn.addEventListener('click', () => {
-                 isIdentifyingLayer = !isIdentifyingLayer;
-                 identifyLayerBtn.classList.toggle('active', isIdentifyingLayer);
-                 if (isIdentifyingLayer) {
-                     wasDrawing = isDrawing;
-                     isDrawing = false;
-                     canvasContainer.style.cursor = 'crosshair';
-                 } else {
-                     canvasContainer.style.cursor = 'default';
-                     isDrawing = wasDrawing;
-                 }
-              });
-            function identifyLayerClickHandler(e) {
-                    const rect = layers[1].getBoundingClientRect(); 
-                    const x = (e.clientX - rect.left) / zoomLevel;
-                    const y = (e.clientY - rect.top) / zoomLevel;
-
-                    // Start from the top layer (highest z-index)
-                    for (let i = layerCount; i >= 1; i--) { 
-                        const ctx = contexts[i];
-                        const pixelData = ctx.getImageData(x, y, 1, 1).data;
-
-                        // If a pixel is found on this layer (alpha > 0)
-                        if (pixelData[3] > 0) { 
-                            setCurrentLayer(i);
-                            console.log('Found drawing on layer:', i);
-                            updateLayerButtonColor(i);
-
-                            // Stop checking other layers
-                            return; 
-                        }
-                    }
-                }
-
-            layerPanel.addEventListener("pointerenter", (e)=>{
-                e.preventDefault();
-                isDraggingScroll = true;
-                startY = e.clientY;
-                    });
-            sidebar.addEventListener("pointerenter", (e)=>{
-                e.preventDefault();
-                isDraggingScroll = true;
-                startY = e.clientY;
-                    });
-            sidebar.addEventListener('pointermove', (e) => {
-                if (isDraggingScroll) {
-                    const deltaY = e.clientY - startY;
-                    sidebar.scrollTop += deltaY; 
-                    startY = e.clientY;
-                }
+            layer.addEventListener('pointerdown', startDrawing);
+            layer.addEventListener('pointermove', draw);
+            layer.addEventListener('pointerup', stopDrawing);
+            // layer.addEventListener('pointerout', stopDrawing);
+            layer.addEventListener('pointercancel', stopDrawing);
+         }
+        document.querySelectorAll('button, input').forEach(element => {
+            element.addEventListener('pointerdown', (e) => {
+                e.stopPropagation();
             });
-            layerPanel.addEventListener('pointerdown', (e) => {
-                e.preventDefault();
-                isDraggingScroll = true;
+         });
+        function togglePreviousLayer() {
+            [currentLayer, previousLayer] = [previousLayer, currentLayer];
+            const layerButton = document.querySelector(`.layer-button[data-layer="${currentLayer}"]`);
+            if (layerButton) {
+                layerButton.click();
+            }
+         }
+        function redrawCanvas() {
+            currentCtx.fillStyle = backgroundPicker.value;
+            currentCtx.fillRect(0, 0, layer2.width, layer2.height);
+            if (uploadedImage) {
+                currentCtx.drawImage(uploadedImage, 0, 0, layer2.width, layer2.height);
+            }
+         }
+        function setBackground() {
+            if (contexts[1]) {
+                contexts[1].fillStyle = backgroundPicker.value;
+                contexts[1].fillRect(0, 0, layers[1].width, layers[1].height);
+                saveState();
+            }
+         }
+        canvasContainer.addEventListener('click', (e) => {
+            if (isIdentifyingLayer) {
+                identifyLayerClickHandler(e);
+                canvasContainer.style.cursor = 'default';
+                isDrawing = wasDrawing;
+                isIdentifyingLayer = false;
+                identifyLayerBtn.classList.remove('active');
+            }
+         });
+        identifyLayerBtn.addEventListener('click', () => {
+            isIdentifyingLayer = !isIdentifyingLayer;
+            identifyLayerBtn.classList.toggle('active', isIdentifyingLayer);
+            if (isIdentifyingLayer) {
+                wasDrawing = isDrawing;
+                isDrawing = false;
+                canvasContainer.style.cursor = 'crosshair';
+            } else {
+                canvasContainer.style.cursor = 'default';
+                isDrawing = wasDrawing;
+            }
+         });
+        function identifyLayerClickHandler(e) {
+            const rect = layers[1].getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            for (let i = layerCount; i >= 1; i--) {
+                const ctx = contexts[i];
+                const pixelData = ctx.getImageData(x, y, 1, 1).data;
+                if (pixelData[3] > 0) {
+                    setCurrentLayer(i);
+                    console.log('Found drawing on layer:', i);
+                    updateLayerButtonColor(i);
+                    break;
+                }
+            }
+         }
+        layerPanel.addEventListener('pointerdown', (e) => {
+            e.preventDefault();
+            isDraggingScroll = true;
+            startY = e.clientY;
+         });
+        layerPanel.addEventListener('pointermove', (e) => {
+            if (isDraggingScroll) {
+                const deltaY = e.clientY - startY;
+                layerPanel.scrollTop += deltaY;
                 startY = e.clientY;
-             });
+            }
+         });
 
-            layerPanel.addEventListener('pointermove', (e) => {
-                if (isDraggingScroll) {
-                    const deltaY = e.clientY - startY;
-                    layerPanel.scrollTop += deltaY;
-                    startY = e.clientY;
-                }
-             });
-            layerPanel.addEventListener('pointerup', () => {
-                isDraggingScroll = false;
-             });
-            canvasContainer.addEventListener('pointerdown', handleCanvasClick);
-            function handleCanvasClick(e) {
-                if (e.altKey) {
-                    isDrawing=false;
-                    e.preventDefault();
-                    identifyLayerClickHandler(e);
-                }
-             }
+        // layerPanel.addEventListener('pointerup', () => {
+        //     isDraggingScroll = false;
+        //  });
+        canvasContainer.addEventListener('pointerdown', handleCanvasClick);
+        function handleCanvasClick(e) {
+            if (e.altKey) {
+                // e.preventDefault();
+                identifyLayerClickHandler(e);
+            }
+         }
         // добавляем слой под текущий
             document.addEventListener('keydown', function (e) {
                 if (e.key === 'Tab') {
                     e.preventDefault();
                     createLayerBelowCurrent();
-            updateZoom();
                 }
              });
             function createLayerBelowCurrent() {
@@ -500,6 +451,17 @@
                 }
              }
             const layerButtonsContainer = document.getElementById('layerButtons');
+        // симуляция нажатия контрл для нормальной работы зума.
+            function simulateCtrlPress() {
+                isCtrlPressed = true;
+                canvasContainer.style.cursor = 'zoom-in';
+                
+                // Simulate releasing the Ctrl key after a short delay
+                setTimeout(() => {
+                    isCtrlPressed = false;
+                    canvasContainer.style.cursor = 'default';
+                }, 1000); // 1000 ms = 1 second, adjust as needed
+            }
         // Zoom functions
             zoomBtn.addEventListener('click', toggleZoom);
             function toggleZoom() {
@@ -520,89 +482,122 @@
                     isCtrlPressed = false;
                 }
              });
+    canvasContainer.addEventListener('mousemove', (e) => {
+        const rect = canvasContainer.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / zoomLevel;
+        const y = (e.clientY - rect.top) / zoomLevel;
 
-    // canvasContainer.addEventListener('mousemove', (e) => {
-    //   if (isCtrlPressed) {
-    //     e.preventDefault();
-
-    //     const rect = canvas.getBoundingClientRect();
-    //     const x = e.clientX - rect.left;
-    //     const y = e.clientY - rect.top;
-
-    //     if (lastX !== undefined && lastY !== undefined) {
-    //       const deltaX = e.movementX;
-    //       const oldZoom = zoomLevel;
-    //       zoomLevel = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoomLevel + deltaX * ZOOM_STEP));
-
-    //       if (oldZoom !== zoomLevel) {
-    //         // Рассчитываем новое положение, чтобы курсор оставался над той же точкой изображения
-    //         const zoomRatio = zoomLevel / oldZoom;
-    //         offsetX = x - (x - offsetX) * zoomRatio;
-    //         offsetY = y - (y - offsetY) * zoomRatio;
-
-    //         updateZoom();
-    //       }
-    //     }
-
-    //     lastX = x;
-    //     lastY = y;
-    //   }
-    // });
+        if (isCtrlPressed) {
+            lastX = x; // Anchor cursor to current pixel
+            lastY = y; // Anchor cursor to current pixel
+            canvasContainer.style.cursor = 'none'; // Hide cursor
+        } else {
+            canvasContainer.style.cursor = currentCursor; 
+        }
+    });
+            zoomBtn.addEventListener('click', toggleZoom);
+            function updateZoom() {
+                Object.values(layers).forEach(layer => {
+                    layer.style.transform = `scale(${zoomLevel})`;
+                });
+                canvasContainer.style.overflow = 'auto';
+                document.getElementById('zoomLevelDisplay').textContent = `: ${(zoomLevel * 100).toFixed(0)}%`;
+             }
 
 
 
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Control') {
+            isCtrlPressed = true;
+        }
+    });
+
+    document.addEventListener('keyup', (e) => {
+        if (e.key === 'Control') {
+            isCtrlPressed = false;
+        }
+    });
+
+    canvasContainer.addEventListener('mousemove', (e) => {
+        if (isCtrlPressed) {
+            const deltaX = e.movementX;
+            zoomLevel = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoomLevel + deltaX * ZOOM_STEP));
+            updateZoom();
+        }
+     });
 
 
-          document.addEventListener('keydown', (e) => {
-              if (e.key === 'Control') {
-                  isCtrlPressed = true;
-              }
-          });
-      
-          document.addEventListener('keyup', (e) => {
-              if (e.key === 'Control') {
-                  isCtrlPressed = false;
-              }
-          });
-      
-          canvasContainer.addEventListener('mousemove', (e) => {
-              if (isCtrlPressed) {
-                  const deltaX = e.movementX;
-                  zoomLevel = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoomLevel + deltaX * ZOOM_STEP));
-                  updateZoom();
-              }
-           });
-      
-      
-          function updateZoom() {
-              Object.values(layers).forEach(layer => {
-                  layer.style.transform = `scale(${zoomLevel})`;
-              });
-              canvasContainer.style.overflow = 'auto';
-              document.getElementById('zoomLevelDisplay').textContent = `🔎${(zoomLevel * 100).toFixed(0)}%`;
-              }
-      
-      
-      
-        
-
-           document.addEventListener('keyup', (e) => {
-               if (e.key === 'Control') {
-                   isCtrlPressed = false;
-                   canvasContainer.style.cursor = currentCursor; 
-               }
-           });
-
-        const cursorPanel = document.getElementById('cursorPanel');
-        const canvas = document.getElementById('yourCanvasId'); // Replace with your canvas ID
-
-        cursorPanel.addEventListener('show', () => { // Assuming you have a 'show' event
-            canvas.style.pointerEvents = 'none';
+    function updateZoom() {
+        Object.values(layers).forEach(layer => {
+            layer.style.transform = `scale(${zoomLevel})`;
         });
+        canvasContainer.style.overflow = 'auto';
+        document.getElementById('zoomLevelDisplay').textContent = `: ${(zoomLevel * 100).toFixed(0)}%`;
+        }
 
-        cursorPanel.addEventListener('hide', () => { // Assuming you have a 'hide' event
-            canvas.style.pointerEvents = 'auto'; 
-        });
+
+
+    // ?
+
+    document.addEventListener('keyup', (e) => {
+        if (e.key === 'Control') {
+            isCtrlPressed = false;
+            canvasContainer.style.cursor = currentCursor; 
+        }
+    });
+
+            // function draw(e) {
+            //             if (!isDrawing || !currentCtx) {
+            //                 return;
+            //             }
+            //             const rect = layers[currentLayer].getBoundingClientRect();
+            //             const x = (e.clientX - rect.left) / zoomLevel;
+            //             const y = (e.clientY - rect.top) / zoomLevel;
+            //             const pressure = e.pressure || 1;
+            //             currentCtx.lineWidth = brushSizeInput.value * pressure;
+            //             currentCtx.lineCap = 'round';
+            //             currentCtx.lineJoin = 'round';
+            //             currentCtx.globalAlpha = opacityInput.value / 100;
+            //             if (isErasing) {
+            //                 currentCtx.globalCompositeOperation = 'destination-out';
+            //             } else {
+            //                 currentCtx.globalCompositeOperation = 'source-over';
+            //             }
+            //             currentCtx.beginPath();
+            //             currentCtx.moveTo(lastX, lastY);
+            //             currentCtx.lineTo(x, y);
+            //             currentCtx.stroke();
+            //             if (symmetry) {
+            //                 const centerX = layers[currentLayer].width / 2;
+            //                 const symmetricLastX = centerX + (centerX - lastX);
+            //                 const symmetricX = centerX + (centerX - x);
+            //                 currentCtx.beginPath();
+            //                 currentCtx.moveTo(symmetricLastX, lastY);
+            //                 currentCtx.lineTo(symmetricX, y);
+            //                 currentCtx.stroke();
+            //             }
+            //             [lastX, lastY] = [x, y];
+            //             if (isPressureSupported) {
+            //                 pressureBar.value = pressure * 10000;
+            //                 pressureBar.nextElementSibling.textContent = Math.round(pressure * 100);
+            //             }
+            //          }
+    function startDrawing(e) {
+            if (!currentCtx) {
+                console.error('Error: currentCtx is undefined in startDrawing.', currentLayer);
+                return;
+            }
+            isDrawing = true;
+            const rect = layers[currentLayer].getBoundingClientRect();
+            [lastX, lastY] = [(e.clientX - rect.left) / zoomLevel, (e.clientY - rect.top) / zoomLevel];
+            saveState();
+         }document.querySelectorAll('button, input').forEach(element => {
+            element.addEventListener('pointerdown', (e) => {
+                e.stopPropagation();
+            });
+         });
+
+
     </script>
     <script src="script.js" defer></script>
     <script src="cursors.js" defer></script>
