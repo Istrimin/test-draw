@@ -8,73 +8,53 @@ let isFillMode = false;
 // try {
 //   isPressureSupported = !!window.PointerEvent && 'pressure' in PointerEvent.prototype;
 // } catch (e) { }
-backgroundPicker.addEventListener('input', (event) => {
-  // Apply background color to the current layer
-  currentCtx.fillStyle = event.target.value;
-  currentCtx.fillRect(0, 0, layers[2].width, layers[2].height);
-  });
+
 // *toggle eraser
         eraserBtn.addEventListener('click', toggleEraser);
         function toggleEraser() {
             isErasing = !isErasing;
             eraserBtn.classList.toggle('active', isErasing);
-            // Change the cursor to indicate eraser mode
-            if (isErasing) {
-                document.body.style.cursor = 'url(cursors/eraser.png), auto'; // Assuming you have an eraser cursor image
-            } else {
-                document.body.style.cursor = 'default';
-            }
         }
 
-brushSizeInput.addEventListener('input', () => {
-  brushSizeValue.textContent = brushSizeInput.value;
-  });
-opacityInput.addEventListener('input', () => {
-  opacityValue.textContent = opacityInput.value;
-  currentCtx.globalAlpha = opacityInput.value / 100;
-  });
+// размер кисти
+  brushSizeInput.addEventListener('input', () => {
+    brushSizeValue.textContent = brushSizeInput.value;
+    });
+// прозрачность
+  opacityInput.addEventListener('input', () => {
+    opacityValue.textContent = opacityInput.value;
+    currentCtx.globalAlpha = opacityInput.value / 100;
+    });
 // Layer switching
   document.querySelectorAll('.layer-button').forEach(button => {
     button.addEventListener('click', function () {
-      // Remove active class from previously active layer
       document.querySelector('.active-layer').classList.remove('active-layer');
-      // Add active class to the clicked layer
       this.classList.add('active-layer');
-      // Update currentLayer and currentCtx
       currentLayer = parseInt(this.dataset.layer);
       currentCtx = window['ctx' + currentLayer];
-      // Ensure no drawing is happening when switching layers
       isDrawing = false;
+      });
     });
-  });
 // Functions
-function importImage(event) {
-  const file = event.target.files[0];
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    uploadedImage = new Image();
-    uploadedImage.onload = () => {
-      currentCtx.drawImage(uploadedImage, 0, 0, layer2.width, layer2.height);
+// загрузка изображения
+  function importImage(event) {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      uploadedImage = new Image();
+      uploadedImage.onload = () => {
+        currentCtx.drawImage(uploadedImage, 0, 0, layer2.width, layer2.height);
+      };
+      uploadedImage.src = e.target.result;
     };
-    uploadedImage.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
-}
-function toggleSymmetry() {
-  symmetry = !symmetry;
-  symmetryButton.classList.toggle('active', symmetry);
-}
-// function resizeCanvas() {
-//   const rect = canvasContainer.getBoundingClientRect();
-//   Object.values(layers).forEach(layer => {
-//     layer.width = rect.width * devicePixelRatio;
-//     layer.height = rect.height * devicePixelRatio;
-//     layer.getContext('2d').scale(devicePixelRatio, devicePixelRatio);
-//   });
-//   Object.keys(layers).forEach(layerNum => initializeLayer(parseInt(layerNum)));
-//   }
-//   window.addEventListener('resize', resizeCanvas);
-//   resizeCanvas();
+    reader.readAsDataURL(file);
+  }
+// переключение симметрии
+  function toggleSymmetry() {
+    symmetry = !symmetry;
+    symmetryButton.classList.toggle('active', symmetry);
+  }
+
 // Exit functionality
   const exitLink = document.getElementById('exitLink');
   const doorSound = new Howl({
@@ -97,34 +77,34 @@ function toggleSymmetry() {
     }
   }
 // Функция отмены
-  function undo() {
-    if (history[currentLayer] && history[currentLayer].length > 0) {
-      if (history[currentLayer].length === 1) {
-        // Если это последнее состояние, сохраняем текущее состояние перед очисткой
-        const currentState = currentCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height);
-        redoHistory[currentLayer].push(currentState);
-        // Очищаем холст
-        currentCtx.clearRect(0, 0, layers[currentLayer].width, layers[currentLayer].height);
-      } else {
-        // Сохраняем текущее состояние в redoHistory
-        const currentState = currentCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height);
-        redoHistory[currentLayer].push(currentState);
-        // Возвращаемся к предыдущему состоянию
-        const previousState = history[currentLayer].pop();
-        currentCtx.putImageData(previousState, 0, 0);
+    function undo() {
+      if (history[currentLayer] && history[currentLayer].length > 0) {
+        if (history[currentLayer].length === 1) {
+          // Если это последнее состояние, сохраняем текущее состояние перед очисткой
+          const currentState = currentCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height);
+          redoHistory[currentLayer].push(currentState);
+          // Очищаем холст
+          currentCtx.clearRect(0, 0, layers[currentLayer].width, layers[currentLayer].height);
+        } else {
+          // Сохраняем текущее состояние в redoHistory
+          const currentState = currentCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height);
+          redoHistory[currentLayer].push(currentState);
+          // Возвращаемся к предыдущему состоянию
+          const previousState = history[currentLayer].pop();
+          currentCtx.putImageData(previousState, 0, 0);
+        }
       }
     }
-  }
-  // Функция повтора
-  function redo() {
-    if (redoHistory[currentLayer] && redoHistory[currentLayer].length > 0) {
-      const nextState = redoHistory[currentLayer].pop();
-      // Сохраняем текущее состояние в history перед применением redo
-      const currentState = currentCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height);
-      history[currentLayer].push(currentState);
-      currentCtx.putImageData(nextState, 0, 0);
+// Функция повтора
+    function redo() {
+      if (redoHistory[currentLayer] && redoHistory[currentLayer].length > 0) {
+        const nextState = redoHistory[currentLayer].pop();
+        // Сохраняем текущее состояние в history перед применением redo
+        const currentState = currentCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height);
+        history[currentLayer].push(currentState);
+        currentCtx.putImageData(nextState, 0, 0);
+      }
     }
-  }
 // fix flood fill
   // // Flood Fill Functionality
   // function floodFill(e) {
@@ -222,3 +202,15 @@ function toggleSymmetry() {
   //     floodFill(e);
   //   }
   // });
+
+//?! function resizeCanvas() {
+//   const rect = canvasContainer.getBoundingClientRect();
+//   Object.values(layers).forEach(layer => {
+//     layer.width = rect.width * devicePixelRatio;
+//     layer.height = rect.height * devicePixelRatio;
+//     layer.getContext('2d').scale(devicePixelRatio, devicePixelRatio);
+//   });
+//   Object.keys(layers).forEach(layerNum => initializeLayer(parseInt(layerNum)));
+//   }
+//   window.addEventListener('resize', resizeCanvas);
+//   resizeCanvas();

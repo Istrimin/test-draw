@@ -13,3 +13,22 @@ const images = [
         // var timing=1
         // changeBackgroundImage(); // Set the initial background image
         // setInterval(changeBackgroundImage, timing * 60 * 1000); // Change every 5 minutes (5 * 60 * 1000 milliseconds)
+
+add zoom
+        //   canvasContainer.addEventListener('mousemove', (e) => {
+        //       if (isCtrlPressed) {
+        //           const deltaX = e.movementX;
+        //           zoomLevel = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoomLevel + deltaX * ZOOM_STEP));
+        //           updateZoom();
+        //       }
+        //    });
+      
+      
+        //   function updateZoom() {
+        //       Object.values(layers).forEach(layer => {
+        //           layer.style.transform = `scale(${zoomLevel})`;
+        //       });
+        //       canvasContainer.style.overflow = 'auto';
+        //       document.getElementById('zoomLevelDisplay').textContent = `🔎${(zoomLevel * 100).toFixed(0)}%`;
+        //       }
+      

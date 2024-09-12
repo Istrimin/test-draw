@@ -32,7 +32,8 @@
                 <p id="message"></p>
              </div>
             <button id="identifyLayerBtn" title="Определить слой">🔍</button>
-            <button id="drawOnExistingBtn" title="Рисовать на существующем">➡️</button>
+            <button id="drawUnderExistingBtn" title="Рисовать под нарисованным">➡️</button>
+            <button id="drawOnExistingBtn" title="Рисовать на нарисованном">On</button>
 
             <input type="file" id="imageInput" accept="image/*" style="display: none;">
             <button id="UploadButton" title="Загрузить изображение (U)">🌺</button>
@@ -159,9 +160,8 @@
             const canvasContainer = document.getElementById('canvasContainer');
             let isDrawOnExisting = false;
 
-            const drawOnExistingBtn = document.getElementById('drawOnExistingBtn');
 
-            drawOnExistingBtn.addEventListener('click', toggleDrawOnExisting);
+            drawUnderExistingBtn.addEventListener('click', toggleDrawOnExisting);
 
         // ZOOM CONSTANTS
             let zoomLevel =     10; // 1000% = 10
@@ -272,7 +272,85 @@
                  .height));
              redoHistory[currentLayer] = [];
           }
-        
+        // function startDrawing(e) {
+        //     if (!currentCtx) {
+        //         console.error('Error: currentCtx is undefined in startDrawing.', currentLayer);
+        //         return;
+        //     }
+            
+        //     isDrawing = true;
+        //     const rect = layers[currentLayer].getBoundingClientRect();
+        //     const x = Math.floor((e.clientX - rect.left) / zoomLevel);
+        //     const y = Math.floor((e.clientY - rect.top) / zoomLevel);
+            
+        //     if (isDrawOnExisting) {
+        //         const imageData = currentCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height);
+        //         const index = (y * layers[currentLayer].width + x) * 4;
+        //         if (imageData.data[index + 3] === 0) {
+        //             isDrawing = false;
+        //             return; // Don't start drawing if the pixel is transparent
+        //         }
+        //     }
+            
+        //     [lastX, lastY] = [x, y];
+        //     saveState();
+        // }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// function startDrawing(e) {
+//     if (!currentCtx) {
+//         console.error('Error: currentCtx is undefined in startDrawing.', currentLayer);
+//         return;
+//     }
+    
+//     isDrawing = true;
+//     const rect = layers[currentLayer].getBoundingClientRect();
+//     const x = Math.floor((e.clientX - rect.left) / zoomLevel);
+//     const y = Math.floor((e.clientY - rect.top) / zoomLevel);
+    
+//     [lastX, lastY] = [x, y];
+//     saveState();
+// }
+
+const drawUnderExistingBtn = document.getElementById('drawUnderExistingBtn');
+
+drawUnderExistingBtn.addEventListener('click', drawUnderExisting);
+drawOnExistingBtn.addEventListener('click', drawOnExisting);
+
+function drawUnderExisting() {
+    isDrawOnExisting = false;
+    drawUnderExistingBtn.classList.add('active');
+    drawOnExistingBtn.classList.remove('active');
+}
+
+function drawOnExisting() {
+    isDrawOnExisting = true;
+    drawOnExistingBtn.classList.add('active');
+    drawUnderExistingBtn.classList.remove('active');
+}
+
+
+function toggleDrawOnExisting() {
+            isDrawOnExisting = !isDrawOnExisting;
+            drawUnderExistingBtn.classList.toggle('active', isDrawOnExisting);
+        }
+
+
+
+
+
 function startDrawing(e) {
     if (!currentCtx) {
         console.error('Error: currentCtx is undefined in startDrawing.', currentLayer);
@@ -287,10 +365,15 @@ function startDrawing(e) {
     [lastX, lastY] = [x, y];
     saveState();
 }
-        function toggleDrawOnExisting() {
-            isDrawOnExisting = !isDrawOnExisting;
-            drawOnExistingBtn.classList.toggle('active', isDrawOnExisting);
-        }
+const drawOnExistingBtn = document.getElementById('drawOnExistingBtn');
+
+drawOnExistingBtn.addEventListener('click', toggleDrawOnExisting);
+
+function toggleDrawOnExisting() {
+    isDrawOnExisting = !isDrawOnExisting;
+    drawOnExistingBtn.classList.toggle('active', isDrawOnExisting);
+}
+
 function draw(e) {
     if (!isDrawing || !currentCtx) {
         return;
@@ -313,12 +396,6 @@ function draw(e) {
         tempCanvas.height = layers[currentLayer].height;
         const tempCtx = tempCanvas.getContext('2d');
         
-        // Copy the current layer to the temporary canvas
-        tempCtx.drawImage(layers[currentLayer], 0, 0);
-        
-        // Set the composite operation to only draw where there's already content
-        tempCtx.globalCompositeOperation = 'source-in';
-        
         // Draw the line on the temporary canvas
         tempCtx.strokeStyle = currentCtx.strokeStyle;
         tempCtx.lineWidth = currentCtx.lineWidth;
@@ -329,6 +406,10 @@ function draw(e) {
         tempCtx.moveTo(lastX, lastY);
         tempCtx.lineTo(x, y);
         tempCtx.stroke();
+
+        // Use 'source-in' to keep only the parts of the line that overlap with non-transparent pixels
+        tempCtx.globalCompositeOperation = 'source-in';
+        tempCtx.drawImage(layers[currentLayer], 0, 0);
 
         // Draw the result back to the main canvas
         currentCtx.drawImage(tempCanvas, 0, 0);
@@ -350,9 +431,6 @@ function draw(e) {
             tempCanvas.height = layers[currentLayer].height;
             const tempCtx = tempCanvas.getContext('2d');
             
-            tempCtx.drawImage(layers[currentLayer], 0, 0);
-            tempCtx.globalCompositeOperation = 'source-in';
-            
             tempCtx.strokeStyle = currentCtx.strokeStyle;
             tempCtx.lineWidth = currentCtx.lineWidth;
             tempCtx.lineCap = currentCtx.lineCap;
@@ -362,6 +440,9 @@ function draw(e) {
             tempCtx.moveTo(symmetricLastX, lastY);
             tempCtx.lineTo(symmetricX, y);
             tempCtx.stroke();
+
+            tempCtx.globalCompositeOperation = 'source-in';
+            tempCtx.drawImage(layers[currentLayer], 0, 0);
             
             currentCtx.drawImage(tempCanvas, 0, 0);
         } else {
