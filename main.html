@@ -34,6 +34,7 @@
                 <p id="message"></p>
              </div>
             <div class="sidebar">
+            </div>
             <button id="fullscreenBtn" title="Полноэкранный режим">🔲</button>
 
 
@@ -59,7 +60,7 @@
             <button id="mergeLayers" title="Объединить слои">🔗</button>
             <button id="settings" title="Настройки">⚙️</button>
           </div>
-            </div>
+
        <div class="canvas-and-sliders">
             <div class="layer-panel-wrapper">
 
@@ -613,166 +614,168 @@ function draw(e) {
              }
             const layerButtonsContainer = document.getElementById('layerButtons');
         // Zoom functions
-            let isCtrlPressed = false;
+                let isCtrlPressed = false;
 
-          document.addEventListener('keydown', (e) => {
-              if (e.key === 'Control') {
-                  isCtrlPressed = true;
-              }
-                  });
-              
-            //  чтобы не рисовалась лишняя линия
-                  document.addEventListener('keyup', (e) => {
-                      if (e.key === 'Control') {
-                          isCtrlPressed = false;
-                      }
-                  });
-
-
-                let zoomOriginX = 0;
-                let zoomOriginY = 0;
-
-
-                canvasContainer.addEventListener('mousemove', (e) => {
-                  if (isCtrlPressed) {
-                    e.preventDefault();
-                    const rect = canvasContainer.getBoundingClientRect();
-                    const mouseX = e.clientX - rect.left;
-                    const mouseY = e.clientY - rect.top;
-
-                    if (lastX !== undefined) {
-                      const deltaX = e.movementX;
-                      const oldZoom = zoomLevel;
-                      zoomLevel = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoomLevel + deltaX * ZOOM_STEP));
-
-                      if (oldZoom !== zoomLevel) {
-                        // Calculate zoom origin relative to the canvas
-                        zoomOriginX = (mouseX - offsetX) / oldZoom;
-                        zoomOriginY = (mouseY - offsetY) / oldZoom;
-
-                        // Update offset to keep the zoom origin point under the mouse
-                        offsetX = mouseX - zoomOriginX * zoomLevel;
-                        offsetY = mouseY - zoomOriginY * zoomLevel;
-
-                        updateZoom();
-                      }
-                    }
-
-                    lastX = mouseX;
-                    lastY = mouseY;
+              document.addEventListener('keydown', (e) => {
+                  if (e.key === 'Control') {
+                      isCtrlPressed = true;
                   }
-                });
-
-
-
-
-            function updateZoom() {
-                const container = document.getElementById('canvasContainer');
-                const containerRect = container.getBoundingClientRect();
-                
-            // Обновляем фоновый слой
-            const backgroundLayer = layers[0];
-            backgroundLayer.style.transformOrigin = '0 0';
-            backgroundLayer.style.transform = `scale(${zoomLevel})`;
-            backgroundLayer.style.left = `${offsetX}px`;
-            backgroundLayer.style.top = `${offsetY}px`;
-              Object.values(layers).forEach(layer => {
-                if (layer.id !== 'layer0') {
-                layer.style.transformOrigin = '0 0';
-                
-                if (zoomLevel <= 1) {
-                  // Reset position when zoomed out to normal or less
-                  offsetX = 0;
-                  offsetY = 0;
-                  layer.style.transform = `scale(${zoomLevel})`;
-                  layer.style.left = '0';
-                  layer.style.top = '0';
-                } else {
-                  // Apply zoom and offset
-                  layer.style.transform = `scale(${zoomLevel})`;
+                      });
                   
-                  // Ensure the layer stays within the container
-                  const layerRect = layer.getBoundingClientRect();
-                  offsetX = Math.min(Math.max(offsetX, containerRect.width - layerRect.width), 0);
-                  offsetY = Math.min(Math.max(offsetY, containerRect.height - layerRect.height), 0);
-                  
-                  layer.style.left = `${offsetX}px`;
-                  layer.style.top = `${offsetY}px`;
+                //  чтобы не рисовалась лишняя линия
+                      document.addEventListener('keyup', (e) => {
+                          if (e.key === 'Control') {
+                              isCtrlPressed = false;
+                          }
+                      });
+
+
+                    let zoomOriginX = 0;
+                    let zoomOriginY = 0;
+
+
+                    canvasContainer.addEventListener('mousemove', (e) => {
+                      if (isCtrlPressed) {
+                        e.preventDefault();
+                        const rect = canvasContainer.getBoundingClientRect();
+                        const mouseX = e.clientX - rect.left;
+                        const mouseY = e.clientY - rect.top;
+
+                        if (lastX !== undefined) {
+                          const deltaX = e.movementX;
+                          const oldZoom = zoomLevel;
+                          zoomLevel = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoomLevel + deltaX * ZOOM_STEP));
+
+                          if (oldZoom !== zoomLevel) {
+                            // Calculate zoom origin relative to the canvas
+                            zoomOriginX = (mouseX - offsetX) / oldZoom;
+                            zoomOriginY = (mouseY - offsetY) / oldZoom;
+
+                            // Update offset to keep the zoom origin point under the mouse
+                            offsetX = mouseX - zoomOriginX * zoomLevel;
+                            offsetY = mouseY - zoomOriginY * zoomLevel;
+
+                            updateZoom();
+                          }
+                        }
+
+                        lastX = mouseX;
+                        lastY = mouseY;
+                      }
+                    });
+
+
+
+
+                function updateZoom() {
+                    const container = document.getElementById('canvasContainer');
+                    const containerRect = container.getBoundingClientRect();
+                    
+                // Обновляем фоновый слой
+                const backgroundLayer = layers[0];
+                backgroundLayer.style.transformOrigin = '0 0';
+                backgroundLayer.style.transform = `scale(${zoomLevel})`;
+                backgroundLayer.style.left = `${offsetX}px`;
+                backgroundLayer.style.top = `${offsetY}px`;
+                  Object.values(layers).forEach(layer => {
+                    if (layer.id !== 'layer0') {
+                    layer.style.transformOrigin = '0 0';
+                    
+                    if (zoomLevel <= 1) {
+                      // Reset position when zoomed out to normal or less
+                      offsetX = 0;
+                      offsetY = 0;
+                      layer.style.transform = `scale(${zoomLevel})`;
+                      layer.style.left = '0';
+                      layer.style.top = '0';
+                    } else {
+                      // Apply zoom and offset
+                      layer.style.transform = `scale(${zoomLevel})`;
+                      
+                      // Ensure the layer stays within the container
+                      const layerRect = layer.getBoundingClientRect();
+                      offsetX = Math.min(Math.max(offsetX, containerRect.width - layerRect.width), 0);
+                      offsetY = Math.min(Math.max(offsetY, containerRect.height - layerRect.height), 0);
+                      
+                      layer.style.left = `${offsetX}px`;
+                      layer.style.top = `${offsetY}px`;
+                    }
+                  }});
+
+                  canvasContainer.style.overflow = 'hidden';
+                  document.getElementById('zoomLevelDisplay').textContent = `🔎${(zoomLevel * 100).toFixed(0)}%`;
                 }
-              }});
-
-              canvasContainer.style.overflow = 'hidden';
-              document.getElementById('zoomLevelDisplay').textContent = `🔎${(zoomLevel * 100).toFixed(0)}%`;
-            }
 
 
-        const cursorPanel = document.getElementById('cursorPanel');
-        const canvas = document.getElementById('yourCanvasId'); 
+
 
 //  инструмент сужение 
-let isNarrowingToCenter = false;
+    let isNarrowingToCenter = false;
 
-const narrowToCenterBtn = document.getElementById('narrowToCenter');
+    const narrowToCenterBtn = document.getElementById('narrowToCenter');
 
-narrowToCenterBtn.addEventListener('click', () => {
-    isNarrowingToCenter = !isNarrowingToCenter;
-    narrowToCenterBtn.classList.toggle('active', isNarrowingToCenter);
-});
-function narrowToCenter(e) {
-    if (!isDrawing || !currentCtx || !isNarrowingToCenter) return;
+    narrowToCenterBtn.addEventListener('click', () => {
+        isNarrowingToCenter = !isNarrowingToCenter;
+        narrowToCenterBtn.classList.toggle('active', isNarrowingToCenter);
+    });
+    function narrowToCenter(e) {
+        if (!isDrawing || !currentCtx || !isNarrowingToCenter) return;
 
-    const rect = layers[currentLayer].getBoundingClientRect();
-    const x = Math.floor((e.clientX - rect.left) / zoomLevel);
-    const y = Math.floor((e.clientY - rect.top) / zoomLevel);
+        const rect = layers[currentLayer].getBoundingClientRect();
+        const x = Math.floor((e.clientX - rect.left) / zoomLevel);
+        const y = Math.floor((e.clientY - rect.top) / zoomLevel);
 
-    const brushSize = parseInt(brushSizeInput.value);
-    const narrowFactor = 0.9; // Фактор сужения (0.9 = сужение на 10% за проход)
+        const brushSize = parseInt(brushSizeInput.value);
+        const narrowFactor = 0.9; // Фактор сужения (0.9 = сужение на 10% за проход)
 
-    const imageData = currentCtx.getImageData(x - brushSize/2, y - brushSize/2, brushSize, brushSize);
-    const newImageData = currentCtx.createImageData(brushSize, brushSize);
+        const imageData = currentCtx.getImageData(x - brushSize/2, y - brushSize/2, brushSize, brushSize);
+        const newImageData = currentCtx.createImageData(brushSize, brushSize);
 
-    const centerX = brushSize / 2;
-    const centerY = brushSize / 2;
+        const centerX = brushSize / 2;
+        const centerY = brushSize / 2;
 
-    for (let i = 0; i < brushSize; i++) {
-        for (let j = 0; j < brushSize; j++) {
-            const index = (j * brushSize + i) * 4;
-            
-            // Вычисляем расстояние от текущего пикселя до центра кисти
-            const distX = i - centerX;
-            const distY = j - centerY;
-            const distance = Math.sqrt(distX * distX + distY * distY);
-            
-            if (distance < brushSize / 2) {
-                // Вычисляем новую позицию пикселя
-                const newDist = distance * narrowFactor;
-                const newX = Math.round(centerX + (distX / distance) * newDist);
-                const newY = Math.round(centerY + (distY / distance) * newDist);
+        for (let i = 0; i < brushSize; i++) {
+            for (let j = 0; j < brushSize; j++) {
+                const index = (j * brushSize + i) * 4;
                 
-                if (newX >= 0 && newX < brushSize && newY >= 0 && newY < brushSize) {
-                    const newIndex = (newY * brushSize + newX) * 4;
+                // Вычисляем расстояние от текущего пикселя до центра кисти
+                const distX = i - centerX;
+                const distY = j - centerY;
+                const distance = Math.sqrt(distX * distX + distY * distY);
+                
+                if (distance < brushSize / 2) {
+                    // Вычисляем новую позицию пикселя
+                    const newDist = distance * narrowFactor;
+                    const newX = Math.round(centerX + (distX / distance) * newDist);
+                    const newY = Math.round(centerY + (distY / distance) * newDist);
                     
-                    // Копируем пиксель в новую позицию
-                    for (let k = 0; k < 4; k++) {
-                        newImageData.data[newIndex + k] = imageData.data[index + k];
+                    if (newX >= 0 && newX < brushSize && newY >= 0 && newY < brushSize) {
+                        const newIndex = (newY * brushSize + newX) * 4;
+                        
+                        // Копируем пиксель в новую позицию
+                        for (let k = 0; k < 4; k++) {
+                            newImageData.data[newIndex + k] = imageData.data[index + k];
+                        }
                     }
                 }
             }
         }
-    }
 
-    // Смешиваем новое изображение с оригинальным
-    for (let i = 0; i < imageData.data.length; i += 4) {
-        if (newImageData.data[i + 3] === 0) { // Если пиксель прозрачный в новом изображении
-            newImageData.data[i] = imageData.data[i];
-            newImageData.data[i + 1] = imageData.data[i + 1];
-            newImageData.data[i + 2] = imageData.data[i + 2];
-            newImageData.data[i + 3] = imageData.data[i + 3];
+        // Смешиваем новое изображение с оригинальным
+        for (let i = 0; i < imageData.data.length; i += 4) {
+            if (newImageData.data[i + 3] === 0) { // Если пиксель прозрачный в новом изображении
+                newImageData.data[i] = imageData.data[i];
+                newImageData.data[i + 1] = imageData.data[i + 1];
+                newImageData.data[i + 2] = imageData.data[i + 2];
+                newImageData.data[i + 3] = imageData.data[i + 3];
+            }
         }
+
+        currentCtx.putImageData(newImageData, x - brushSize/2, y - brushSize/2);
     }
 
-    currentCtx.putImageData(newImageData, x - brushSize/2, y - brushSize/2);
-}
+
+
 
 
     </script>

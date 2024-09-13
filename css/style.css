@@ -668,3 +668,26 @@ img:hover {
     overflow: hidden;
     position: relative;
 }
+
+/* стили для большого экрана */
+.base-container.fullscreen-mode {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+}
+
+.base-container.fullscreen-mode .sidebar {
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.base-container.fullscreen-mode .canvas-and-sliders {
+    flex-grow: 1;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.base-container.fullscreen-mode .canvas-container {
+    width: 100%;
+    height: 100%;
+}

@@ -1,3 +1,172 @@
+// полный экран.
+
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    const baseContainer = document.querySelector('.base-container');
+
+    fullscreenBtn.addEventListener('click', toggleFullscreen);
+function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+        if (baseContainer.requestFullscreen) {
+            baseContainer.requestFullscreen();
+        } else if (baseContainer.mozRequestFullScreen) { // Firefox
+            baseContainer.mozRequestFullScreen();
+        } else if (baseContainer.webkitRequestFullscreen) { // Chrome, Safari and Opera
+            baseContainer.webkitRequestFullscreen();
+        } else if (baseContainer.msRequestFullscreen) { // IE/Edge
+            baseContainer.msRequestFullscreen();
+        }
+    } else {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.mozCancelFullScreen) { // Firefox
+            document.mozCancelFullScreen();
+        } else if (document.webkitExitFullscreen) { // Chrome, Safari and Opera
+            document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) { // IE/Edge
+            document.msExitFullscreen();
+        }
+    }
+}
+
+function handleFullscreenChange() {
+    if (document.fullscreenElement) {
+        enterFullscreenMode();
+    } else {
+        exitFullscreenMode();
+    }
+}
+
+function enterFullscreenMode() {
+    baseContainer.classList.add('fullscreen-mode');
+    resizeCanvas();
+}
+
+function exitFullscreenMode() {
+    baseContainer.classList.remove('fullscreen-mode');
+    resetCanvasSize();
+}
+function resizeCanvas() {
+    const fullscreenWidth = window.innerWidth - sidebar.offsetWidth;
+    const fullscreenHeight = window.innerHeight;
+    
+    Object.values(layers).forEach(layer => {
+        const ctx = layer.getContext('2d');
+        const tempCanvas = document.createElement('canvas');
+        const tempCtx = tempCanvas.getContext('2d');
+        
+        // Сохраняем текущее содержимое
+        tempCanvas.width = layer.width;
+        tempCanvas.height = layer.height;
+        tempCtx.drawImage(layer, 0, 0);
+        
+        // Изменяем размер канваса
+        layer.width = fullscreenWidth;
+        layer.height = fullscreenHeight;
+        
+        // Восстанавливаем содержимое с учетом зума
+        ctx.save();
+        ctx.scale(zoomLevel, zoomLevel);
+        ctx.drawImage(tempCanvas, -offsetX / zoomLevel, -offsetY / zoomLevel);
+        ctx.restore();
+    });
+    
+    updateZoom();
+}
+
+function resetCanvasSize() {
+    const originalWidth = 600;
+    const originalHeight = 400;
+    
+    Object.values(layers).forEach(layer => {
+        const ctx = layer.getContext('2d');
+        const tempCanvas = document.createElement('canvas');
+        const tempCtx = tempCanvas.getContext('2d');
+        
+        // Сохраняем текущее содержимое
+        tempCanvas.width = layer.width;
+        tempCanvas.height = layer.height;
+        tempCtx.drawImage(layer, 0, 0);
+        
+        // Возвращаем исходный размер канваса
+        layer.width = originalWidth;
+        layer.height = originalHeight;
+        
+        // Восстанавливаем содержимое с учетом зума
+        ctx.save();
+        ctx.scale(1 / zoomLevel, 1 / zoomLevel);
+        ctx.drawImage(tempCanvas, offsetX, offsetY);
+        ctx.restore();
+    });
+    
+    // Сбрасываем зум и смещение
+    zoomLevel = 1;
+    offsetX = 0;
+    offsetY = 0;
+    
+    updateZoom();
+}
+
+function updateZoom() {
+    const container = document.getElementById('canvasContainer');
+    const containerRect = container.getBoundingClientRect();
+    
+    Object.values(layers).forEach(layer => {
+        layer.style.transformOrigin = '0 0';
+        layer.style.transform = `scale(${zoomLevel})`;
+        
+        // Обновляем позицию с учетом зума
+        const layerRect = layer.getBoundingClientRect();
+        offsetX = Math.min(Math.max(offsetX, containerRect.width - layerRect.width), 0);
+        offsetY = Math.min(Math.max(offsetY, containerRect.height - layerRect.height), 0);
+        
+        layer.style.left = `${offsetX}px`;
+        layer.style.top = `${offsetY}px`;
+    });
+    
+    canvasContainer.style.overflow = 'hidden';
+    document.getElementById('zoomLevelDisplay').textContent = `🔎${(zoomLevel * 100).toFixed(0)}%`;
+}
+
+// Обновляем обработчик изменения размера окна
+window.addEventListener('resize', () => {
+    if (document.fullscreenElement) {
+        resizeCanvas();
+    }
+});
+
+
+// Добавляем слушатель события изменения полноэкранного режима
+document.addEventListener('fullscreenchange', handleFullscreenChange);
+document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
+// Обновляем стили для полноэкранного режима
+const style = document.createElement('style');
+style.textContent = `
+    .base-container.fullscreen-mode {
+        display: flex;
+        width: 100vw;
+        height: 100vh;
+    }
+    .base-container.fullscreen-mode .sidebar {
+        height: 100vh;
+        overflow-y: auto;
+    }
+    .base-container.fullscreen-mode .canvas-and-sliders {
+        flex-grow: 1;
+        height: 100vh;
+        overflow: hidden;
+    }
+    .base-container.fullscreen-mode .canvas-container {
+        width: 100%;
+        height: 100%;
+    }
+`;
+document.head.appendChild(style);
+
+
+
 // Слушатели и константы
     // курсоры
     const canvasContainer = document.getElementById('canvasContainer');
@@ -169,76 +338,7 @@
         saveState();
     }
 // Курсоры
-// полный экран
-    const fullscreenBtn = document.getElementById('fullscreenBtn');
-    const baseContainer = document.querySelector('.base-container');
-
-    fullscreenBtn.addEventListener('click', toggleFullscreen);
-
-    function toggleFullscreen() {
-        if (!document.fullscreenElement) {
-            if (baseContainer.requestFullscreen) {
-                baseContainer.requestFullscreen();
-            } else if (baseContainer.mozRequestFullScreen) { // Firefox
-                baseContainer.mozRequestFullScreen();
-            } else if (baseContainer.webkitRequestFullscreen) { // Chrome, Safari and Opera
-                baseContainer.webkitRequestFullscreen();
-            } else if (baseContainer.msRequestFullscreen) { // IE/Edge
-                baseContainer.msRequestFullscreen();
-            }
-            enterFullscreenMode();
-        } else {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            } else if (document.mozCancelFullScreen) { // Firefox
-                document.mozCancelFullScreen();
-            } else if (document.webkitExitFullscreen) { // Chrome, Safari and Opera
-                document.webkitExitFullscreen();
-            } else if (document.msExitFullscreen) { // IE/Edge
-                document.msExitFullscreen();
-            }
-            exitFullscreenMode();
-        }
-    }
-
-    function enterFullscreenMode() {
-        baseContainer.classList.add('fullscreen-mode');
-        resizeCanvas();
-    }
-
-    function exitFullscreenMode() {
-        baseContainer.classList.remove('fullscreen-mode');
-        resetCanvasSize();
-    }
-
-    function resizeCanvas() {
-        const fullscreenWidth = window.innerWidth - sidebar.offsetWidth;
-        const fullscreenHeight = window.innerHeight;
-        
-        Object.values(layers).forEach(layer => {
-            layer.width = fullscreenWidth;
-            layer.height = fullscreenHeight;
-        });
-        
-        updateZoom();
-    }
-
-    function resetCanvasSize() {
-        Object.values(layers).forEach(layer => {
-            layer.width = 600;
-            layer.height = 400;
-        });
-        
-        updateZoom();
-    }
-
-    // Слушаем изменения размера окна в полноэкранном режиме
-    window.addEventListener('resize', () => {
-        if (document.fullscreenElement) {
-            resizeCanvas();
-        }
-    });
-
+            const canvas = document.getElementById('yourCanvasId'); 
     document.addEventListener('DOMContentLoaded', () => {
     			const cursorPanel = document.getElementById('cursorPanel');
     			const cursorList = document.getElementById('cursorList');
@@ -315,7 +415,6 @@
     // Загружаем курсоры
     loadCursors();
     });
-
 
 
 

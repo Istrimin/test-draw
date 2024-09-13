@@ -7,7 +7,7 @@
 			function loadCursors() {
 				cursorList.innerHTML = '';
 				for (let i = 1; i <= 1000; i++) {
-					const cursorUrl = `cursors/${i}.png`;
+					const cursorUrl = `../cursorsNum/${i}.png`;
 
 					const image = new Image();
 					image.src = cursorUrl;
