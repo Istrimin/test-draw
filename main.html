@@ -28,9 +28,17 @@
         <div class="sidebar">
             <a href="index.html" target="_self" title="Выйти из команты" id="exitLink">🚪</a>
             <button id="message" title="Сообщение">✉️</button>
+
             <div id="message-container" style="display: none;">
+
                 <p id="message"></p>
              </div>
+            <div class="sidebar">
+            <button id="fullscreenBtn" title="Полноэкранный режим">🔲</button>
+
+
+            <button id="narrowToCenter" title="Сужение к центру">🎯</button>
+
             <button id="identifyLayerBtn" title="Определить слой">🔍</button>
             <button id="drawOnExistingBtn" title="Рисовать на существующем">➡️</button>
 
@@ -51,6 +59,7 @@
             <button id="mergeLayers" title="Объединить слои">🔗</button>
             <button id="settings" title="Настройки">⚙️</button>
           </div>
+            </div>
        <div class="canvas-and-sliders">
             <div class="layer-panel-wrapper">
 
@@ -182,14 +191,22 @@
             let lastX = 0;
             let currentCursor = 'auto'; 
             let isZoomActive = false;
-        // fix
-        backgroundPicker.addEventListener('input', (event) => {
-          // Apply background color to the current layer
-          currentCtx.fillStyle = event.target.value;
-          currentCtx.fillRect(0, 0, layers[2].width, layers[2].height);
-          });
+        // fix background picker
+            // backgroundPicker.addEventListener('input', (event) => {
+            //   // Apply background color to the current layer
+            //   currentCtx.fillStyle = event.target.value;
+            //   currentCtx.fillRect(0, 0, layers[2].width, layers[2].height);
+            //   });
+
+            backgroundPicker.addEventListener('input', (event) => {
+                // Применяем цвет фона только к слою 0
+                contexts[0].fillStyle = event.target.value;
+                contexts[0].fillRect(0, 0, layers[0].width, layers[0].height);
+            });
+
         // ИНИЦИАЛИЗАЦИЯ 
             document.addEventListener('DOMContentLoaded', function () {
+
                 initializeApp();
               });
         function createLayer() {
@@ -261,6 +278,7 @@
                 contexts[layerNum].fillRect(0, 0, layers[layerNum].width, layers[layerNum].height);
             }
         function initializeApp() {
+    createBackgroundLayer();
              createLayer();
                }
         function saveState() {
@@ -273,6 +291,28 @@
              redoHistory[currentLayer] = [];
           }
         
+
+// создаем бэк
+
+function createBackgroundLayer() {
+    const canvas = document.createElement('canvas');
+    canvas.id = 'layer0';
+    canvas.width = 600;
+    canvas.height = 400;
+    canvas.style.position = 'absolute';
+    canvas.style.top = '0';
+    canvas.style.left = '0';
+    canvas.style.zIndex = '110';
+    canvasContainer.appendChild(canvas);
+    
+    layers[0] = canvas;
+    contexts[0] = canvas.getContext('2d');
+    
+    // Установите начальный цвет фона
+    contexts[0].fillStyle = backgroundPicker.value;
+    contexts[0].fillRect(0, 0, canvas.width, canvas.height);
+}
+
 function startDrawing(e) {
     if (!currentCtx) {
         console.error('Error: currentCtx is undefined in startDrawing.', currentLayer);
@@ -293,6 +333,11 @@ function startDrawing(e) {
         }
 function draw(e) {
     if (!isDrawing || !currentCtx) {
+        return;
+    }
+
+    if (isNarrowingToCenter) {
+        narrowToCenter(e);
         return;
     }
     const rect = layers[currentLayer].getBoundingClientRect();
@@ -423,26 +468,25 @@ function draw(e) {
                  }
               });
             function identifyLayerClickHandler(e) {
-                    const rect = layers[1].getBoundingClientRect(); 
-                    const x = (e.clientX - rect.left) / zoomLevel;
-                    const y = (e.clientY - rect.top) / zoomLevel;
-
-                    // Start from the top layer (highest z-index)
-                    for (let i = layerCount; i >= 1; i--) { 
-                        const ctx = contexts[i];
-                        const pixelData = ctx.getImageData(x, y, 1, 1).data;
-
-                        // If a pixel is found on this layer (alpha > 0)
-                        if (pixelData[3] > 0) { 
-                            setCurrentLayer(i);
-                            console.log('Found drawing on layer:', i);
-                            updateLayerButtonColor(i);
-
-                            // Stop checking other layers
-                            return; 
-                        }
+                const rect = layers[1].getBoundingClientRect();
+                const x = (e.clientX - rect.left) / zoomLevel;
+                const y = (e.clientY - rect.top) / zoomLevel;
+                
+                // Start from the top layer (highest z-index), excluding background layer
+                for (let i = layerCount; i >= 1; i--) {
+                    const ctx = contexts[i];
+                    const pixelData = ctx.getImageData(x, y, 1, 1).data;
+                    // If a pixel is found on this layer (alpha > 0)
+                    if (pixelData[3] > 0) {
+                        setCurrentLayer(i);
+                        console.log('Found drawing on layer:', i);
+                        updateLayerButtonColor(i);
+                        // Stop checking other layers
+                        return;
                     }
                 }
+            }
+
 
             layerPanel.addEventListener("pointerenter", (e)=>{
                 e.preventDefault();
@@ -535,14 +579,15 @@ function draw(e) {
                 updateLayerOrder();
              }
             function updateLayerOrder() {
-                const layerButtons = Array.from(document.querySelectorAll('.layer-button'));
-                layerButtons.forEach((button, index) => {
-                    const layerId = parseInt(button.dataset.layer);
-                    if (layers[layerId]) {
-                        layers[layerId].style.zIndex = layerButtons.length - index;
-                    }
-                });
-             }
+                    const layerButtons = Array.from(document.querySelectorAll('.layer-button'));
+                    layerButtons.forEach((button, index) => {
+                        const layerId = parseInt(button.dataset.layer);
+                        if (layers[layerId] && layerId !== 0) {
+                            layers[layerId].style.zIndex = layerButtons.length - index + 110; // +110 чтобы быть выше фона
+                        }
+                    });
+                }
+
         // двигаем слои кнопками
             const moveLayerUpBtn = document.getElementById('moveLayerUp');
             const moveLayerDownBtn = document.getElementById('moveLayerDown');
@@ -584,106 +629,152 @@ function draw(e) {
                   });
 
 
-    let zoomOriginX = 0;
-    let zoomOriginY = 0;
+                let zoomOriginX = 0;
+                let zoomOriginY = 0;
 
-    // canvasContainer.addEventListener('pointermove', (e) => {
-    //   if (isCtrlPressed) {
-    //     e.preventDefault();
-    //     const rect = canvasContainer.getBoundingClientRect();
-    //     const mouseX = e.clientX - rect.left;
-    //     const mouseY = e.clientY - rect.top;
 
-    //     if (lastX !== undefined) {
-    //       const deltaX = e.movementX;
-    //       const oldZoom = zoomLevel;
-    //       zoomLevel = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoomLevel + deltaX * ZOOM_STEP));
+                canvasContainer.addEventListener('mousemove', (e) => {
+                  if (isCtrlPressed) {
+                    e.preventDefault();
+                    const rect = canvasContainer.getBoundingClientRect();
+                    const mouseX = e.clientX - rect.left;
+                    const mouseY = e.clientY - rect.top;
 
-    //       if (oldZoom !== zoomLevel) {
-    //         // Calculate zoom origin relative to the canvas
-    //         zoomOriginX = (mouseX - offsetX) / oldZoom;
-    //         zoomOriginY = (mouseY - offsetY) / oldZoom;
+                    if (lastX !== undefined) {
+                      const deltaX = e.movementX;
+                      const oldZoom = zoomLevel;
+                      zoomLevel = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoomLevel + deltaX * ZOOM_STEP));
 
-    //         // Update offset to keep the zoom origin point under the mouse
-    //         offsetX = mouseX - zoomOriginX * zoomLevel;
-    //         offsetY = mouseY - zoomOriginY * zoomLevel;
+                      if (oldZoom !== zoomLevel) {
+                        // Calculate zoom origin relative to the canvas
+                        zoomOriginX = (mouseX - offsetX) / oldZoom;
+                        zoomOriginY = (mouseY - offsetY) / oldZoom;
 
-    //         updateZoom();
-    //       }
-    //     }
+                        // Update offset to keep the zoom origin point under the mouse
+                        offsetX = mouseX - zoomOriginX * zoomLevel;
+                        offsetY = mouseY - zoomOriginY * zoomLevel;
 
-    //     lastX = mouseX;
-    //     lastY = mouseY;
-    //   }
-    // });
+                        updateZoom();
+                      }
+                    }
 
-    canvasContainer.addEventListener('mousemove', (e) => {
-      if (isCtrlPressed) {
-        e.preventDefault();
-        const rect = canvasContainer.getBoundingClientRect();
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
-
-        if (lastX !== undefined) {
-          const deltaX = e.movementX;
-          const oldZoom = zoomLevel;
-          zoomLevel = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoomLevel + deltaX * ZOOM_STEP));
-
-          if (oldZoom !== zoomLevel) {
-            // Calculate zoom origin relative to the canvas
-            zoomOriginX = (mouseX - offsetX) / oldZoom;
-            zoomOriginY = (mouseY - offsetY) / oldZoom;
-
-            // Update offset to keep the zoom origin point under the mouse
-            offsetX = mouseX - zoomOriginX * zoomLevel;
-            offsetY = mouseY - zoomOriginY * zoomLevel;
-
-            updateZoom();
-          }
-        }
-
-        lastX = mouseX;
-        lastY = mouseY;
-      }
-    });
+                    lastX = mouseX;
+                    lastY = mouseY;
+                  }
+                });
 
 
 
-    function updateZoom() {
-      const container = document.getElementById('canvasContainer');
-      const containerRect = container.getBoundingClientRect();
 
-      Object.values(layers).forEach(layer => {
-        layer.style.transformOrigin = '0 0';
-        
-        if (zoomLevel <= 1) {
-          // Reset position when zoomed out to normal or less
-          offsetX = 0;
-          offsetY = 0;
-          layer.style.transform = `scale(${zoomLevel})`;
-          layer.style.left = '0';
-          layer.style.top = '0';
-        } else {
-          // Apply zoom and offset
-          layer.style.transform = `scale(${zoomLevel})`;
-          
-          // Ensure the layer stays within the container
-          const layerRect = layer.getBoundingClientRect();
-          offsetX = Math.min(Math.max(offsetX, containerRect.width - layerRect.width), 0);
-          offsetY = Math.min(Math.max(offsetY, containerRect.height - layerRect.height), 0);
-          
-          layer.style.left = `${offsetX}px`;
-          layer.style.top = `${offsetY}px`;
-        }
-      });
+            function updateZoom() {
+                const container = document.getElementById('canvasContainer');
+                const containerRect = container.getBoundingClientRect();
+                
+            // Обновляем фоновый слой
+            const backgroundLayer = layers[0];
+            backgroundLayer.style.transformOrigin = '0 0';
+            backgroundLayer.style.transform = `scale(${zoomLevel})`;
+            backgroundLayer.style.left = `${offsetX}px`;
+            backgroundLayer.style.top = `${offsetY}px`;
+              Object.values(layers).forEach(layer => {
+                if (layer.id !== 'layer0') {
+                layer.style.transformOrigin = '0 0';
+                
+                if (zoomLevel <= 1) {
+                  // Reset position when zoomed out to normal or less
+                  offsetX = 0;
+                  offsetY = 0;
+                  layer.style.transform = `scale(${zoomLevel})`;
+                  layer.style.left = '0';
+                  layer.style.top = '0';
+                } else {
+                  // Apply zoom and offset
+                  layer.style.transform = `scale(${zoomLevel})`;
+                  
+                  // Ensure the layer stays within the container
+                  const layerRect = layer.getBoundingClientRect();
+                  offsetX = Math.min(Math.max(offsetX, containerRect.width - layerRect.width), 0);
+                  offsetY = Math.min(Math.max(offsetY, containerRect.height - layerRect.height), 0);
+                  
+                  layer.style.left = `${offsetX}px`;
+                  layer.style.top = `${offsetY}px`;
+                }
+              }});
 
-      canvasContainer.style.overflow = 'hidden';
-      document.getElementById('zoomLevelDisplay').textContent = `🔎${(zoomLevel * 100).toFixed(0)}%`;
-    }
+              canvasContainer.style.overflow = 'hidden';
+              document.getElementById('zoomLevelDisplay').textContent = `🔎${(zoomLevel * 100).toFixed(0)}%`;
+            }
 
 
         const cursorPanel = document.getElementById('cursorPanel');
         const canvas = document.getElementById('yourCanvasId'); 
+
+//  инструмент сужение 
+let isNarrowingToCenter = false;
+
+const narrowToCenterBtn = document.getElementById('narrowToCenter');
+
+narrowToCenterBtn.addEventListener('click', () => {
+    isNarrowingToCenter = !isNarrowingToCenter;
+    narrowToCenterBtn.classList.toggle('active', isNarrowingToCenter);
+});
+function narrowToCenter(e) {
+    if (!isDrawing || !currentCtx || !isNarrowingToCenter) return;
+
+    const rect = layers[currentLayer].getBoundingClientRect();
+    const x = Math.floor((e.clientX - rect.left) / zoomLevel);
+    const y = Math.floor((e.clientY - rect.top) / zoomLevel);
+
+    const brushSize = parseInt(brushSizeInput.value);
+    const narrowFactor = 0.9; // Фактор сужения (0.9 = сужение на 10% за проход)
+
+    const imageData = currentCtx.getImageData(x - brushSize/2, y - brushSize/2, brushSize, brushSize);
+    const newImageData = currentCtx.createImageData(brushSize, brushSize);
+
+    const centerX = brushSize / 2;
+    const centerY = brushSize / 2;
+
+    for (let i = 0; i < brushSize; i++) {
+        for (let j = 0; j < brushSize; j++) {
+            const index = (j * brushSize + i) * 4;
+            
+            // Вычисляем расстояние от текущего пикселя до центра кисти
+            const distX = i - centerX;
+            const distY = j - centerY;
+            const distance = Math.sqrt(distX * distX + distY * distY);
+            
+            if (distance < brushSize / 2) {
+                // Вычисляем новую позицию пикселя
+                const newDist = distance * narrowFactor;
+                const newX = Math.round(centerX + (distX / distance) * newDist);
+                const newY = Math.round(centerY + (distY / distance) * newDist);
+                
+                if (newX >= 0 && newX < brushSize && newY >= 0 && newY < brushSize) {
+                    const newIndex = (newY * brushSize + newX) * 4;
+                    
+                    // Копируем пиксель в новую позицию
+                    for (let k = 0; k < 4; k++) {
+                        newImageData.data[newIndex + k] = imageData.data[index + k];
+                    }
+                }
+            }
+        }
+    }
+
+    // Смешиваем новое изображение с оригинальным
+    for (let i = 0; i < imageData.data.length; i += 4) {
+        if (newImageData.data[i + 3] === 0) { // Если пиксель прозрачный в новом изображении
+            newImageData.data[i] = imageData.data[i];
+            newImageData.data[i + 1] = imageData.data[i + 1];
+            newImageData.data[i + 2] = imageData.data[i + 2];
+            newImageData.data[i + 3] = imageData.data[i + 3];
+        }
+    }
+
+    currentCtx.putImageData(newImageData, x - brushSize/2, y - brushSize/2);
+}
+
+
     </script>
     <script src="script.js" defer></script>
     <script src="cursors.js" defer></script>

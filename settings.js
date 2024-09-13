@@ -16,9 +16,10 @@
   });
 // !блокировка контекстного меню
         // document.addEventListener('contextmenu', event => event.preventDefault());
-        // $(function () {
-        //     $("#message-container").resizable();
-        // });
+// добавляем ресайз для контейнера с сообщениями
+// $(function () {
+//     $("#message-container").resizable();
+// });
     });
 // настройки планшета
         document.addEventListener('touchstart', function (e) {
@@ -32,14 +33,14 @@
     e.preventDefault(); 
   });
 // отключаем обры линии при выходе из канваса
-  document.addEventListener('pointerleave',function(e)
-  {
-      e.preventDefault();
-  });
-  document.addEventListener('mouseleave',function(e)
-  {
-      e.preventDefault();
-  });
+    document.addEventListener('pointerleave',function(e)
+    {
+        e.preventDefault();
+    });
+    document.addEventListener('mouseleave',function(e)
+    {
+        e.preventDefault();
+    });
 // блокируем контекстное меню
         document.addEventListener('contextmenu', event => event.preventDefault());
 // добавляем класс для красивых иконок

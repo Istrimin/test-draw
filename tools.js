@@ -54,7 +54,7 @@
         link.href = mergeCanvas.toDataURL('image/png');
         link.click();
     }
-// Пипетка
+// fix Пипетка(слева жмется, с права нет)
     function handleEyedropperActivation(e) {
     isEyedropperActive = !isEyedropperActive;
     document.body.style.cursor = isEyedropperActive ? 'url(cursors/pipette.png), auto' : 'default';
@@ -63,17 +63,20 @@
         isDrawing = false;
     }
     }
-    // Function to get pixel color from all layers
-    function getPixelColorFromAllLayers(x, y) {
-    for (let i = layerCount; i >= 1; i--) {
-        const ctx = contexts[i];
-        const pixelData = ctx.getImageData(x, y, 1, 1).data;
-        if (pixelData[3] > 0) {
-        return `#${pixelData[0].toString(16).padStart(2, '0')}${pixelData[1].toString(16).padStart(2, '0')}${pixelData[2].toString(16).padStart(2, '0')}`;
+    // fix Function to get pixel color from all layers
+        function getPixelColorFromAllLayers(x, y) {
+            // Начинаем с верхнего слоя (исключая фоновый слой)
+            for (let i = layerCount; i >= 1; i--) {
+                const ctx = contexts[i];
+                const pixelData = ctx.getImageData(x, y, 1, 1).data;
+                if (pixelData[3] > 0) {
+                    return `#${pixelData[0].toString(16).padStart(2, '0')}${pixelData[1].toString(16).padStart(2, '0')}${pixelData[2].toString(16).padStart(2, '0')}`;
+                }
+            }
+            // Если ни на одном слое не найден непрозрачный пиксель, возвращаем цвет фона
+            return backgroundPicker.value;
         }
-    }
-    return backgroundPicker.value;
-    }
+
     // Function to handle eyedropper click/touch events
     function handleEyedropperClick(e) {
     if (isEyedropperActive) {
@@ -84,7 +87,7 @@
         const pickedColor = getPixelColorFromAllLayers(x, y);
         document.getElementById('colorPicker').value = pickedColor;
         setDrawingColor(pickedColor);
-        // Optionally deactivate eyedropper after picking
+        // !Optionally deactivate eyedropper after picking
         isEyedropperActive = false;
         document.body.style.cursor = 'default';
         eyedropperBtn.classList.remove('active');
@@ -166,28 +169,76 @@
         saveState();
     }
 // Курсоры
-    // const cursors = [
-    //     { name: 'default', url: 'cursors/default.png' },
-    //     { name: 'pencil', url: 'cursors/pencil.png' },
-    //     { name: 'brush', url: 'cursors/brush.png' },
-    //     // Добавьте больше курсоров по необходимости
-    // ];
-    // function createCursorPanel() {
-    //     cursors.forEach(cursor => {
-    //         const cursorItem = document.createElement('div');
-    //         cursorItem.className = 'cursor-item';
-    //         cursorItem.innerHTML = `<img src="${cursor.url}" alt="${cursor.name}">`;
-    //         cursorItem.addEventListener('click', () => {
-    //             canvasContainer.style.cursor = `url(${cursor.url}), auto`;
-    //             cursorPanel.style.display = 'none';
-    //         });
-    //         cursorList.appendChild(cursorItem);
-    //     });
-    // }
-    // changeCursorBtn.addEventListener('click', () => {
-    //     cursorPanel.style.display = cursorPanel.style.display === 'none' ? 'block' : 'none';
-    // });
-    // createCursorPanel();
+// полный экран
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    const baseContainer = document.querySelector('.base-container');
+
+    fullscreenBtn.addEventListener('click', toggleFullscreen);
+
+    function toggleFullscreen() {
+        if (!document.fullscreenElement) {
+            if (baseContainer.requestFullscreen) {
+                baseContainer.requestFullscreen();
+            } else if (baseContainer.mozRequestFullScreen) { // Firefox
+                baseContainer.mozRequestFullScreen();
+            } else if (baseContainer.webkitRequestFullscreen) { // Chrome, Safari and Opera
+                baseContainer.webkitRequestFullscreen();
+            } else if (baseContainer.msRequestFullscreen) { // IE/Edge
+                baseContainer.msRequestFullscreen();
+            }
+            enterFullscreenMode();
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.mozCancelFullScreen) { // Firefox
+                document.mozCancelFullScreen();
+            } else if (document.webkitExitFullscreen) { // Chrome, Safari and Opera
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) { // IE/Edge
+                document.msExitFullscreen();
+            }
+            exitFullscreenMode();
+        }
+    }
+
+    function enterFullscreenMode() {
+        baseContainer.classList.add('fullscreen-mode');
+        resizeCanvas();
+    }
+
+    function exitFullscreenMode() {
+        baseContainer.classList.remove('fullscreen-mode');
+        resetCanvasSize();
+    }
+
+    function resizeCanvas() {
+        const fullscreenWidth = window.innerWidth - sidebar.offsetWidth;
+        const fullscreenHeight = window.innerHeight;
+        
+        Object.values(layers).forEach(layer => {
+            layer.width = fullscreenWidth;
+            layer.height = fullscreenHeight;
+        });
+        
+        updateZoom();
+    }
+
+    function resetCanvasSize() {
+        Object.values(layers).forEach(layer => {
+            layer.width = 600;
+            layer.height = 400;
+        });
+        
+        updateZoom();
+    }
+
+    // Слушаем изменения размера окна в полноэкранном режиме
+    window.addEventListener('resize', () => {
+        if (document.fullscreenElement) {
+            resizeCanvas();
+        }
+    });
+
     document.addEventListener('DOMContentLoaded', () => {
     			const cursorPanel = document.getElementById('cursorPanel');
     			const cursorList = document.getElementById('cursorList');
@@ -200,7 +251,7 @@
         cursorList.innerHTML = '';
         
         // Цикл для загрузки 100 курсоров
-        for (let i = 1; i <= 100; i++) {
+        for (let i = 1; i <= 50; i++) {
             // Формируем URL курсора
             const cursorUrl = `cursorsNum/${i}.png`;
 
@@ -215,7 +266,7 @@
                 let targetHeight = image.height;
 
                 // Максимальный размер для курсора
-                const maxSize = 64;
+                const maxSize = 128;
 
                 // Проверяем, нужно ли изменять размер
                 if (targetWidth > maxSize || targetHeight > maxSize) {
@@ -264,6 +315,7 @@
     // Загружаем курсоры
     loadCursors();
     });
+
 
 
 
