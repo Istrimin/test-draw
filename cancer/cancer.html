@@ -36,7 +36,7 @@
             <button id="clearBtn" title="Очистить">💀</button>
             <button id="saveImageBtn" title="Сохранить изображение">💾</button>
             <button id="eraserBtn" title="Стерка">🧽</button>
-        </aside>
+            <button id="toggleSmoothDrawingBtn">🌀</button> </aside>
         <div class="canvas-and-sliders">
             <div class="canvas-container">
                 <div class="color-picker-group">
@@ -59,275 +59,341 @@
                     <div id="cursorList"></div>
                 </div>
             </div>
-    <div class="slider-group">
-        <div class="slider">
-            <div class="pressure-bar" id="pressureBar"></div>
-            <label for="brushSize" title="Размер кисти">🖌️</label>
-            <input type="range" id="brushSize" min="1" max="100" value="3">
-            <span class="slider-value" id="rangeValue">3</span>
-        </div>
-    </div>
+            <div id="chat-container">
+                <div id="chat-messages"></div>
+                <form id="chat-form">
+                    <input type="text" id="chat-input" placeholder="Введите сообщение...">
+                    <button type="submit">Отправить</button>
+                </form>
+            </div>
+
+            <div class="slider-group">
+                <div class="slider">
+                    <div class="pressure-bar" id="pressureBar"></div>
+                    <label for="brushSize" title="Размер кисти">🖌️</label>
+                    <input type="range" id="brushSize" min="1" max="100" value="3">
+                    <span class="slider-value" id="rangeValue">3</span>
+                </div>
+            </div>
         </div>
     </main>
     <script>
-const colorPicker = document.getElementById('colorPicker');
-const backgroundPicker = document.getElementById('backgroundPicker');
-const drawingCanvas = document.getElementById('drawingCanvas');
-const backgroundCanvas = document.getElementById('backgroundCanvas');
-const ctx = drawingCanvas.getContext('2d');
-const bgCtx = backgroundCanvas.getContext('2d');
-const symmetryButton = document.getElementById('symmetry');
-const brushSizeInput = document.getElementById('brushSize');
-const eyedropperBtn = document.getElementById('eyedropperBtn');
-const clearBtn = document.getElementById('clearBtn');
-const eraserBtn = document.getElementById('eraserBtn');
-const undoBtn = document.getElementById('undo');
-const redoBtn = document.getElementById('redo');
-const saveImageBtn = document.getElementById('saveImageBtn');
-const overlayCanvas = document.getElementById('overlayCanvas');
-const overlayCtx = overlayCanvas.getContext('2d');
+        const colorPicker = document.getElementById('colorPicker');
+        const backgroundPicker = document.getElementById('backgroundPicker');
+        const drawingCanvas = document.getElementById('drawingCanvas');
+        const backgroundCanvas = document.getElementById('backgroundCanvas');
+        const ctx = drawingCanvas.getContext('2d');
+        const bgCtx = backgroundCanvas.getContext('2d');
+        const symmetryButton = document.getElementById('symmetry');
+        const brushSizeInput = document.getElementById('brushSize');
+        const eyedropperBtn = document.getElementById('eyedropperBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const eraserBtn = document.getElementById('eraserBtn');
+        const undoBtn = document.getElementById('undo');
+        const redoBtn = document.getElementById('redo');
+        const saveImageBtn = document.getElementById('saveImageBtn');
+        const overlayCanvas = document.getElementById('overlayCanvas');
+        const overlayCtx = overlayCanvas.getContext('2d');
+        const toggleSmoothDrawingBtn = document.getElementById('toggleSmoothDrawingBtn');
 
-let isDrawing = false;
-let lastX = 0;
-let lastY = 0;
-let isEyedropperActive = false;
-let symmetry = true;
-let isErasing = false;
-let history = [];
-let redoHistory = [];
-let overlayActive = false;
-let currentCursor = 'url(../cursorsNum/1.png), auto';
-let previousCursor = currentCursor;
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+        let isEyedropperActive = false;
+        let symmetry = true;
+        let isErasing = false;
+        let history = [];
+        let redoHistory = [];
+        let overlayActive = false;
+        let currentCursor = 'url(../cursorsNum/1.png), auto';
+        let previousCursor = currentCursor;
+        let isSmoothDrawing = false; // Flag for smooth drawing
+        let points = []; // Array to store points for smooth drawing
 
-ctx.imageSmoothingEnabled = false;
-ctx.willReadFrequently = true;
+        ctx.imageSmoothingEnabled = false;
+        ctx.willReadFrequently = true;
 
-function initializeCanvas() {
-    const backgroundImage = new Image();
-    backgroundImage.onload = () => {
-        // Здесь можно добавить код для отрисовки фонового изображения, если нужно
-    };
-    saveState();
-}
+        function initializeCanvas() {
+            const backgroundImage = new Image();
+            backgroundImage.onload = () => {
+                // Здесь можно добавить код для отрисовки фонового изображения, если нужно
+            };
+            saveState();
+        }
 
-function saveState() {
-    history.push(ctx.getImageData(0, 0, drawingCanvas.width, drawingCanvas.height));
-    redoHistory = [];
-    updateUndoRedoButtons();
-}
+        function saveState() {
+            history.push(ctx.getImageData(0, 0, drawingCanvas.width, drawingCanvas.height));
+            redoHistory = [];
+            updateUndoRedoButtons();
+        }
 
-function updateUndoRedoButtons() {
-    undoBtn.disabled = history.length <= 1;
-    redoBtn.disabled = redoHistory.length === 0;
-}
+        function updateUndoRedoButtons() {
+            undoBtn.disabled = history.length <= 1;
+            redoBtn.disabled = redoHistory.length === 0;
+        }
 
-function startDrawing(e) {
-    isDrawing = true;
-    [lastX, lastY] = getCoordinates(e);
-}
+        function startDrawing(e) {
+            isDrawing = true;
+            [lastX, lastY] = getCoordinates(e);
+            if (isSmoothDrawing) {
+                points.push({ x: lastX, y: lastY }); // Start new stroke
+            }
+        }
 
-function draw(e) {
-    if (!isDrawing) return;
-    e.preventDefault();
+        function draw(e) {
+            if (!isDrawing) return;
+            e.preventDefault();
 
-    const [x, y] = getCoordinates(e);
-    
-    const pressure = e.pressure || 1;
-    ctx.lineWidth = brushSizeInput.value * pressure;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
+            const [x, y] = getCoordinates(e);
 
-    if (isErasing) {
-        ctx.globalCompositeOperation = 'destination-out';
-    } else {
-        ctx.globalCompositeOperation = 'source-over';
-        ctx.strokeStyle = colorPicker.value;
-    }
+            const pressure = e.pressure || 1;
+            ctx.lineWidth = brushSizeInput.value * pressure;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
 
-    ctx.beginPath();
-    ctx.moveTo(lastX, lastY);
-    ctx.lineTo(x, y);
-    ctx.stroke();
+            if (isErasing) {
+                ctx.globalCompositeOperation = 'destination-out';
+            } else {
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.strokeStyle = colorPicker.value;
+            }
 
-    if (symmetry) {
-        const centerX = drawingCanvas.width / 2;
-        const symmetricX = 2 * centerX - x;
-        ctx.beginPath();
-        ctx.moveTo(2 * centerX - lastX, lastY);
-        ctx.lineTo(symmetricX, y);
-        ctx.stroke();
-    }
+            if (isSmoothDrawing) {
+                drawSmoothLine(lastX, lastY, x, y);
+            } else {
+                ctx.beginPath();
+                ctx.moveTo(lastX, lastY);
+                ctx.lineTo(x, y);
+                ctx.stroke();
+            }
 
-    [lastX, lastY] = [x, y];
-}
+            if (symmetry) {
+                const centerX = drawingCanvas.width / 2;
+                const symmetricX = 2 * centerX - x;
+                if (isSmoothDrawing) {
+                    drawSmoothLine(2 * centerX - lastX, lastY, symmetricX, y);
+                } else {
+                    ctx.beginPath();
+                    ctx.moveTo(2 * centerX - lastX, lastY);
+                    ctx.lineTo(symmetricX, y);
+                    ctx.stroke();
+                }
+            }
 
-function stopDrawing() {
-    if (isDrawing) {
-        isDrawing = false;
-        saveState();
-    }
-}
+            [lastX, lastY] = [x, y];
+        }
 
-function getCoordinates(e) {
-    const rect = drawingCanvas.getBoundingClientRect();
-    return [
-        e.clientX - rect.left,
-        e.clientY - rect.top
-    ];
-}
+        function stopDrawing() {
+            if (isDrawing) {
+                isDrawing = false;
+                saveState();
+                if (isSmoothDrawing) {
+                    points.length = 0; // Clear points on stroke end
+                }
+            }
+        }
 
-function toggleSymmetry() {
-    symmetry = !symmetry;
-    symmetryButton.classList.toggle('active', symmetry);
-}
+        function getCoordinates(e) {
+            const rect = drawingCanvas.getBoundingClientRect();
+            return [
+                e.clientX - rect.left,
+                e.clientY - rect.top
+            ];
+        }
 
-function undo() {
-    if (history.length > 1) {
-        redoHistory.push(history.pop());
-        ctx.putImageData(history[history.length - 1], 0, 0);
-        updateUndoRedoButtons();
-    }
-}
+        function toggleSymmetry() {
+            symmetry = !symmetry;
+            symmetryButton.classList.toggle('active', symmetry);
+        }
 
-function redo() {
-    if (redoHistory.length > 0) {
-        const state = redoHistory.pop();
-        history.push(state);
-        ctx.putImageData(state, 0, 0);
-        updateUndoRedoButtons();
-    }
-}
+        function undo() {
+            if (history.length > 1) {
+                redoHistory.push(history.pop());
+                ctx.putImageData(history[history.length - 1], 0, 0);
+                updateUndoRedoButtons();
+            }
+        }
 
-function clearCanvas() {
-    ctx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
-    saveState();
-}
+        function redo() {
+            if (redoHistory.length > 0) {
+                const state = redoHistory.pop();
+                history.push(state);
+                ctx.putImageData(state, 0, 0);
+                updateUndoRedoButtons();
+            }
+        }
 
-function saveImage() {
-    const tempCanvas = document.createElement('canvas');
-    tempCanvas.width = drawingCanvas.width;
-    tempCanvas.height = drawingCanvas.height;
-    const tempCtx = tempCanvas.getContext('2d');
+        function clearCanvas() {
+            ctx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+            saveState();
+        }
 
-    tempCtx.drawImage(drawingCanvas, 0, 0);
+        function saveImage() {
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = drawingCanvas.width;
+            tempCanvas.height = drawingCanvas.height;
+            const tempCtx = tempCanvas.getContext('2d');
 
-    if (overlayActive) {
-        tempCtx.globalAlpha = parseFloat(overlayCanvas.style.opacity);
-        tempCtx.drawImage(overlayCanvas, 0, 0);
-        tempCtx.globalAlpha = 1.0;
-    }
+            tempCtx.drawImage(drawingCanvas, 0, 0);
 
-    const link = document.createElement('a');
-    link.download = 'my-drawing.png';
-    link.href = tempCanvas.toDataURL('image/png');
-    link.click();
-}
+            if (overlayActive) {
+                tempCtx.globalAlpha = parseFloat(overlayCanvas.style.opacity);
+                tempCtx.drawImage(overlayCanvas, 0, 0);
+                tempCtx.globalAlpha = 1.0;
+            }
 
-function resizeCanvas() {
-    const rect = backgroundCanvas.getBoundingClientRect();
-    backgroundCanvas.width = rect.width * devicePixelRatio;
-    backgroundCanvas.height = rect.height * devicePixelRatio;
-    drawingCanvas.width = rect.width * devicePixelRatio;
-    drawingCanvas.height = rect.height * devicePixelRatio;
-    ctx.scale(devicePixelRatio, devicePixelRatio);
-    bgCtx.scale(devicePixelRatio, devicePixelRatio);
-    initializeCanvas();
-}
+            const link = document.createElement('a');
+            link.download = 'my-drawing.png';
+            link.href = tempCanvas.toDataURL('image/png');
+            link.click();
+        }
 
-function createOverlayLayer() {
-    overlayActive = true;
-    overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
-    overlayCtx.drawImage(drawingCanvas, 0, 0);
-    overlayCanvas.style.opacity = '0.5';
-    clearCanvas();
-}
+        function resizeCanvas() {
+            const rect = backgroundCanvas.getBoundingClientRect();
+            backgroundCanvas.width = rect.width * devicePixelRatio;
+            backgroundCanvas.height = rect.height * devicePixelRatio;
+            drawingCanvas.width = rect.width * devicePixelRatio;
+            drawingCanvas.height = rect.height * devicePixelRatio;
+            ctx.scale(devicePixelRatio, devicePixelRatio);
+            bgCtx.scale(devicePixelRatio, devicePixelRatio);
+            initializeCanvas();
+        }
 
-function toggleOverlayOpacity() {
-    if (overlayActive) {
-        overlayCanvas.style.opacity = overlayCanvas.style.opacity === '0.5' ? '1' : '0.5';
-    }
-}
+        function createOverlayLayer() {
+            overlayActive = true;
+            overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+            overlayCtx.drawImage(drawingCanvas, 0, 0);
+            overlayCanvas.style.opacity = '0.5';
+            clearCanvas();
+        }
 
-function toggleEraser() {
-    isErasing = !isErasing;
-    eraserBtn.classList.toggle('active', isErasing);
-    if (isErasing) {
-        previousCursor = drawingCanvas.style.cursor;
-        drawingCanvas.style.cursor = 'url(../cursorsNum/2.png), auto';
-    } else {
-        drawingCanvas.style.cursor = previousCursor;
-    }
-}
+        function toggleOverlayOpacity() {
+            if (overlayActive) {
+                overlayCanvas.style.opacity = overlayCanvas.style.opacity === '0.5' ? '1' : '0.5';
+            }
+        }
 
-function toggleEyedropper() {
-    isEyedropperActive = !isEyedropperActive;
-    eyedropperBtn.classList.toggle('active', isEyedropperActive);
-    if (isEyedropperActive) {
-        previousCursor = drawingCanvas.style.cursor;
-        drawingCanvas.style.cursor = 'url(../cursorsNum/3.png), auto';
-        drawingCanvas.addEventListener('click', pickColor, { once: true });
-    } else {
-        drawingCanvas.style.cursor = previousCursor;
-    }
-}
+        function toggleEraser() {
+            isErasing = !isErasing;
+            eraserBtn.classList.toggle('active', isErasing);
+            if (isErasing) {
+                previousCursor = drawingCanvas.style.cursor;
+                drawingCanvas.style.cursor = 'url(../cursorsNum/2.png), auto';
+            } else {
+                drawingCanvas.style.cursor = previousCursor;
+            }
+        }
 
-function initializeCursor() {
-    drawingCanvas.style.cursor = currentCursor;
-}
+        function toggleEyedropper() {
+            isEyedropperActive = !isEyedropperActive;
+            eyedropperBtn.classList.toggle('active', isEyedropperActive);
+            if (isEyedropperActive) {
+                previousCursor = drawingCanvas.style.cursor;
+                drawingCanvas.style.cursor = 'url(../cursorsNum/3.png), auto';
+                drawingCanvas.addEventListener('click', pickColor, { once: true });
+            } else {
+                drawingCanvas.style.cursor = previousCursor;
+            }
+        }
 
-// Event Listeners
-colorPicker.addEventListener('input', () => ctx.strokeStyle = colorPicker.value);
-backgroundPicker.addEventListener('input', () => {
-    bgCtx.fillStyle = backgroundPicker.value;
-    bgCtx.fillRect(0, 0, backgroundCanvas.width, backgroundCanvas.height);
-});
+        function initializeCursor() {
+            drawingCanvas.style.cursor = currentCursor;
+        }
 
-document.addEventListener('pointerdown', (e) => {
-    if (e.target === drawingCanvas) {
-        startDrawing(e);
-    }
-});
-document.addEventListener('pointermove', (e) => {
-    if (isDrawing) {
-        draw(e);
-    }
-});
-document.addEventListener('pointerup', stopDrawing);
-document.addEventListener('pointercancel', stopDrawing);
+        // Smooth Drawing Functions
+        function drawSmoothLine(startX, startY, endX, endY) {
+            ctx.globalAlpha = 0.5; // Set opacity
+            ctx.strokeStyle = colorPicker.value; // Set color
+            ctx.lineWidth = 5; // Increased line width for better visibility
+            ctx.lineJoin = 'round'; // Rounded corners
+            ctx.lineCap = 'round'; // Rounded line ends
 
-symmetryButton.addEventListener('click', toggleSymmetry);
-undoBtn.addEventListener('click', undo);
-redoBtn.addEventListener('click', redo);
-clearBtn.addEventListener('click', clearCanvas);
-eraserBtn.addEventListener('click', toggleEraser);
-saveImageBtn.addEventListener('click', saveImage);
-eyedropperBtn.addEventListener('click', toggleEyedropper);
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+            ctx.quadraticCurveTo(startX, startY, endX, endY); // Use quadratic curve for smoother lines
+            ctx.stroke();
 
-window.addEventListener('resize', resizeCanvas);
+            points.push({ x: endX, y: endY }); // Store the current point
 
-document.addEventListener('keydown', (e) => {
-    const key = e.code.toLowerCase();
-    if (key === 'keyd') {
-        createOverlayLayer();
-    } else if (key === 'keyg') {
-        toggleOverlayOpacity();
-    }
-});
+            // Draw neighbor points with a fill effect
+            for (let i = 0; i < points.length; i++) {
+                const dx = points[i].x - endX;
+                const dy = points[i].y - endY;
+                const dd = dx * dx + dy * dy;
 
-// Initialization
-initializeCanvas();
-resizeCanvas();
-initializeCursor();
+                if (dd < 1000) {
+                    ctx.beginPath();
+                    ctx.moveTo(endX + (dx * 0.2), endY + (dy * 0.2));
+                    ctx.lineTo(points[i].x - (dx * 0.2), points[i].y - (dy * 0.2));
+                    ctx.stroke();
+                }
+            }
+        }
 
-if (window.PointerEvent) {
-    console.log('Pointer events are supported');
-} else {
-    console.log('Pointer events are not supported');
-}
+        function toggleSmoothDrawing() {
+            isSmoothDrawing = !isSmoothDrawing;
+            points.length = 0; // Clear points when toggling
+        }
 
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('a, button').forEach(icon => icon.classList.add('icon-hover'));
-});
+        // Event Listeners
+        colorPicker.addEventListener('input', () => ctx.strokeStyle = colorPicker.value);
+        backgroundPicker.addEventListener('input', () => {
+            bgCtx.fillStyle = backgroundPicker.value;
+            bgCtx.fillRect(0, 0, backgroundCanvas.width, backgroundCanvas.height);
+        });
+
+        document.addEventListener('pointerdown', (e) => {
+            if (e.target === drawingCanvas) {
+                startDrawing(e);
+            }
+        });
+        document.addEventListener('pointermove', (e) => {
+            if (isDrawing) {
+                draw(e);
+            }
+        });
+        document.addEventListener('pointerup', stopDrawing);
+        document.addEventListener('pointercancel', stopDrawing);
+        document.addEventListener('mouseout', () => {
+            if (isSmoothDrawing) {
+                points.length = 0; // Clear points on mouse out
+            }
+        });
+
+        symmetryButton.addEventListener('click', toggleSymmetry);
+        undoBtn.addEventListener('click', undo);
+        redoBtn.addEventListener('click', redo);
+        clearBtn.addEventListener('click', clearCanvas);
+        eraserBtn.addEventListener('click', toggleEraser);
+        saveImageBtn.addEventListener('click', saveImage);
+        eyedropperBtn.addEventListener('click', toggleEyedropper);
+        toggleSmoothDrawingBtn.addEventListener('click', toggleSmoothDrawing); // Toggle smooth drawing
+
+        window.addEventListener('resize', resizeCanvas);
+
+        document.addEventListener('keydown', (e) => {
+            const key = e.code.toLowerCase();
+            if (key === 'keyd') {
+                createOverlayLayer();
+            } else if (key === 'keyg') {
+                toggleOverlayOpacity();
+            }
+        });
+
+        // Initialization
+        initializeCanvas();
+        resizeCanvas();
+        initializeCursor();
+
+        if (window.PointerEvent) {
+            console.log('Pointer events are supported');
+        } else {
+            console.log('Pointer events are not supported');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('a, button').forEach(icon => icon.classList.add('icon-hover'));
+        });
 
     </script>
     <script type="module" src="cancer.js" defer></script>

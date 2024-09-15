@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smooth Gradient Fill Drawing Demo</title>
+    <style>
+        canvas { border: 1px solid black; }
+        button { margin: 10px; }
+    </style>
+</head>
+<body>
+    <canvas id="drawingCanvas" width="500" height="500"></canvas>
+    <br>
+    <button id="clear">Clear Canvas</button>
+    <script>
+        const canvas = document.getElementById('drawingCanvas');
+        const ctx = canvas.getContext('2d');
+        const clearBtn = document.getElementById('clear');
+        let isDrawing = false, lastX = 0, lastY = 0;
+        const points = [];
+
+        clearBtn.addEventListener('click', () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            points.length = 0;
+        });
+
+        canvas.addEventListener('mousedown', (e) => {
+            isDrawing = true;
+            lastX = e.offsetX;
+            lastY = e.offsetY;
+            points.push({ x: lastX, y: lastY });
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (isDrawing) {
+                draw(lastX, lastY, e.offsetX, e.offsetY);
+                lastX = e.offsetX;
+                lastY = e.offsetY;
+            }
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            isDrawing = false;
+            points.length = 0;
+        });
+
+        function draw(startX, startY, endX, endY) {
+            points.push({ x: endX, y: endY });
+
+            for (const point of points) {
+                const dx = point.x - endX, dy = point.y - endY;
+                if (dx * dx + dy * dy < 1000) { // Порог расстояния для соседних точек
+                    const midX = (endX + point.x) / 2;
+                    const midY = (endY + point.y) / 2;
+                    const gradient = ctx.createRadialGradient(
+                        midX, midY, 0,
+                        midX, midY, Math.sqrt(dx * dx + dy * dy) / 2
+                    );
+                    gradient.addColorStop(0, 'rgba(0, 0, 0, 0.1)');
+                    gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+                    ctx.beginPath();
+                    ctx.moveTo(endX, endY);
+                    ctx.lineTo(point.x, point.y);
+                    ctx.lineTo(endX + (point.y - endY), endY - (point.x - endX));
+                    ctx.closePath();
+                    ctx.fillStyle = gradient;
+                    ctx.fill();
+                }
+            }
+        }
+    </script>
+</body>
+</html>

@@ -187,16 +187,30 @@ document.head.appendChild(style);
             deleteAllLayers();
         }
     });
-// Назначаем горячие клавиши для выбора цветов
+// Назначаем горячие клавиши для выбора цветов(это не влияет на выбор цвет бэка)
+//Set the background color
+    function setBackgroundColor(color) {
+        backgroundColor = color; 
+        const backgroundCtx = contexts[0]; 
+        backgroundCtx.fillStyle = color;
+        backgroundCtx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+
+    // Update color picker setup
         const colorPickers = document.querySelectorAll('input[type="color"]');
         colorPickers.forEach((picker, index) => {
             picker.addEventListener('input', (event) => {
-                setDrawingColor(event.target.value);
+                if (picker.id === 'backgroundPicker') {
+                    setBackgroundColor(event.target.value);
+                } else {
+                    setDrawingColor(event.target.value);
+                }
             });
-            // Назначаем горячие клавиши для выбора цветов
             document.addEventListener('keydown', (e) => {
                 if (e.key === (index + 1).toString()) {
-                    setDrawingColor(picker.value);
+
+                        setDrawingColor(picker.value);
                 }
             });
         });
@@ -214,7 +228,8 @@ document.head.appendChild(style);
         });
         layerButtons.forEach((button) => {
             const layerId = parseInt(button.dataset.layer);
-            if (layers[layerId]) {
+            // *Exclude layer 100 from the export
+            if (layers[layerId] && layerId !== 100) { 
                 mergeCtx.drawImage(layers[layerId], 0, 0);
             }
         });
@@ -223,6 +238,7 @@ document.head.appendChild(style);
         link.href = mergeCanvas.toDataURL('image/png');
         link.click();
     }
+
 // fix Пипетка(слева жмется, с права нет)
     function handleEyedropperActivation(e) {
     isEyedropperActive = !isEyedropperActive;
@@ -267,12 +283,6 @@ document.head.appendChild(style);
         Object.keys(layers).forEach(layerNum => {
             const ctx = contexts[layerNum];
             ctx.clearRect(0, 0, layers[layerNum].width, layers[layerNum].height);
-            // Если это первый слой (фон), заполняем его белым цветом
-            // if (layerNum === '1') {
-            //     ctx.fillStyle = '#ffffff';
-            //     ctx.fillRect(0, 0, layers[layerNum].width, layers[layerNum].height);
-            // }
-            // Сохраняем состояние после очистки
             saveState();
         });
         // Обновляем отображение
@@ -329,6 +339,40 @@ document.head.appendChild(style);
         setCurrentLayer(1);
     }
 // Очистка канваса
+// Прозрачность слоев
+        layerOpacitySlider.addEventListener('input', function() {
+            const opacity = this.value;
+            layerOpacityValue.textContent = opacity;
+            setLayerOpacity(currentLayer, opacity / 100);
+            layerOpacities[currentLayer] = opacity; 
+        });
+
+        // Function to set the opacity of a specific layer
+        function setLayerOpacity(layerNum, opacity) {
+            if (layers[layerNum]) {
+                layers[layerNum].style.opacity = opacity;
+                layerOpacities[layerNum] = Math.round(opacity * 100); // Store the opacity as a percentage
+            }
+        }
+
+// сглаживание линий(закгругление)
+
+
+
+
+
+
+
+
+
+
+// document.getElementById('clear').addEventListener('click', function() {
+//     if (layers[currentLayer]) {
+//         contexts[currentLayer].clearRect(0, 0, layers[currentLayer].width, layers[currentLayer].height);
+//         resetOriginalImage(currentLayer);
+//         saveState();
+//     }
+// });
     const clearBtn = document.getElementById('clear');
     clearBtn.addEventListener('click', clearCanvas);
     function clearCanvas() {

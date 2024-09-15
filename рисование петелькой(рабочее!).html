@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smooth Line Drawing Demo</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+        button {
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="drawingCanvas" width="500" height="500"></canvas>
+    <br>
+    <button id="clear">Clear Canvas</button>
+
+    <script>
+        const canvas = document.getElementById('drawingCanvas');
+        const ctx = canvas.getContext('2d');
+        const clearBtn = document.getElementById('clear');
+
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+        const points = [];
+        const brushOpacity = 0.5; // Increased opacity for better visibility
+        const brushColor = 'black'; // Example color value
+
+        clearBtn.addEventListener('click', () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            points.length = 0; // Clear points array
+        });
+
+        canvas.addEventListener('mousedown', (e) => {
+            isDrawing = true;
+            lastX = e.offsetX;
+            lastY = e.offsetY;
+            points.push({ x: lastX, y: lastY }); // Start new stroke
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (isDrawing) {
+                draw(lastX, lastY, e.offsetX, e.offsetY);
+                lastX = e.offsetX;
+                lastY = e.offsetY;
+            }
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            isDrawing = false;
+            points.length = 0; // Clear points on stroke end
+        });
+
+        canvas.addEventListener('mouseout', () => {
+            isDrawing = false;
+            points.length = 0; // Clear points on mouse out
+        });
+
+        function draw(startX, startY, endX, endY) {
+            ctx.globalAlpha = brushOpacity; // Set opacity
+            ctx.strokeStyle = brushColor; // Set color
+            ctx.lineWidth = 5; // Increased line width for better visibility
+            ctx.lineJoin = 'round'; // Rounded corners
+            ctx.lineCap = 'round'; // Rounded line ends
+
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+            ctx.quadraticCurveTo(startX, startY, endX, endY); // Use quadratic curve for smoother lines
+            ctx.stroke();
+
+            points.push({ x: endX, y: endY }); // Store the current point
+
+            // Draw neighbor points with a fill effect
+            for (let i = 0; i < points.length; i++) {
+                const dx = points[i].x - endX;
+                const dy = points[i].y - endY;
+                const dd = dx * dx + dy * dy;
+
+                if (dd < 1000) {
+                    ctx.beginPath();
+                    ctx.moveTo(endX + (dx * 0.2), endY + (dy * 0.2));
+                    ctx.lineTo(points[i].x - (dx * 0.2), points[i].y - (dy * 0.2));
+                    ctx.stroke();
+                }
+            }
+        }
+
+
+    </script>
+</body>
+</html>

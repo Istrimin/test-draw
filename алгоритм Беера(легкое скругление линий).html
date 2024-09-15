@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smooth Line Drawing Demo</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+        button {
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="drawingCanvas" width="500" height="500"></canvas>
+    <br>
+    <button id="clear">Clear Canvas</button>
+
+    <script>
+        const canvas = document.getElementById('drawingCanvas');
+        const ctx = canvas.getContext('2d');
+        const clearBtn = document.getElementById('clear');
+
+        let isDrawing = false;
+        let points = []; 
+
+        clearBtn.addEventListener('click', () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        });
+
+        canvas.addEventListener('mousedown', (e) => {
+            isDrawing = true;
+            points = [{ x: e.offsetX, y: e.offsetY }]; // Start with the first point
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (isDrawing) {
+                points.push({ x: e.offsetX, y: e.offsetY });
+                drawCurrentLine(points); // Draw the current line while moving the mouse
+            }
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            isDrawing = false;
+            drawSmoothCurve(points); // Draw the smooth curve when mouse is released
+            points = []; // Clear points after drawing
+        });
+
+        canvas.addEventListener('mouseout', () => {
+            isDrawing = false;
+            points = []; 
+        });
+
+        function drawCurrentLine(points) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+            ctx.beginPath();
+            ctx.moveTo(points[0].x, points[0].y);
+            for (let i = 1; i < points.length; i++) {
+                ctx.lineTo(points[i].x, points[i].y);
+            }
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        function drawSmoothCurve(points) {
+            if (points.length < 2) return; // Need at least two points to draw
+
+            ctx.beginPath();
+            ctx.moveTo(points[0].x, points[0].y);
+
+            for (let i = 0; i < points.length - 1; i++) {
+                const midPoint = {
+                    x: (points[i].x + points[i + 1].x) / 2,
+                    y: (points[i].y + points[i + 1].y) / 2
+                };
+
+                // Add more control points for smoother curves
+                if (i > 0) {
+                    const prevMidPoint = {
+                        x: (points[i - 1].x + points[i].x) / 2,
+                        y: (points[i - 1].y + points[i].y) / 2
+                    };
+                    ctx.quadraticCurveTo(prevMidPoint.x, prevMidPoint.y, midPoint.x, midPoint.y);
+                } else {
+                    ctx.quadraticCurveTo(points[i].x, points[i].y, midPoint.x, midPoint.y);
+                }
+            }
+
+            ctx.lineTo(points[points.length - 1].x, points[points.length - 1].y);
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        function getDistanceFromLine(start, end, point) {
+            const A = point.y - start.y;
+            const B = start.x - end.x;
+            const C = end.y - start.y;
+            const D = end.x - start.x;
+
+            const distance = Math.abs(A * D - B * C) / Math.sqrt(D * D + C * C);
+            return distance;
+        }
+    </script>
+</body>
+</html>

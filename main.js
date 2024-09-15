@@ -1,2 +1,1 @@
-const layerCreationComplete = new Event('layerCreationComplete');
-document.dispatchEvent(layerCreationComplete); 
+// основной модуль, в нем преимущественно константы.

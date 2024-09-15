@@ -214,3 +214,4 @@ let isFillMode = false;
 //   }
 //   window.addEventListener('resize', resizeCanvas);
 //   resizeCanvas();
+
