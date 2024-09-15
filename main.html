@@ -369,49 +369,93 @@ function startDrawing(e) {
     [lastX, lastY] = [x, y];
     saveState();
 }
-
 function draw(e) {
-    if (currentLayer === 100 || !isDrawing || !currentCtx) {
+    if (!isDrawing || !currentCtx) {
         return;
     }
+
     if (isNarrowingToCenter) {
         narrowToCenter(e);
         return;
     }
-    
     const rect = layers[currentLayer].getBoundingClientRect();
     const x = Math.floor((e.clientX - rect.left) / zoomLevel);
     const y = Math.floor((e.clientY - rect.top) / zoomLevel);
     const pressure = e.pressure || 1;
-    
-    points.push({x, y});
-    
+
     currentCtx.lineWidth = brushSizeInput.value * pressure;
     currentCtx.lineCap = 'round';
     currentCtx.lineJoin = 'round';
     currentCtx.globalAlpha = opacityInput.value / 100;
     currentCtx.globalCompositeOperation = isErasing ? 'destination-out' : 'source-over';
-    
-    if (isSmoothLineMode && points.length > 2) {
-        const output = getSmoothLine(points);
+
+    if (isDrawOnExisting) {
+        // Create a temporary canvas for the line
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = layers[currentLayer].width;
+        tempCanvas.height = layers[currentLayer].height;
+        const tempCtx = tempCanvas.getContext('2d');
         
-        currentCtx.beginPath();
-        currentCtx.moveTo(output[0].x, output[0].y);
+        // Copy the current layer to the temporary canvas
+        tempCtx.drawImage(layers[currentLayer], 0, 0);
         
-        for (let i = 1; i < output.length; i++) {
-            currentCtx.lineTo(output[i].x, output[i].y);
-        }
+        // Set the composite operation to only draw where there's already content
+        tempCtx.globalCompositeOperation = 'source-in';
         
-        currentCtx.stroke();
+        // Draw the line on the temporary canvas
+        tempCtx.strokeStyle = currentCtx.strokeStyle;
+        tempCtx.lineWidth = currentCtx.lineWidth;
+        tempCtx.lineCap = currentCtx.lineCap;
+        tempCtx.lineJoin = currentCtx.lineJoin;
+        tempCtx.globalAlpha = currentCtx.globalAlpha;
+        tempCtx.beginPath();
+        tempCtx.moveTo(lastX, lastY);
+        tempCtx.lineTo(x, y);
+        tempCtx.stroke();
+
+        // Draw the result back to the main canvas
+        currentCtx.drawImage(tempCanvas, 0, 0);
     } else {
         currentCtx.beginPath();
         currentCtx.moveTo(lastX, lastY);
         currentCtx.lineTo(x, y);
         currentCtx.stroke();
     }
-    
+
+    if (symmetry) {
+        const centerX = layers[currentLayer].width / 2;
+        const symmetricLastX = centerX + (centerX - lastX);
+        const symmetricX = centerX + (centerX - x);
+        
+        if (isDrawOnExisting) {
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = layers[currentLayer].width;
+            tempCanvas.height = layers[currentLayer].height;
+            const tempCtx = tempCanvas.getContext('2d');
+            
+            tempCtx.drawImage(layers[currentLayer], 0, 0);
+            tempCtx.globalCompositeOperation = 'source-in';
+            
+            tempCtx.strokeStyle = currentCtx.strokeStyle;
+            tempCtx.lineWidth = currentCtx.lineWidth;
+            tempCtx.lineCap = currentCtx.lineCap;
+            tempCtx.lineJoin = currentCtx.lineJoin;
+            tempCtx.globalAlpha = currentCtx.globalAlpha;
+            tempCtx.beginPath();
+            tempCtx.moveTo(symmetricLastX, lastY);
+            tempCtx.lineTo(symmetricX, y);
+            tempCtx.stroke();
+            
+            currentCtx.drawImage(tempCanvas, 0, 0);
+        } else {
+            currentCtx.beginPath();
+            currentCtx.moveTo(symmetricLastX, lastY);
+            currentCtx.lineTo(symmetricX, y);
+            currentCtx.stroke();
+        }
+    }
+
     [lastX, lastY] = [x, y];
-    
     pressureBar.value = pressure * 10000;
     pressureBar.nextElementSibling.textContent = Math.round(pressure * 100);
 }

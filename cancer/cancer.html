@@ -97,6 +97,7 @@
         const overlayCtx = overlayCanvas.getContext('2d');
         const toggleSmoothDrawingBtn = document.getElementById('toggleSmoothDrawingBtn');
 
+
         let isDrawing = false;
         let lastX = 0;
         let lastY = 0;
@@ -113,6 +114,18 @@
 
         ctx.imageSmoothingEnabled = false;
         ctx.willReadFrequently = true;
+
+        document.getElementById('chat-input').addEventListener('focus', () => {
+            // Отключаем обработку горячих клавиш при фокусе на поле ввода
+            window.removeEventListener('keydown', handleKeyDown); 
+        });
+
+        document.getElementById('chat-input').addEventListener('blur', () => {
+            // Включаем обработку горячих клавиш при потере фокуса с поля ввода
+            window.addEventListener('keydown', handleKeyDown); 
+        });
+
+
 
         function initializeCanvas() {
             const backgroundImage = new Image();
