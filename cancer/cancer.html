@@ -24,61 +24,68 @@
 </head>
 
 <body>
-<main class="base-container">
-    <aside class="sidebar" style="z-index: 10;">
-        <a href="../index.html" target="_self" title="Выйти из команты" id="exitLink" style="font-size: 50px;">🚪</a>
-        <button id="undo" title="Отменить (Z)">⟲</button>
-        <button id="redo" title="Повторить (X)">⟳</button>
-        <button id="symmetry" title="Симметрия (S)">🦋</button>
-        <button id="eyedropperBtn" title="Пипетка заливки (A)">💧</button>
-        <button id="changeCursorBtn" title="Сменить курсор">🎨</button>
-        <button id="clearBtn" title="Очистить">💀</button>
-        <button id="saveImageBtn" title="Сохранить изображение">💾</button>
-        <button id="eraserBtn" title="Стерка">🧽</button>
-        <button id="toggleSmoothDrawingBtn" title="Паутинка">🌀</button>
-    </aside>
-    <div class="canvas-and-chat-container">
-        <div class="canvas-and-sliders">
-            <div class="canvas-container">
-                <div class="color-picker-group">
-                    <input type="color" id="colorPicker" value="#000000" title="Цвет заливки (C)">
-                    <input type="color" id="backgroundPicker" value="#ffffff" title="Цвет фона (B)">
-                    <button id="previousWord" title="Предыдущее слово">&lt;</button>
-                    <p id="Quizz"></p>
-                    <button id="nextWord" title="Следующее слово">&gt;</button>
-                    <div id="elapsedTime" class="time"></div>
-                </div>
-                <div class="canv-container" style="position: relative; width: 600px; height: 500px;">
-                    <canvas id="backgroundCanvas" width="600" height="500"
+    <main class="base-container">
+        <aside class="sidebar" style="z-index: 10;">
+            <a href="../index.html" target="_self" title="Выйти из команты" id="exitLink"
+                style="font-size: 50px;">🚪</a>
+            <button id="undo" title="Отменить (Z)">⟲</button>
+            <button id="redo" title="Повторить (X)">⟳</button>
+            <button id="symmetry" title="Симметрия (S)">🦋</button>
+            <button id="eyedropperBtn" title="Пипетка заливки (A)">💧</button>
+            <button id="changeCursorBtn" title="Сменить курсор">🎨</button>
+            <button id="clearBtn" title="Очистить">💀</button>
+            <button id="saveImageBtn" title="Сохранить изображение">💾</button>
+            <button id="eraserBtn" title="Стерка">🧽</button>
+            <button id="toggleSmoothDrawingBtn" title="Паутинка">🌀</button> 
+        </aside>
+
+            <div class="canvas-and-sliders">
+                <div class="canvas-container">
+                    <div class="color-picker-group">
+                        <input type="color" id="colorPicker" value="#000000" title="Цвет заливки (C)">
+                        <input type="color" id="backgroundPicker" value="#ffffff" title="Цвет фона (B)">
+                        <button id="previousWord" title="Предыдущее слово">&lt;</button>
+                        <p id="Quizz"></p>
+                        <button id="nextWord" title="Следующее слово">&gt;</button>
+                        <div id="elapsedTime" class="time"></div>
+                    </div>
+
+        <div class="canvas-and-chat-container"> 
+            <div class="canvas-container"> 
+                <div class="canv-container" style="position: relative; width: 700px; height: 500px;">
+                    <canvas id="backgroundCanvas" width="700" height="500"
                         style="position: absolute; top: 0; left: 0; z-index: 1;"></canvas>
-                    <canvas id="drawingCanvas" width="600" height="500"
+                    <canvas id="drawingCanvas" width="700" height="500"
                         style="position: absolute; top: 0; left: 0; z-index: 3;"></canvas>
-                    <canvas id="overlayCanvas" width="600" height="500"
+                    <canvas id="overlayCanvas" width="700" height="500"
                         style="position: absolute; top: 0; left: 0; z-index: 2; opacity: 0.5;"></canvas>
                 </div>
                 <div id="cursorPanel" class="cursor-panel" style="display: none;">
                     <div id="cursorList"></div>
                 </div>
             </div>
-            <div class="slider-group">
-                <div class="slider">
-                    <div class="pressure-bar" id="pressureBar"></div>
-                    <label for="brushSize" title="Размер кисти">🖌️</label>
-                    <input type="range" id="brushSize" min="1" max="100" value="3">
-                    <span class="slider-value" id="rangeValue">3</span>
+
+            <div id="chat-container">
+                <div id="chat-messages"></div>
+                <form id="chat-form">
+                    <input type="text" id="chat-input" placeholder="Введите сообщение...">
+                    <button type="submit">=></button>
+                </form>
+            </div> 
+                </div>
+                <div class="slider-group">
+                    <div class="slider">
+                        <div class="pressure-bar" id="pressureBar"></div>
+                        <label for="brushSize" title="Размер кисти">🖌️</label>
+                        <input type="range" id="brushSize" min="1" max="100" value="3">
+                        <span class="slider-value" id="rangeValue">3</span>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div id="chat-container">
-            <div id="chat-messages"></div>
-            <form id="chat-form">
-                <input type="text" id="chat-input" placeholder="Введите сообщение...">
-                <button type="submit">=></button>
-            </form>
-        </div>
-    </div>
-</main>
 
+
+        </div> 
+    </main>
     <script>
         const colorPicker = document.getElementById('colorPicker');
         const backgroundPicker = document.getElementById('backgroundPicker');
