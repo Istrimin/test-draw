@@ -1,62 +1,130 @@
 // !
-document.addEventListener('DOMContentLoaded', () => {
-    const chatForm = document.getElementById('chat-form');
-    const chatInput = document.getElementById('chat-input');
-    const chatMessages = document.getElementById('chat-messages');
+let userId;
 
-    chatForm.addEventListener('submit', async (e) => {
-        e.preventDefault(); // Предотвращаем перезагрузку страницы
-
-        const message = chatInput.value.trim();
-        if (message) {
-            try {
-                // Ваш код для отправки сообщения
-                addMessage('Вы', message);
-                chatInput.value = '';
-            } catch (error) {
-                console.error('Ошибка при отправке сообщения:', error);
-            }
-        }
-    });
-
-    function addMessage(sender, text) {
-        const messageElement = document.createElement('div');
-        messageElement.classList.add('message');
-        messageElement.innerHTML = `<strong>${sender}:</strong> ${text}`;
-        chatMessages.appendChild(messageElement);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        const user = await vkBridge.send('VKWebAppGetUserInfo');
+        userId = user.id;
+        console.log('User ID:', userId);
+        // Здесь вы можете вызвать функцию для загрузки истории сообщений
+        await getNewMessages();
+    } catch (error) {
+        console.error('Error getting user info:', error);
     }
-
-    async function getNewMessages() {
-        try {
-            const response = await vkBridge.send('VKWebAppCallAPIMethod', {
-                method: 'messages.getHistory',
-                params: {
-                    user_id: 0, // Замените на ID пользователя или 0 для получения истории чата
-                    count: 20,
-                    v: '5.131'
-                }
-            });
-
-            // Очистка существующих сообщений
-            chatMessages.innerHTML = '';
-
-            // Отображение полученных сообщений
-            response.response.items.reverse().forEach(item => {
-                const sender = item.from_id === vkBridge.send('VKWebAppGetUserInfo').id ? 'Вы' : 'Собеседник';
-                addMessage(sender, item.text);
-            });
-        } catch (error) {
-            console.error('Ошибка при получении новых сообщений:', error);
-        }
-    }
-
-    // Периодическое получение новых сообщений
-    setInterval(getNewMessages, 5000); // Проверка каждые 5 секунд
-
-    // Начальная загрузка сообщений
-    getNewMessages();
 });
+
+async function getNewMessages() {
+    try {
+        const response = await vkBridge.send('VKWebAppCallAPIMethod', {
+            method: 'messages.getHistory',
+            params: {
+                user_id: userId, // Используем полученный ID пользователя
+                count: 20,
+                v: '5.131'
+            }
+        });
+        
+        // Обработка полученных сообщений
+        if (response.response && response.response.items) {
+            const messages = response.response.items;
+            messages.forEach(message => {
+                addMessage(message.from_id === userId ? 'Вы' : 'Собеседник', message.text);
+            });
+        }
+    } catch (error) {
+        console.error('Error getting messages:', error);
+    }
+}
+
+async function sendMessage(text) {
+    try {
+        const response = await vkBridge.send('VKWebAppCallAPIMethod', {
+            method: 'messages.send',
+            params: {
+                user_id: userId,
+                random_id: Math.floor(Math.random() * 1000000),
+                message: text,
+                v: '5.131'
+            }
+        });
+        console.log('Message sent:', response);
+    } catch (error) {
+        console.error('Error sending message:', error);
+    }
+}
+
+document.getElementById('chat-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const input = document.getElementById('chat-input');
+    const message = input.value.trim();
+    if (message) {
+        addMessage('Вы', message);
+        await sendMessage(message);
+        input.value = '';
+    }
+});
+
+
+
+
+// document.addEventListener('DOMContentLoaded', () => {
+//     const chatForm = document.getElementById('chat-form');
+//     const chatInput = document.getElementById('chat-input');
+//     const chatMessages = document.getElementById('chat-messages');
+
+//     chatForm.addEventListener('submit', async (e) => {
+//         e.preventDefault(); // Предотвращаем перезагрузку страницы
+
+//         const message = chatInput.value.trim();
+//         if (message) {
+//             try {
+//                 // Ваш код для отправки сообщения
+//                 addMessage('Вы', message);
+//                 chatInput.value = '';
+//             } catch (error) {
+//                 console.error('Ошибка при отправке сообщения:', error);
+//             }
+//         }
+//     });
+
+//     function addMessage(sender, text) {
+//         const messageElement = document.createElement('div');
+//         messageElement.classList.add('message');
+//         messageElement.innerHTML = `<strong>${sender}:</strong> ${text}`;
+//         chatMessages.appendChild(messageElement);
+//         chatMessages.scrollTop = chatMessages.scrollHeight;
+//     }
+
+//     async function getNewMessages() {
+//         try {
+//             const response = await vkBridge.send('VKWebAppCallAPIMethod', {
+//                 method: 'messages.getHistory',
+//                 params: {
+//                     user_id: 0, // Замените на ID пользователя или 0 для получения истории чата
+//                     count: 20,
+//                     v: '5.131'
+//                 }
+//             });
+
+//             // Очистка существующих сообщений
+//             chatMessages.innerHTML = '';
+
+//             // Отображение полученных сообщений
+//             response.response.items.reverse().forEach(item => {
+//                 const sender = item.from_id === vkBridge.send('VKWebAppGetUserInfo').id ? 'Вы' : 'Собеседник';
+//                 addMessage(sender, item.text);
+//             });
+//         } catch (error) {
+//             console.error('Ошибка при получении новых сообщений:', error);
+//         }
+//     }
+
+//     // Периодическое получение новых сообщений
+//     setInterval(getNewMessages, 5000); // Проверка каждые 5 секунд
+
+//     // Начальная загрузка сообщений
+//     getNewMessages();
+// });
 
 
 
