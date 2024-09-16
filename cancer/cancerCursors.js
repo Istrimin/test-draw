@@ -6,7 +6,7 @@
 
 			function loadCursors() {
 				cursorList.innerHTML = '';
-				for (let i = 1; i <= 1000; i++) {
+				for (let i = 1; i <= 80; i++) {
 					const cursorUrl = `../cursorsNum/${i}.png`;
 
 					const image = new Image();
@@ -17,7 +17,7 @@
 						let targetHeight = image.height;
 
 
-						const maxSize = 64;
+						const maxSize = 128;
 
 						if (targetWidth > maxSize || targetHeight > maxSize) {
 							const aspectRatio = targetWidth / targetHeight;

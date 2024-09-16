@@ -395,7 +395,7 @@
         cursorList.innerHTML = '';
         
         // Цикл для загрузки 100 курсоров
-        for (let i = 1; i <= 50; i++) {
+        for (let i = 1; i <= 80; i++) {
             // Формируем URL курсора
             const cursorUrl = `cursorsNum/${i}.png`;
 
