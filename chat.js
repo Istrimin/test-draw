@@ -44,7 +44,7 @@ async function getNewMessages() {
         const response = await vkBridge.send('VKWebAppCallAPIMethod', {
             method: 'messages.getHistory',
             params: {
-                peer_id: -groupId, // Используем отрицательный ID группы
+                peer_id: -groupId, 
                 count: 20,
                 access_token: accessToken,
                 v: '5.131'
@@ -68,7 +68,7 @@ async function sendMessage(text) {
         const response = await vkBridge.send('VKWebAppCallAPIMethod', {
             method: 'messages.send',
             params: {
-                peer_id: -groupId, // Используем отрицательный ID группы
+                peer_id: -groupId, 
                 random_id: Math.floor(Math.random() * 1000000),
                 message: text,
                 access_token: accessToken,
@@ -97,4 +97,15 @@ function addMessage(sender, text) {
     // Здесь должна быть логика добавления сообщения в интерфейс
     console.log(`${sender}: ${text}`);
 }
+
+        document.getElementById('chat-input').addEventListener('focus', () => {
+            // Отключаем обработку горячих клавиш при фокусе на поле ввода
+            window.removeEventListener('keydown', handleKeyDown); 
+        });
+
+        document.getElementById('chat-input').addEventListener('blur', () => {
+            // Включаем обработку горячих клавиш при потере фокуса с поля ввода
+            window.addEventListener('keydown', handleKeyDown); 
+        });
+
 

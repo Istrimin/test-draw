@@ -506,6 +506,7 @@ body {
     display: flex;
     flex-direction: column;
     height: 500px;
+    width: 100px;
     /* border: 1px solid #0026ff; */
 	color:white;
     border-radius: 5px;
@@ -521,6 +522,7 @@ body {
     border-radius: 20px;
     background-color: rgba(25, 9, 48, 0.8);
     border: 1px solid #0026ff;
+    width: 100px;
 }
 #chat-form {
     display: flex;
@@ -529,7 +531,6 @@ body {
     border: 1px solid #0026ff; 
     border-radius: 20px;
     background-color: rgba(25, 9, 48, 0.8);
-
 } 
 
 #chat-input {
@@ -540,8 +541,7 @@ body {
     color: white;
     border-radius: 20px;
     background-color: rgba(25, 9, 48, 0.8);
-
-    /* Improve auto-complete appearance across browsers */
+    width: 50px;
     -webkit-appearance: none; /* For Safari and Chrome */
     -moz-appearance: none;    /* For Firefox */
     appearance: none;         /* Standard */
@@ -551,48 +551,6 @@ body {
     outline: none;
     box-shadow: 0 0 5px rgba(0, 0, 255, 0.5);
 }
-
-/* Style the auto-complete dropdown list */
-#chat-input::-webkit-autocomplete-dropdown { /* Consistent styling across browsers */
-    background-color: rgba(25, 9, 48, 0.9);
-    border: 1px solid #0026ff;
-    border-radius: 5px; 
-}
-
-#chat-input::-webkit-autocomplete-dropdown-item {
-    color: white;
-    padding: 5px; 
-}
-
-/* Use <mark> for reliable hover effect */
-#chat-input::-webkit-autocomplete-dropdown-item mark { 
-    background-color: rgba(28, 0, 66, 0.8); 
-}
-
-/* Style the auto-complete dropdown list */
-#chat-input::-webkit-autocomplete-dropdown { 
-    background-color: rgba(25, 9, 48, 0.9);
-    border: 1px solid #0026ff;
-    border-radius: 5px; 
-}
-
-#chat-input::-webkit-autocomplete-dropdown-item {
-    color: white;
-    padding: 5px; 
-
-    /* Forcefully remove background on hover */
-    background-color: transparent !important; 
-}
-
-/* Use <mark> for reliable hover effect */
-#chat-input::-webkit-autocomplete-dropdown-item mark { 
-    background-color: rgba(28, 0, 66, 0.8); 
-}
-
-
-
-
-
 
 
 
@@ -613,3 +571,4 @@ body {
     font-weight: bold;
     margin-right: 5px;
 }
+
