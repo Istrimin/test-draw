@@ -1,63 +1,4 @@
-// fix 
-// function getPixelColorFromAllLayers(x, y) {
-//     // Start from the top layer and go down
-//     for (let i = layerCount; i >= 1; i--) {
-//         if (layers[i] && contexts[i]) {
-//             const ctx = contexts[i];
-//             const pixelData = ctx.getImageData(x, y, 1, 1).data;
-//             if (pixelData[3] > 0) {
-//                 return `#${pixelData[0].toString(16).padStart(2, '0')}${pixelData[1].toString(16).padStart(2, '0')}${pixelData[2].toString(16).padStart(2, '0')}`;
-//             }
-//         }
-//     }
-    
-//     // If no color is found in regular layers, check the background layer (100)
-//     if (layers[100] && contexts[100]) {
-//         const bgCtx = contexts[100];
-//         const bgPixelData = bgCtx.getImageData(x, y, 1, 1).data;
-//         if (bgPixelData[3] > 0) {
-//             return `#${bgPixelData[0].toString(16).padStart(2, '0')}${bgPixelData[1].toString(16).padStart(2, '0')}${bgPixelData[2].toString(16).padStart(2, '0')}`;
-//         }
-//     }
-    
-//     // If still no color is found, return the background color
-//     return backgroundPicker.value;
-// }
 
-// function handleEyedropperClick(e) {
-//     if (isEyedropperActive) {
-//         // Find the topmost visible layer
-//         let topmostLayer = null;
-//         for (let i = layerCount; i >= 1; i--) {
-//             if (layers[i] && layers[i].style.display !== 'none') {
-//                 topmostLayer = layers[i];
-//                 break;
-//             }
-//         }
-
-//         if (!topmostLayer) {
-//             console.error('No visible layers found');
-//             return;
-//         }
-
-//         const rect = topmostLayer.getBoundingClientRect();
-//         // Get coordinates correctly for both touch and mouse events
-//         const x = Math.floor((e.clientX || e.touches[0].clientX) - rect.left);
-//         const y = Math.floor((e.clientY || e.touches[0].clientY) - rect.top);
-        
-//         const pickedColor = getPixelColorFromAllLayers(x, y);
-//         document.getElementById('colorPicker').value = pickedColor;
-//         setDrawingColor(pickedColor);
-        
-//         // Optionally deactivate eyedropper after picking
-//         isEyedropperActive = false;
-//         document.body.style.cursor = 'auto';
-//         eyedropperBtn.classList.remove('active');
-//     }
-// }
-
-
-// fix Пипетка(слева жмется, с права нет)
 
 
 // полный экран.
@@ -230,11 +171,6 @@
 
 
 // Слушатели и константы
-// курсоры
-    const canvasContainer = document.getElementById('canvasContainer');
-    // const changeCursorBtn = document.getElementById('changeCursorBtn');
-    // const cursorPanel = document.getElementById('cursorPanel');
-    // const cursorList = document.getElementById('cursorList');
 
 // Удаление всего
     const deleteAllBtn = document.getElementById('deleteAllBtn');
@@ -243,6 +179,22 @@
             deleteAllLayers();
         }
     });
+function deleteAllLayers() {
+    Object.keys(layers).forEach(layerNum => {
+        // Convert layerNum to a number for comparison
+        if (parseInt(layerNum) === 100) {
+            return; // Skip deletion for layer 100
+        }
+        
+        const ctx = contexts[layerNum];
+        ctx.clearRect(0, 0, layers[layerNum].width, layers[layerNum].height);
+        saveState();
+    });
+    // Обновляем отображение
+    Object.values(layers).forEach(layer => {
+        layer.style.display = 'block';
+    });
+}
 // Назначаем горячие клавиши для выбора цветов(это не влияет на выбор цвет бэка)
 //Set the background color
     function setBackgroundColor(color) {
@@ -296,18 +248,7 @@
     }
 
 
-// Удаление всего
-    function deleteAllLayers() {
-        Object.keys(layers).forEach(layerNum => {
-            const ctx = contexts[layerNum];
-            ctx.clearRect(0, 0, layers[layerNum].width, layers[layerNum].height);
-            saveState();
-        });
-        // Обновляем отображение
-        Object.values(layers).forEach(layer => {
-            layer.style.display = 'block';
-        });
-    }
+
 // Объединяем слои
     // Получаем ссылку на кнопку объединения слоев
     const mergeLayersBtn = document.getElementById('mergeLayers');
@@ -385,85 +326,6 @@
         currentCtx.clearRect(0, 0, layers[currentLayer].width, layers[currentLayer].height);
         saveState();
     }
-// Курсоры
-
-    document.addEventListener('DOMContentLoaded', () => {
-    			const cursorPanel = document.getElementById('cursorPanel');
-    			const cursorList = document.getElementById('cursorList');
-    			const changeCursorBtn = document.getElementById('changeCursorBtn');
-                const canvas = document.getElementById('yourCanvasId'); 
-    // Функция для загрузки курсоров
-    function loadCursors() {
-        // Очищаем список курсоров
-        cursorList.innerHTML = '';
-        
-        // Цикл для загрузки 100 курсоров
-        for (let i = 1; i <= 80; i++) {
-            // Формируем URL курсора
-            const cursorUrl = `cursorsNum/${i}.png`;
-
-            // Создаем новый объект изображения
-            const image = new Image();
-            image.src = cursorUrl;
-
-            // Обработчик события загрузки изображения
-            image.onload = () => {
-                // Получаем размеры изображения
-                let targetWidth = image.width;
-                let targetHeight = image.height;
-
-                // Максимальный размер для курсора
-                const maxSize = 128;
-
-                // Проверяем, нужно ли изменять размер
-                if (targetWidth > maxSize || targetHeight > maxSize) {
-                    const aspectRatio = targetWidth / targetHeight;
-                    if (targetWidth > targetHeight) {
-                        targetWidth = maxSize;
-                        targetHeight = maxSize / aspectRatio;
-                    } else {
-                        targetHeight = maxSize;
-                        targetWidth = maxSize * aspectRatio;
-                    }
-                }
-
-                // Создаем канвас для изменения размера
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                canvas.width = targetWidth;
-                canvas.height = targetHeight;
-                ctx.drawImage(image, 0, 0, targetWidth, targetHeight);
-                const resizedCursorUrl = canvas.toDataURL();
-
-                // Создаем элемент изображения для курсора
-                const cursorImg = document.createElement('img');
-                cursorImg.src = resizedCursorUrl;
-                cursorImg.alt = `cursor${i}`;
-                cursorImg.style.maxWidth = `${maxSize}px`;
-
-                // Обработчик события клика на изображение курсора
-                cursorImg.addEventListener('click', () => {
-                    // Устанавливаем курсор на канвасе
-                    canvasContainer.style.cursor = `url(${resizedCursorUrl}), auto`;
-                    cursorPanel.style.display = 'none';
-                });
-
-                // Добавляем изображение курсора в список
-                cursorList.appendChild(cursorImg);
-            };
-        }
-    }
-
-    // Обработчик события клика на кнопку изменения курсора
-    changeCursorBtn.addEventListener('click', () => {
-        cursorPanel.style.display = cursorPanel.style.display === 'none' ? 'block' : 'none';
-    });
-
-    // Загружаем курсоры
-    loadCursors();
-    });
-
-
 
 
 
@@ -704,4 +566,65 @@
         //             lastY = y;
         //         }
 
+// Цвет заливки пикер(отдельно от пикера цвета)
+    // Это инструмент, позволяющий рисвовать контур и затем сразу заливать его вторым цветом.
+    // fix 
+// function getPixelColorFromAllLayers(x, y) {
+//     // Start from the top layer and go down
+//     for (let i = layerCount; i >= 1; i--) {
+//         if (layers[i] && contexts[i]) {
+//             const ctx = contexts[i];
+//             const pixelData = ctx.getImageData(x, y, 1, 1).data;
+//             if (pixelData[3] > 0) {
+//                 return `#${pixelData[0].toString(16).padStart(2, '0')}${pixelData[1].toString(16).padStart(2, '0')}${pixelData[2].toString(16).padStart(2, '0')}`;
+//             }
+//         }
+//     }
+    
+//     // If no color is found in regular layers, check the background layer (100)
+//     if (layers[100] && contexts[100]) {
+//         const bgCtx = contexts[100];
+//         const bgPixelData = bgCtx.getImageData(x, y, 1, 1).data;
+//         if (bgPixelData[3] > 0) {
+//             return `#${bgPixelData[0].toString(16).padStart(2, '0')}${bgPixelData[1].toString(16).padStart(2, '0')}${bgPixelData[2].toString(16).padStart(2, '0')}`;
+//         }
+//     }
+    
+//     // If still no color is found, return the background color
+//     return backgroundPicker.value;
+// }
 
+// function handleEyedropperClick(e) {
+//     if (isEyedropperActive) {
+//         // Find the topmost visible layer
+//         let topmostLayer = null;
+//         for (let i = layerCount; i >= 1; i--) {
+//             if (layers[i] && layers[i].style.display !== 'none') {
+//                 topmostLayer = layers[i];
+//                 break;
+//             }
+//         }
+
+//         if (!topmostLayer) {
+//             console.error('No visible layers found');
+//             return;
+//         }
+
+//         const rect = topmostLayer.getBoundingClientRect();
+//         // Get coordinates correctly for both touch and mouse events
+//         const x = Math.floor((e.clientX || e.touches[0].clientX) - rect.left);
+//         const y = Math.floor((e.clientY || e.touches[0].clientY) - rect.top);
+        
+//         const pickedColor = getPixelColorFromAllLayers(x, y);
+//         document.getElementById('colorPicker').value = pickedColor;
+//         setDrawingColor(pickedColor);
+        
+//         // Optionally deactivate eyedropper after picking
+//         isEyedropperActive = false;
+//         document.body.style.cursor = 'auto';
+//         eyedropperBtn.classList.remove('active');
+//     }
+// }
+
+
+// fix Пипетка(слева жмется, с права нет)

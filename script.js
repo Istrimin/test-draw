@@ -1,14 +1,9 @@
-const UploadButton = document.getElementById('UploadButton');
-const symmetryButton = document.getElementById('symmetry');
-const fillModeBtn = document.getElementById('fillModeBtn');
-let uploadedImage = null;
-let clearedCanvasState = null;
-let isFillMode = false;
-// Check for pressure support
-// try {
-//   isPressureSupported = !!window.PointerEvent && 'pressure' in PointerEvent.prototype;
-// } catch (e) { }
 
+
+try {
+  isPressureSupported = !!window.PointerEvent && 'pressure' in PointerEvent.prototype;
+} catch (e) { }
+            const isPressureSupported = 'onpointermove' in window;
 // *toggle eraser
         eraserBtn.addEventListener('click', toggleEraser);
         function toggleEraser() {
@@ -16,15 +11,8 @@ let isFillMode = false;
             eraserBtn.classList.toggle('active', isErasing);
         }
 
-// размер кисти
-  brushSizeInput.addEventListener('input', () => {
-    brushSizeValue.textContent = brushSizeInput.value;
-    });
-// прозрачность
-  opacityInput.addEventListener('input', () => {
-    opacityValue.textContent = opacityInput.value;
-    currentCtx.globalAlpha = opacityInput.value / 100;
-    });
+
+
 // Layer switching
   document.querySelectorAll('.layer-button').forEach(button => {
     button.addEventListener('click', function () {
@@ -50,10 +38,6 @@ let isFillMode = false;
     reader.readAsDataURL(file);
   }
 // переключение симметрии
-  function toggleSymmetry() {
-    symmetry = !symmetry;
-    symmetryButton.classList.toggle('active', symmetry);
-  }
 
 // Exit functionality
   const exitLink = document.getElementById('exitLink');
