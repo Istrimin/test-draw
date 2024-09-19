@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('dragend', () => {
     document.body.style.cursor = 'auto'; // Reset cursor to default
   });
-  // !блокировка контекстного меню
+  // !блокировка контекстного меню 
   // document.addEventListener('contextmenu', event => event.preventDefault());
   // добавляем ресайз для контейнера с сообщениями
   // $(function () {
@@ -84,6 +84,8 @@ document.addEventListener('touchmove', function(e) {
     passive: false,
     capture: true
 });
+
+
 
 // // отключаем альт 
 // document.addEventListener('keydown', function(e) {

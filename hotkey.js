@@ -13,6 +13,7 @@ document.addEventListener('keydown', (event) => {
     KeyU: 'UploadButton',
     KeyW: togglePreviousLayer, 
     KeyT: 'drawOnExistingBtn',
+    KeyV: toggleSpider,
   };
 
   const element = elementMap[keyCode];

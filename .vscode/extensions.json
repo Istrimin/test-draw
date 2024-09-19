@@ -1,6 +1,10 @@
 {
 	"recommendations": [
 		"ritwickdey.liveserver",
-		"smallcloud.codify"
+		"smallcloud.codify",
+		"harryhopkinson.vs-code-runner",
+		"znck.preview",
+		"katsute.code-background",
+		"helin.background-online"
 	]
 }

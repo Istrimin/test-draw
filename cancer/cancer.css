@@ -73,6 +73,10 @@ button {
 	border: none;
 }
 
+button.active {
+    background-color: var(--button-active-color);
+}
+
 button:hover,
 .custom-file-upload:hover,
 input[type="color"]:hover,

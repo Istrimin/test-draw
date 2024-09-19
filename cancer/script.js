@@ -1,87 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DrawCaterpillar</title>
-    <link rel="stylesheet" href="cancer.css">
-    <script src="cancerCursors.js" async></script>
-    <style>
-        #drawingCanvas {
-            cursor: url('../cursorsNum/4.png'), auto;
-        }
-/* 
-        .canvas-container {
-            position: relative;
-        } */
-    </style>
-</head>
-
-<body>
-    <main class="base-container">
-        <aside class="sidebar" style="z-index: 10;">
-            <a href="../index.html" target="_self" title="Выйти из команты" id="exitLink"
-                style="font-size: 50px;">🚪</a>
-            <button id="undo" title="Отменить (Z)">⟲</button>
-            <button id="redo" title="Повторить (X)">⟳</button>
-            <button id="symmetryBtn" title="Симметрия (S)">🦋</button>
-            <button id="eyedropperBtn" title="Пипетка заливки (A)">💧</button>
-            <button id="changeCursorBtn" title="Сменить курсор">🎨</button>
-            <button id="clearBtn" title="Очистить">💀</button>
-            <button id="saveImageBtn" title="Сохранить изображение">💾</button>
-            <button id="eraserBtn" title="Стерка">🧽</button>
-            <button id="smoothDrawingBtn" title="Паутинка">🌀</button> 
-        </aside>
-
-            <div class="canvas-and-sliders">
-                <div class="canvas-container">
-                    <div class="color-picker-group">
-                        <input type="color" id="colorPicker" value="#000000" title="Цвет заливки (C)">
-                        <input type="color" id="backgroundPicker" value="#ffffff" title="Цвет фона (B)">
-                        <button id="previousWord" title="Предыдущее слово">&lt;</button>
-                        <p id="Quizz"></p>
-                        <button id="nextWord" title="Следующее слово">&gt;</button>
-                        <div id="elapsedTime" class="time"></div>
-                    </div>
-
-        <div class="canvas-and-chat-container"> 
-            <div class="canvas-container"> 
-                <div class="canv-container" style="position: relative; width: 700px; height: 500px;">
-                    <canvas id="backgroundCanvas" width="700" height="500"
-                        style="position: absolute; top: 0; left: 0; z-index: 1;"></canvas>
-                    <canvas id="drawingCanvas" width="700" height="500"
-                        style="position: absolute; top: 0; left: 0; z-index: 3;"></canvas>
-                    <canvas id="overlayCanvas" width="700" height="500"
-                        style="position: absolute; top: 0; left: 0; z-index: 2; opacity: 0.5;"></canvas>
-                </div>
-                <div id="cursorPanel" class="cursor-panel" style="display: none;">
-                    <div id="cursorList"></div>
-                </div>
-            </div>
-
-            <div id="chat-container">
-                <div id="chat-messages"></div>
-                <form id="chat-form">
-                    <input type="text" id="chat-input" placeholder="Введите сообщение...">
-                    <button type="submit">=></button>
-                </form>
-            </div> 
-                </div>
-                <div class="slider-group">
-                    <div class="slider">
-                        <div class="pressure-bar" id="pressureBar"></div>
-                        <label for="brushSize" title="Размер кисти">🖌️</label>
-                        <input type="range" id="brushSize" min="1" max="100" value="3">
-                        <span class="slider-value" id="rangeValue">3</span>
-                    </div>
-                </div>
-            </div>
-
-
-        </div> 
-    </main>
-    <script>
     const $ = id => document.getElementById(id);
 
     const [
@@ -113,7 +29,7 @@ undoBtn, redoBtn,
         let overlayActive = false;
         let currentCursor = 'url(../cursorsNum/1.png), auto';
         let previousCursor = currentCursor;
-
+        let isSmoothDrawing = false; 
         let points = []; 
 
         ctx.imageSmoothingEnabled = false;
@@ -132,56 +48,11 @@ undoBtn, redoBtn,
             redoBtn.disabled = redoHistory.length === 0;
         }
 
-        let isSmoothDrawing = false; 
-        smoothDrawingBtn.addEventListener('click', toggleSmoothDrawing); 
-        window.addEventListener('resize', resizeCanvas);
-        function toggleSmoothDrawing() {
-
-            isSmoothDrawing = !isSmoothDrawing;
-            smoothDrawingBtn.classList.toggle('active', isSmoothDrawing);
-        }
-
-        // Smooth Drawing Functions
-        function drawSmoothLine(startX, startY, endX, endY) {
-            // ctx.globalAlpha = 0.5; // Set opacity
-            ctx.globalAlpha = 1; // Set opacity
-            ctx.strokeStyle = colorPicker.value; // Set color
-            // ctx.lineWidth = 5; // Increased line width for better visibility
-            ctx.lineJoin = 'round'; // Rounded corners
-            ctx.lineCap = 'round'; // Rounded line ends
-
-            ctx.beginPath();
-            ctx.moveTo(startX, startY);
-            ctx.quadraticCurveTo(startX, startY, endX, endY); // Use quadratic curve for smoother lines
-            ctx.stroke();
-
-            points.push({ x: endX, y: endY }); // Store the current point
-
-            // Draw neighbor points with a fill effect
-            for (let i = 0; i < points.length; i++) {
-                const dx = points[i].x - endX;
-                const dy = points[i].y - endY;
-                const dd = dx * dx + dy * dy;
-
-                if (dd < 1000) {
-                    ctx.beginPath();
-                    ctx.moveTo(endX + (dx * 0.2), endY + (dy * 0.2));
-                    ctx.lineTo(points[i].x - (dx * 0.2), points[i].y - (dy * 0.2));
-                    ctx.stroke();
-                }
-            }
-        }
-
-        function pickBgColor(){   
-         bgCtx.fillStyle = backgroundPicker.value;
-            bgCtx.fillRect(0, 0, backgroundCanvas.width, backgroundCanvas.height);}
-
-
         function startDrawing(e) {
             isDrawing = true;
             [lastX, lastY] = getCoordinates(e);
             if (isSmoothDrawing) {
-                points.push({ x: lastX, y: lastY });
+                points.push({ x: lastX, y: lastY }); // Start new stroke
             }
         }
 
@@ -246,7 +117,13 @@ undoBtn, redoBtn,
             ];
         }
 
+// паутинка
 
+        function toggleSmoothDrawing() {
+
+            isSmoothDrawing = !isSmoothDrawing;
+            smoothDrawingBtn.classList.toggle('active', isSmoothDrawing);
+        }
 
         function toggleSymmetry() {
             symmetryBtn = !symmetryBtn;
@@ -347,6 +224,39 @@ undoBtn, redoBtn,
             drawingCanvas.style.cursor = currentCursor;
         }
 
+        // Smooth Drawing Functions
+        function drawSmoothLine(startX, startY, endX, endY) {
+            ctx.globalAlpha = 0.5; // Set opacity
+            ctx.strokeStyle = colorPicker.value; // Set color
+            ctx.lineWidth = 5; // Increased line width for better visibility
+            ctx.lineJoin = 'round'; // Rounded corners
+            ctx.lineCap = 'round'; // Rounded line ends
+
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+            ctx.quadraticCurveTo(startX, startY, endX, endY); // Use quadratic curve for smoother lines
+            ctx.stroke();
+
+            points.push({ x: endX, y: endY }); // Store the current point
+
+            // Draw neighbor points with a fill effect
+            for (let i = 0; i < points.length; i++) {
+                const dx = points[i].x - endX;
+                const dy = points[i].y - endY;
+                const dd = dx * dx + dy * dy;
+
+                if (dd < 1000) {
+                    ctx.beginPath();
+                    ctx.moveTo(endX + (dx * 0.2), endY + (dy * 0.2));
+                    ctx.lineTo(points[i].x - (dx * 0.2), points[i].y - (dy * 0.2));
+                    ctx.stroke();
+                }
+            }
+        }
+
+        function pickBgColor(){   
+         bgCtx.fillStyle = backgroundPicker.value;
+            bgCtx.fillRect(0, 0, backgroundCanvas.width, backgroundCanvas.height);}
 
 
         // Event Listeners
@@ -365,8 +275,8 @@ undoBtn, redoBtn,
         eraserBtn.addEventListener('click', toggleEraser);
         saveImageBtn.addEventListener('click', saveImage);
         eyedropperBtn.addEventListener('click', toggleEyedropper);
-
-
+        smoothDrawingBtn.addEventListener('click', toggleSmoothDrawing); 
+        window.addEventListener('resize', resizeCanvas);
 
         // Initialization
         initializeCanvas();
@@ -382,12 +292,3 @@ undoBtn, redoBtn,
         document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('a, button').forEach(icon => icon.classList.add('icon-hover'));
         });
-
-    </script>
-    <script type="module" src="cancer.js" defer></script>
-    <script type="module" src="cancerSettings.js" defer></script>
-    <script type="module" src="cancerHelper.js" defer></script>
-    <script type="module" src="cancerHotkey.js" defer></script>
-</body>
-
-</html>

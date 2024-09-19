@@ -1,3 +1,65 @@
+// fix 
+// function getPixelColorFromAllLayers(x, y) {
+//     // Start from the top layer and go down
+//     for (let i = layerCount; i >= 1; i--) {
+//         if (layers[i] && contexts[i]) {
+//             const ctx = contexts[i];
+//             const pixelData = ctx.getImageData(x, y, 1, 1).data;
+//             if (pixelData[3] > 0) {
+//                 return `#${pixelData[0].toString(16).padStart(2, '0')}${pixelData[1].toString(16).padStart(2, '0')}${pixelData[2].toString(16).padStart(2, '0')}`;
+//             }
+//         }
+//     }
+    
+//     // If no color is found in regular layers, check the background layer (100)
+//     if (layers[100] && contexts[100]) {
+//         const bgCtx = contexts[100];
+//         const bgPixelData = bgCtx.getImageData(x, y, 1, 1).data;
+//         if (bgPixelData[3] > 0) {
+//             return `#${bgPixelData[0].toString(16).padStart(2, '0')}${bgPixelData[1].toString(16).padStart(2, '0')}${bgPixelData[2].toString(16).padStart(2, '0')}`;
+//         }
+//     }
+    
+//     // If still no color is found, return the background color
+//     return backgroundPicker.value;
+// }
+
+// function handleEyedropperClick(e) {
+//     if (isEyedropperActive) {
+//         // Find the topmost visible layer
+//         let topmostLayer = null;
+//         for (let i = layerCount; i >= 1; i--) {
+//             if (layers[i] && layers[i].style.display !== 'none') {
+//                 topmostLayer = layers[i];
+//                 break;
+//             }
+//         }
+
+//         if (!topmostLayer) {
+//             console.error('No visible layers found');
+//             return;
+//         }
+
+//         const rect = topmostLayer.getBoundingClientRect();
+//         // Get coordinates correctly for both touch and mouse events
+//         const x = Math.floor((e.clientX || e.touches[0].clientX) - rect.left);
+//         const y = Math.floor((e.clientY || e.touches[0].clientY) - rect.top);
+        
+//         const pickedColor = getPixelColorFromAllLayers(x, y);
+//         document.getElementById('colorPicker').value = pickedColor;
+//         setDrawingColor(pickedColor);
+        
+//         // Optionally deactivate eyedropper after picking
+//         isEyedropperActive = false;
+//         document.body.style.cursor = 'auto';
+//         eyedropperBtn.classList.remove('active');
+//     }
+// }
+
+
+// fix Пипетка(слева жмется, с права нет)
+
+
 // полный экран.
 
     const fullscreenBtn = document.getElementById('fullscreenBtn');
@@ -168,19 +230,13 @@
 
 
 // Слушатели и константы
-    // курсоры
+// курсоры
     const canvasContainer = document.getElementById('canvasContainer');
-    const changeCursorBtn = document.getElementById('changeCursorBtn');
-    const cursorPanel = document.getElementById('cursorPanel');
-    const cursorList = document.getElementById('cursorList');
-    // пипетка
-    const eyedropperBtn = document.getElementById('eyedropperBtn');
-    let isEyedropperActive = false;
-    canvasContainer.addEventListener('click', handleEyedropperClick);
-    canvasContainer.addEventListener('touchstart', handleEyedropperClick);
-    eyedropperBtn.addEventListener('click', handleEyedropperActivation);
-    eyedropperBtn.addEventListener('touchstart', handleEyedropperActivation);
-    // Удаление всего
+    // const changeCursorBtn = document.getElementById('changeCursorBtn');
+    // const cursorPanel = document.getElementById('cursorPanel');
+    // const cursorList = document.getElementById('cursorList');
+
+// Удаление всего
     const deleteAllBtn = document.getElementById('deleteAllBtn');
     deleteAllBtn.addEventListener('click', () => {
         if (confirm('Вы уверены, что хотите удалить содержимое всех слоев?')) {
@@ -197,7 +253,7 @@
     }
 
 
-    // Update color picker setup
+    // Update color picker setup 
         const colorPickers = document.querySelectorAll('input[type="color"]');
         colorPickers.forEach((picker, index) => {
             picker.addEventListener('input', (event) => {
@@ -239,45 +295,7 @@
         link.click();
     }
 
-// fix Пипетка(слева жмется, с права нет)
-    function handleEyedropperActivation(e) {
-    isEyedropperActive = !isEyedropperActive;
-    document.body.style.cursor = isEyedropperActive ? 'url(cursors/pipette.png), auto' : 'default';
-    eyedropperBtn.classList.toggle('active');
-    if (isEyedropperActive) {
-        isDrawing = false;
-    }
-    }
-    // fix Function to get pixel color from all layers
-        function getPixelColorFromAllLayers(x, y) {
-            // Начинаем с верхнего слоя (исключая фоновый слой)
-            for (let i = layerCount; i >= 1; i--) {
-                const ctx = contexts[i];
-                const pixelData = ctx.getImageData(x, y, 1, 1).data;
-                if (pixelData[3] > 0) {
-                    return `#${pixelData[0].toString(16).padStart(2, '0')}${pixelData[1].toString(16).padStart(2, '0')}${pixelData[2].toString(16).padStart(2, '0')}`;
-                }
-            }
-            // Если ни на одном слое не найден непрозрачный пиксель, возвращаем цвет фона
-            return backgroundPicker.value;
-        }
 
-    // Function to handle eyedropper click/touch events
-    function handleEyedropperClick(e) {
-    if (isEyedropperActive) {
-        const rect = layers[1].getBoundingClientRect();
-        // Get coordinates correctly for both touch and mouse events
-        const x = (e.clientX || e.touches[0].clientX) - rect.left;
-        const y = (e.clientY || e.touches[0].clientY) - rect.top;
-        const pickedColor = getPixelColorFromAllLayers(x, y);
-        document.getElementById('colorPicker').value = pickedColor;
-        setDrawingColor(pickedColor);
-        // !Optionally deactivate eyedropper after picking
-        isEyedropperActive = false;
-        document.body.style.cursor = 'default';
-        eyedropperBtn.classList.remove('active');
-    }
-    }
 // Удаление всего
     function deleteAllLayers() {
         Object.keys(layers).forEach(layerNum => {
@@ -338,7 +356,6 @@
         updateLayerOrder();
         setCurrentLayer(1);
     }
-// Очистка канваса
 // Прозрачность слоев
         layerOpacitySlider.addEventListener('input', function() {
             const opacity = this.value;
@@ -356,23 +373,10 @@
         }
 
 // сглаживание линий(закгругление)
+// Рисование по нарисованному
+// Очистка канваса
 
 
-
-
-
-
-
-
-
-
-// document.getElementById('clear').addEventListener('click', function() {
-//     if (layers[currentLayer]) {
-//         contexts[currentLayer].clearRect(0, 0, layers[currentLayer].width, layers[currentLayer].height);
-//         resetOriginalImage(currentLayer);
-//         saveState();
-//     }
-// });
     const clearBtn = document.getElementById('clear');
     clearBtn.addEventListener('click', clearCanvas);
     function clearCanvas() {
@@ -382,13 +386,12 @@
         saveState();
     }
 // Курсоры
-            const canvas = document.getElementById('yourCanvasId'); 
+
     document.addEventListener('DOMContentLoaded', () => {
     			const cursorPanel = document.getElementById('cursorPanel');
     			const cursorList = document.getElementById('cursorList');
     			const changeCursorBtn = document.getElementById('changeCursorBtn');
-
-
+                const canvas = document.getElementById('yourCanvasId'); 
     // Функция для загрузки курсоров
     function loadCursors() {
         // Очищаем список курсоров
@@ -459,6 +462,9 @@
     // Загружаем курсоры
     loadCursors();
     });
+
+
+
 
 
 
@@ -626,3 +632,76 @@
     // //     floodFill(e);
     // //   }
     // // });
+
+// ..функция сшивания(копия)
+        // function ntc(e, narrowFactor = 0.9) {
+        //             if (!isDrawing || !currentCtx || !isFinger) return;
+
+        //             const rect = layers[currentLayer].getBoundingClientRect();
+        //             const x = Math.floor((e.clientX - rect.left) / zoomLevel);
+        //             const y = Math.floor((e.clientY - rect.top) / zoomLevel);
+
+        //             const brushSize = parseInt(brushSizeInput.value);
+        //             const halfBrushSize = brushSize / 2;
+        //             const imageData = currentCtx.getImageData(x - halfBrushSize, y - halfBrushSize, brushSize, brushSize);
+        //             const newImageData = currentCtx.createImageData(brushSize, brushSize);
+
+        //             // Определяем направление движения кисти
+        //             if (lastX !== null && lastY !== null) {
+        //                 const dirX = x - lastX;
+        //                 const dirY = y - lastY;
+        //                 const length = Math.sqrt(dirX * dirX + dirY * dirY);
+        //                 const normDirX = dirX / length;
+        //                 const normDirY = dirY / length;
+
+        //                 for (let i = 0; i < brushSize; i++) {
+        //                     for (let j = 0; j < brushSize; j++) {
+        //                         const index = (j * brushSize + i) * 4;
+                                
+        //                         // Вычисляем расстояние от текущего пикселя до центра кисти
+        //                         const distX = i - halfBrushSize;
+        //                         const distY = j - halfBrushSize;
+        //                         const distance = Math.sqrt(distX * distX + distY * distY);
+                                
+        //                         if (distance < halfBrushSize) {
+        //                             // Вычисляем новую позицию пикселя
+        //                             const newDist = distance * narrowFactor;
+
+        //                             // Сжимаем пиксель в направлении кисти
+        //                             const newX = Math.round(halfBrushSize + (distX / distance) * newDist);
+        //                             const newY = Math.round(halfBrushSize + (distY / distance) * newDist);
+                                    
+        //                             if (newX >= 0 && newX < brushSize && newY >= 0 && newY < brushSize) {
+        //                                 const newIndex = (newY * brushSize + newX) * 4;
+                                        
+        //                                 // Копируем пиксель в новую позицию только если он непрозрачный
+        //                                 if (imageData.data[index + 3] > 0) { // Проверяем альфа-канал
+        //                                     newImageData.data[newIndex] = imageData.data[index];     // R
+        //                                     newImageData.data[newIndex + 1] = imageData.data[index + 1]; // G
+        //                                     newImageData.data[newIndex + 2] = imageData.data[index + 2]; // B
+        //                                     newImageData.data[newIndex + 3] = 255; // A (полностью непрозрачный)
+        //                                 }
+        //                             }
+        //                         }
+        //                     }
+        //                 }
+        //             }
+
+        //             // Смешиваем новое изображение с оригинальным
+        //             for (let i = 0; i < imageData.data.length; i += 4) {
+        //                 if (newImageData.data[i + 3] === 0) { // Если пиксель прозрачный в новом изображении
+        //                     newImageData.data[i] = imageData.data[i];
+        //                     newImageData.data[i + 1] = imageData.data[i + 1];
+        //                     newImageData.data[i + 2] = imageData.data[i + 2];
+        //                     newImageData.data[i + 3] = imageData.data[i + 3];
+        //                 }
+        //             }
+
+        //             currentCtx.putImageData(newImageData, x - halfBrushSize, y - halfBrushSize);
+
+        //             // Обновляем последние координаты
+        //             lastX = x;
+        //             lastY = y;
+        //         }
+
+
