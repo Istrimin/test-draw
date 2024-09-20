@@ -1,3 +1,8 @@
+import * as tools from './tools.js';
+
+window.tools = tools;
+
+
 // // основной модуль, в нем преимущественно константы.
 //         // Get DOM elements
 //             // const isPressureSupported = 'onpointermove' in window;

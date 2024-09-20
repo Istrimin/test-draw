@@ -1,4 +1,107 @@
 
+// Рисование на нарисованном (оптимизированная версия)
+export function drawOn(startX, startY, endX, endY, ctx) {
+    const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+    const data = imageData.data;
+
+    // Создаем временный холст для рисования линии
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = ctx.canvas.width;
+    tempCanvas.height = ctx.canvas.height;
+    const tempCtx = tempCanvas.getContext('2d');
+
+    // Отключаем сглаживание для точного рисования пикселей
+    tempCtx.imageSmoothingEnabled = false;
+
+    // Копируем стили рисования из основного контекста
+    tempCtx.strokeStyle = ctx.strokeStyle;
+    tempCtx.lineWidth = ctx.lineWidth;
+    tempCtx.lineCap = ctx.lineCap;
+    tempCtx.lineJoin = ctx.lineJoin;
+
+    // Рисуем линию на временном холсте
+    tempCtx.beginPath();
+    tempCtx.moveTo(startX, startY);
+    tempCtx.lineTo(endX, endY);
+    tempCtx.stroke();
+
+    // Получаем данные изображения линии
+    const lineData = tempCtx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height).data;
+
+    // Оптимизация: проходим только по пикселям линии
+    const lineWidth = ctx.lineWidth;
+    for (let x = Math.floor(startX - lineWidth); x <= Math.ceil(endX + lineWidth); x++) {
+        for (let y = Math.floor(startY - lineWidth); y <= Math.ceil(endY + lineWidth); y++) {
+            if (x >= 0 && x < ctx.canvas.width && y >= 0 && y < ctx.canvas.height) {
+                const i = (y * ctx.canvas.width + x) * 4;
+
+                // Проверяем, находится ли пиксель на линии
+                if (lineData[i + 3] > 0) {
+                    const alpha = ctx.globalAlpha;
+                    const existingAlpha = data[i + 3] / 255;
+                    const newAlpha = alpha + existingAlpha * (1 - alpha);
+
+                    // Смешиваем цвета с учетом прозрачности
+                    data[i] = (lineData[i] * alpha + data[i] * existingAlpha * (1 - alpha)) / newAlpha;
+                    data[i + 1] = (lineData[i + 1] * alpha + data[i + 1] * existingAlpha * (1 - alpha)) / newAlpha;
+                    data[i + 2] = (lineData[i + 2] * alpha + data[i + 2] * existingAlpha * (1 - alpha)) / newAlpha;
+                    data[i + 3] = newAlpha * 255;
+                }
+            }
+        }
+    }
+
+    // Применяем изменения к основному холсту
+    ctx.putImageData(imageData, 0, 0);
+}
+
+// Сохранение изображения
+    saveImageBtn.addEventListener('click', exportImage);
+    function exportImage() {
+      const mergeCanvas = document.createElement('canvas');
+      const mergeCtx = mergeCanvas.getContext('2d');
+      mergeCanvas.width = layers[1].width;
+      mergeCanvas.height = layers[1].height;
+
+      const layerButtons = Array.from(document.querySelectorAll('.layer-button'));
+      layerButtons.sort((a, b) => {
+        const layerA = layers[parseInt(a.dataset.layer)];
+        const layerB = layers[parseInt(b.dataset.layer)];
+        return parseInt(layerA.style.zIndex || 0) - parseInt(layerB.style.zIndex || 0);
+      });
+
+      layerButtons.forEach((button) => {
+        const layerId = parseInt(button.dataset.layer);
+        if (layers[layerId] && layerId !== 100) {
+          // Apply layer opacity during drawing
+          mergeCtx.globalAlpha = layerOpacities[layerId] / 100; 
+          mergeCtx.drawImage(layers[layerId], 0, 0);
+          // Reset globalAlpha for the next layer
+          mergeCtx.globalAlpha = 1; 
+        }
+      });
+
+      const link = document.createElement('a');
+      link.download = 'my-drawing.png';
+      link.href = mergeCanvas.toDataURL('image/png');
+      link.click();
+    }
+
+// Прозрачность слоев
+        layerOpacitySlider.addEventListener('input', function() {
+            const opacity = this.value;
+            layerOpacityValue.textContent = opacity;
+            setLayerOpacity(currentLayer, opacity / 100);
+            layerOpacities[currentLayer] = opacity; 
+        });
+
+        function setLayerOpacity(layerNum, opacity) {
+            if (layers[layerNum]) {
+                layers[layerNum].style.opacity = opacity;
+                layerOpacities[layerNum] = Math.round(opacity * 100); 
+            }
+        }
+
 
 
 // полный экран.
@@ -179,22 +282,22 @@
             deleteAllLayers();
         }
     });
-function deleteAllLayers() {
-    Object.keys(layers).forEach(layerNum => {
-        // Convert layerNum to a number for comparison
-        if (parseInt(layerNum) === 100) {
-            return; // Skip deletion for layer 100
-        }
-        
-        const ctx = contexts[layerNum];
-        ctx.clearRect(0, 0, layers[layerNum].width, layers[layerNum].height);
-        saveState();
-    });
-    // Обновляем отображение
-    Object.values(layers).forEach(layer => {
-        layer.style.display = 'block';
-    });
-}
+    function deleteAllLayers() {
+        Object.keys(layers).forEach(layerNum => {
+            // Convert layerNum to a number for comparison
+            if (parseInt(layerNum) === 100) {
+                return; // Skip deletion for layer 100
+            }
+            
+            const ctx = contexts[layerNum];
+            ctx.clearRect(0, 0, layers[layerNum].width, layers[layerNum].height);
+            saveState();
+        });
+        // Обновляем отображение
+        Object.values(layers).forEach(layer => {
+            layer.style.display = 'block';
+        });
+    }
 // Назначаем горячие клавиши для выбора цветов(это не влияет на выбор цвет бэка)
 //Set the background color
     function setBackgroundColor(color) {
@@ -222,31 +325,6 @@ function deleteAllLayers() {
                 }
             });
         });
-// Сохранение изображения
-    export function exportImage() {
-        const mergeCanvas = document.createElement('canvas');
-        const mergeCtx = mergeCanvas.getContext('2d');
-        mergeCanvas.width = layers[1].width;
-        mergeCanvas.height = layers[1].height;
-        const layerButtons = Array.from(document.querySelectorAll('.layer-button'));
-        layerButtons.sort((a, b) => {
-            const layerA = layers[parseInt(a.dataset.layer)];
-            const layerB = layers[parseInt(b.dataset.layer)];
-            return parseInt(layerA.style.zIndex || 0) - parseInt(layerB.style.zIndex || 0);
-        });
-        layerButtons.forEach((button) => {
-            const layerId = parseInt(button.dataset.layer);
-            // *Exclude layer 100 from the export
-            if (layers[layerId] && layerId !== 100) { 
-                mergeCtx.drawImage(layers[layerId], 0, 0);
-            }
-        });
-        const link = document.createElement('a');
-        link.download = 'my-drawing.png';
-        link.href = mergeCanvas.toDataURL('image/png');
-        link.click();
-    }
-
 
 
 // Объединяем слои
@@ -297,24 +375,8 @@ function deleteAllLayers() {
         updateLayerOrder();
         setCurrentLayer(1);
     }
-// Прозрачность слоев
-        layerOpacitySlider.addEventListener('input', function() {
-            const opacity = this.value;
-            layerOpacityValue.textContent = opacity;
-            setLayerOpacity(currentLayer, opacity / 100);
-            layerOpacities[currentLayer] = opacity; 
-        });
 
-        // Function to set the opacity of a specific layer
-        function setLayerOpacity(layerNum, opacity) {
-            if (layers[layerNum]) {
-                layers[layerNum].style.opacity = opacity;
-                layerOpacities[layerNum] = Math.round(opacity * 100); // Store the opacity as a percentage
-            }
-        }
 
-// сглаживание линий(закгругление)
-// Рисование по нарисованному
 // Очистка канваса
 
 

@@ -13,16 +13,7 @@
 
 
     </head>
-<style>
- #zoomLevelDisplay {
-    color: red; /* Set text color to red */
-    font-weight: bold; /* Make the text bold */
-    font-size: 16px; /* Adjust font size */
-    margin-top: 10px; 
- }
-/* пофиксить панель курсоров для планшета */
 
-    </style>
 <body>
 <style>
 </style>
@@ -37,6 +28,9 @@
              </div>
             <div class="sidebar">
             </div>
+            <button id="backgroundSettingsBtn" title="Настройки фона">🖼️</button> <!-- New button for background settings -->
+            <button id="canvasSettingsBtn" title="Настройки канваса">🖌️</button> <!-- New button for canvas settings -->
+
 
             <button id="fullscreenBtn" title="Полноэкранный режим">🔲</button>
 
@@ -120,7 +114,7 @@
                     </div>
                         <div class="sliders"> 
                            <label for="spiderStrength" title="Сила паука" style="display: none;">🕸️</label> 
-                            <input type="range" id="spiderStrength" min="100" max="1000000" value="1000" title="Сила паука" style="display: none;">
+                            <input type="range" id="spiderStrength" min="50" max="10000" value="1000" title="Сила паука" style="display: none;">
                         </div>
 
                         <div class="sliders">
@@ -165,6 +159,66 @@
         </div>
         </div>
         </div>
+<!-- Background Settings Modal -->
+<div id="backgroundSettingsModal" class="modal">
+    <div class="modal-content">
+        <span id="closeModal" style="float:right;cursor:pointer;">&times;</span>
+        <h2>Настройки фона</h2>
+        <label for="backgroundColorPicker">Выберите цвет фона:</label>
+        <input type="color" id="backgroundColorPicker" value="#ffffff">
+        <br><br>
+        <label for="backgroundImageInput">Выберите изображение фона:</label>
+        <input type="file" id="backgroundImageInput" accept="image/*" multiple>
+        <button id="setBackgroundImageBtn">Установить изображение</button>
+        <div id="backgroundImageGallery" style="display: flex; flex-wrap: wrap; margin-top: 10px;"></div>
+        <div id="backgroundPreview" style="display: none; position: absolute; z-index: 1000; border: 2px solid #000;"></div>
+    </div>
+</div>
+
+<!-- Canvas Settings Modal -->
+<div id="canvasSettingsModal" class="modal">
+    <div class="modal-content">
+        <span id="closeCanvasModal" style="float:right;cursor:pointer;">&times;</span>
+        <h2>Настройки канваса</h2>
+        <label for="canvasColorPicker">Выберите цвет канваса:</label>
+        <input type="color" id="canvasColorPicker" value="#ffffff">
+        <br><br>
+        <label for="canvasImageInput">Выберите изображение канваса:</label>
+        <input type="file" id="canvasImageInput" accept="image/*">
+        <button id="setCanvasImageBtn">Установить изображение</button>
+        <div id="canvasImageGallery" style="display: flex; flex-wrap: wrap; margin-top: 10px;"></div>
+        <div id="canvasPreview" style="width: 200px; height: 200px; border: 1px solid black; margin-top: 10px;"></div>
+    </div>
+</div>
+
+<style>
+    #zoomLevelDisplay {
+        color: red;
+        font-weight: bold;
+        font-size: 16px;
+        margin-top: 10px;
+    }
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.4);
+    }
+    .modal-content {
+        background-color: #4b0000;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+    }
+</style>
+
+
 <script>
             const layerCreationComplete = new Event('layerCreationComplete');
 
@@ -225,6 +279,7 @@
 
 
     </script>
+<script type="module" src="tools.js" defer></script>
 <script>
 
 const symmetryButton = document.getElementById('symmetry'); 
@@ -467,7 +522,7 @@ function draw(e) {
     } else {
         // Если спайдер не активен, проверяем, активен ли режим рисования по нарисованному
         if (isDrawOnExisting) {
-            drawOnExistingContent(lastX, lastY, x, y, currentCtx);
+            tools.drawOn(lastX, lastY, x, y, currentCtx);
         } else {
             currentCtx.beginPath();
             currentCtx.moveTo(lastX, lastY);
@@ -485,7 +540,7 @@ function draw(e) {
             drawSpider(symmetricLastX, lastY, symmetricX, y);
         } else {
             if (isDrawOnExisting) {
-                drawOnExistingContent(symmetricLastX, lastY, symmetricX, y, currentCtx);
+                tools.drawOn(symmetricLastX, lastY, symmetricX, y, currentCtx);
             } else {
                 currentCtx.beginPath();
                 currentCtx.moveTo(symmetricLastX, lastY);
@@ -911,7 +966,7 @@ function identifyLayerClickHandler(e) {
 </script>
     <script src="script.js" defer></script>
     <script src="cursors.js" defer></script>
-    <script type="module" src="tools.js" defer></script>
+
     <script type="module" src="constants.js" defer></script>
     <script type="module" src="tools.js" defer></script>
     <script type="module" src="main.js" defer></script>
@@ -921,6 +976,7 @@ function identifyLayerClickHandler(e) {
     <script type="module" src="listners.js" defer></script>
     <script type="module" src="buttons.js" defer></script>
     <script type="module" src="hotkey.js" defer></script>
+    <script type="module" src ="settingsPanel.js" defer></script>
 <script>
 
 
@@ -994,52 +1050,6 @@ function identifyLayerClickHandler(e) {
                 });
             }
 
-
-
-    // рисование на нарисованном
-            function drawOnExistingContent(startX, startY, endX, endY, ctx) {
-                const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
-                const data = imageData.data;
-
-                // Создаем временный холст для рисования линии
-                const tempCanvas = document.createElement('canvas');
-                tempCanvas.width = ctx.canvas.width;
-                tempCanvas.height = ctx.canvas.height;
-                const tempCtx = tempCanvas.getContext('2d');
-
-                // Отключаем сглаживание
-                tempCtx.imageSmoothingEnabled = false;
-
-                // Рисуем линию на временном холсте
-                tempCtx.strokeStyle = ctx.strokeStyle;
-                tempCtx.lineWidth = ctx.lineWidth;
-                tempCtx.lineCap = ctx.lineCap;
-                tempCtx.lineJoin = ctx.lineJoin;
-                tempCtx.globalAlpha = ctx.globalAlpha;
-                tempCtx.beginPath();
-                tempCtx.moveTo(startX, startY);
-                tempCtx.lineTo(endX, endY);
-                tempCtx.stroke();
-
-                // Получаем данные пикселей линии
-                const lineData = tempCtx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height).data;
-
-                // Проходим по каждому пикселю и рисуем только там, где уже есть контент
-                for (let i = 0; i < data.length; i += 4) {
-                    if (data[i + 3] > 0 && lineData[i + 3] > 0) {
-                        // Используем более строгое условие для копирования пикселей
-                        if (lineData[i + 3] > 200) {  // Копируем только если альфа-канал линии достаточно высок
-                            data[i] = lineData[i];
-                            data[i + 1] = lineData[i + 1];
-                            data[i + 2] = lineData[i + 2];
-                            data[i + 3] = lineData[i + 3];
-                        }
-                    }
-                }
-
-                // Применяем изменения к основному холсту
-                ctx.putImageData(imageData, 0, 0);
-            }
 
 
     // обводка
@@ -1152,5 +1162,10 @@ function identifyLayerClickHandler(e) {
 
 
     </script>
+<script>
+
+
+</script>
+</script>
     </body>
  </html>

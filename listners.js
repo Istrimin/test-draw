@@ -8,7 +8,7 @@ import * as tools from './tools.js';
 
     undoBtn.addEventListener('click', undo);
     redoBtn.addEventListener('click', redo);
-    saveImageBtn.addEventListener('click', tools.exportImage);
+
     document.addEventListener('DOMContentLoaded', () => {
                     for (let i = 1; i < 100; i++) {
                         createLayer();
