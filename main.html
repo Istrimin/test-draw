@@ -280,7 +280,70 @@
 
     </script>
 <script type="module" src="tools.js" defer></script>
+
 <script>
+function drawOn(startX, startY, endX, endY, ctx) {
+    const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+    const data = imageData.data;
+
+    // Создаем временный холст для рисования линии
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = ctx.canvas.width;
+    tempCanvas.height = ctx.canvas.height;
+    const tempCtx = tempCanvas.getContext('2d');
+
+    // Отключаем сглаживание для точного рисования пикселей
+    tempCtx.imageSmoothingEnabled = false;
+
+    // Копируем стили рисования из основного контекста
+    tempCtx.strokeStyle = ctx.strokeStyle;
+    tempCtx.lineWidth = ctx.lineWidth;
+    tempCtx.lineCap = ctx.lineCap;
+    tempCtx.lineJoin = ctx.lineJoin;
+
+    // Рисуем линию на временном холсте
+    tempCtx.beginPath();
+    tempCtx.moveTo(startX, startY);
+    tempCtx.lineTo(endX, endY);
+    tempCtx.stroke();
+
+    // Получаем данные изображения линии
+    const lineData = tempCtx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height).data;
+
+    // Оптимизация: проходим только по пикселям линии
+    const lineWidth = ctx.lineWidth;
+    for (let x = Math.floor(Math.min(startX, endX) - lineWidth); x <= Math.ceil(Math.max(startX, endX) + lineWidth); x++) {
+        for (let y = Math.floor(Math.min(startY, endY) - lineWidth); y <= Math.ceil(Math.max(startY, endY) + lineWidth); y++) {
+            if (x >= 0 && x < ctx.canvas.width && y >= 0 && y < ctx.canvas.height) {
+                const i = (y * ctx.canvas.width + x) * 4;
+
+                // Проверяем, находится ли пиксель на линии и есть ли уже что-то нарисованное в этом месте
+                if (lineData[i + 3] > 0 && data[i + 3] > 0) {
+                    const alpha = ctx.globalAlpha;
+                    const existingAlpha = data[i + 3] / 255;
+                    const newAlpha = alpha + existingAlpha * (1 - alpha);
+
+                    // Смешиваем цвета с учетом прозрачности
+                    data[i] = (lineData[i] * alpha + data[i] * existingAlpha * (1 - alpha)) / newAlpha;
+                    data[i + 1] = (lineData[i + 1] * alpha + data[i + 1] * existingAlpha * (1 - alpha)) / newAlpha;
+                    data[i + 2] = (lineData[i + 2] * alpha + data[i + 2] * existingAlpha * (1 - alpha)) / newAlpha;
+                    data[i + 3] = newAlpha * 255;
+                }
+            }
+        }
+    }
+
+    // Применяем изменения к основному холсту
+    ctx.putImageData(imageData, 0, 0);
+}
+
+
+</script>
+
+<script>
+
+
+
 
 const symmetryButton = document.getElementById('symmetry'); 
 
@@ -522,7 +585,7 @@ function draw(e) {
     } else {
         // Если спайдер не активен, проверяем, активен ли режим рисования по нарисованному
         if (isDrawOnExisting) {
-            tools.drawOn(lastX, lastY, x, y, currentCtx);
+            drawOn(lastX, lastY, x, y, currentCtx);
         } else {
             currentCtx.beginPath();
             currentCtx.moveTo(lastX, lastY);
@@ -540,7 +603,7 @@ function draw(e) {
             drawSpider(symmetricLastX, lastY, symmetricX, y);
         } else {
             if (isDrawOnExisting) {
-                tools.drawOn(symmetricLastX, lastY, symmetricX, y, currentCtx);
+                drawOn(symmetricLastX, lastY, symmetricX, y, currentCtx);
             } else {
                 currentCtx.beginPath();
                 currentCtx.moveTo(symmetricLastX, lastY);
@@ -968,7 +1031,7 @@ function identifyLayerClickHandler(e) {
     <script src="cursors.js" defer></script>
 
     <script type="module" src="constants.js" defer></script>
-    <script type="module" src="tools.js" defer></script>
+    <!-- <script type="module" src="tools.js" defer></script> -->
     <script type="module" src="main.js" defer></script>
     <script type="module" src="test.js" defer></script>
     <script type="module" src="settings.js" defer></script>
