@@ -1,3 +1,140 @@
+// старая версия(тут рисовалось на стертых участках)
+// export function drawOn(startX, startY, endX, endY, ctx) {
+//     const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+//     const data = imageData.data;
+
+//     // Создаем временный холст для рисования линии
+//     const tempCanvas = document.createElement('canvas');
+//     tempCanvas.width = ctx.canvas.width;
+//     tempCanvas.height = ctx.canvas.height;
+//     const tempCtx = tempCanvas.getContext('2d');
+
+//     // Отключаем сглаживание для точного рисования пикселей
+//     tempCtx.imageSmoothingEnabled = false;
+
+//     // Копируем стили рисования из основного контекста
+//     tempCtx.strokeStyle = ctx.strokeStyle;
+//     tempCtx.lineWidth = ctx.lineWidth;
+//     tempCtx.lineCap = ctx.lineCap;
+//     tempCtx.lineJoin = ctx.lineJoin;
+
+//     // Рисуем линию на временном холсте
+//     tempCtx.beginPath();
+//     tempCtx.moveTo(startX, startY);
+//     tempCtx.lineTo(endX, endY);
+//     tempCtx.stroke();
+
+//     // Получаем данные изображения линии
+//     const lineData = tempCtx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height).data;
+
+//     // Оптимизация: проходим только по пикселям линии
+//     const lineWidth = ctx.lineWidth;
+//     for (let x = Math.floor(Math.min(startX, endX) - lineWidth); x <= Math.ceil(Math.max(startX, endX) + lineWidth); x++) {
+//         for (let y = Math.floor(Math.min(startY, endY) - lineWidth); y <= Math.ceil(Math.max(startY, endY) + lineWidth); y++) {
+//             if (x >= 0 && x < ctx.canvas.width && y >= 0 && y < ctx.canvas.height) {
+//                 const i = (y * ctx.canvas.width + x) * 4;
+
+//                 // Проверяем, находится ли пиксель на линии и есть ли уже что-то нарисованное в этом месте
+//                 if (lineData[i + 3] > 0 && data[i + 3] > 0) {
+//                     const alpha = ctx.globalAlpha;
+//                     const existingAlpha = data[i + 3] / 255;
+//                     const newAlpha = alpha + existingAlpha * (1 - alpha);
+
+//                     // Смешиваем цвета с учетом прозрачности
+//                     data[i] = (lineData[i] * alpha + data[i] * existingAlpha * (1 - alpha)) / newAlpha;
+//                     data[i + 1] = (lineData[i + 1] * alpha + data[i + 1] * existingAlpha * (1 - alpha)) / newAlpha;
+//                     data[i + 2] = (lineData[i + 2] * alpha + data[i + 2] * existingAlpha * (1 - alpha)) / newAlpha;
+//                     data[i + 3] = newAlpha * 255;
+//                 }
+//             }
+//         }
+//     }
+
+//     // Применяем изменения к основному холсту
+//     ctx.putImageData(imageData, 0, 0);
+// }
+
+export function drawOn(startX, startY, endX, endY, ctx) {
+    const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+    const data = imageData.data;
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = ctx.canvas.width;
+    tempCanvas.height = ctx.canvas.height;
+    const tempCtx = tempCanvas.getContext('2d');
+    tempCtx.imageSmoothingEnabled = false;
+    tempCtx.strokeStyle = ctx.strokeStyle;
+    tempCtx.lineWidth = ctx.lineWidth;
+    tempCtx.lineCap = ctx.lineCap;
+    tempCtx.lineJoin = ctx.lineJoin;
+    tempCtx.beginPath();
+    tempCtx.moveTo(startX, startY);
+    tempCtx.lineTo(endX, endY);
+    tempCtx.stroke();
+    const lineData = tempCtx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height).data;
+    const lineWidth = ctx.lineWidth;
+    for (let x = Math.floor(Math.min(startX, endX) - lineWidth); x <= Math.ceil(Math.max(startX, endX) + lineWidth); x++) {
+        for (let y = Math.floor(Math.min(startY, endY) - lineWidth); y <= Math.ceil(Math.max(startY, endY) + lineWidth); y++) {
+            if (x >= 0 && x < ctx.canvas.width && y >= 0 && y < ctx.canvas.height) {
+                const i = (y * ctx.canvas.width + x) * 4;
+                // Проверяем, находится ли пиксель на линии и есть ли уже что-то нарисованное в этом месте
+                if (lineData[i + 3] > 0 && data[i + 3] > 0) {
+                    const alpha = ctx.globalAlpha;
+                    const existingAlpha = data[i + 3] / 255;
+                    const newAlpha = alpha + existingAlpha * (1 - alpha);
+                    // Смешиваем цвета с учетом прозрачности
+                    data[i] = (lineData[i] * alpha + data[i] * existingAlpha * (1 - alpha)) / newAlpha;
+                    data[i + 1] = (lineData[i + 1] * alpha + data[i + 1] * existingAlpha * (1 - alpha)) / newAlpha;
+                    data[i + 2] = (lineData[i + 2] * alpha + data[i + 2] * existingAlpha * (1 - alpha)) / newAlpha;
+                    data[i + 3] = newAlpha * 255;
+                }
+            }
+        }
+    }
+    ctx.putImageData(imageData, 0, 0);
+}
+
+
+
+
+// *рисование под нарисованным
+// export function drawOn(startX, startY, endX, endY, ctx) {
+//     const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+//     const data = imageData.data;
+//     const tempCanvas = document.createElement('canvas');
+//     tempCanvas.width = ctx.canvas.width;
+//     tempCanvas.height = ctx.canvas.height;
+//     const tempCtx = tempCanvas.getContext('2d');
+//     tempCtx.imageSmoothingEnabled = false;
+//     tempCtx.strokeStyle = ctx.strokeStyle;
+//     tempCtx.lineWidth = ctx.lineWidth;
+//     tempCtx.lineCap = ctx.lineCap;
+//     tempCtx.lineJoin = ctx.lineJoin;
+//     tempCtx.beginPath();
+//     tempCtx.moveTo(startX, startY);
+//     tempCtx.lineTo(endX, endY);
+//     tempCtx.stroke();
+//     const lineData = tempCtx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height).data;
+//     const lineWidth = ctx.lineWidth;
+//     for (let x = Math.floor(Math.min(startX, endX) - lineWidth); x <= Math.ceil(Math.max(startX, endX) + lineWidth); x++) {
+//         for (let y = Math.floor(Math.min(startY, endY) - lineWidth); y <= Math.ceil(Math.max(startY, endY) + lineWidth); y++) {
+//             if (x >= 0 && x < ctx.canvas.width && y >= 0 && y < ctx.canvas.height) {
+//                 const i = (y * ctx.canvas.width + x) * 4;
+//                 // Проверяем, находится ли пиксель на линии и не является ли он полностью прозрачным
+//                 if (lineData[i + 3] > 0 && data[i + 3] < 255) {
+//                     const alpha = ctx.globalAlpha;
+//                     const existingAlpha = data[i + 3] / 255;
+//                     const newAlpha = alpha + existingAlpha * (1 - alpha);
+//                     data[i] = (lineData[i] * alpha + data[i] * existingAlpha * (1 - alpha)) / newAlpha;
+//                     data[i + 1] = (lineData[i + 1] * alpha + data[i + 1] * existingAlpha * (1 - alpha)) / newAlpha;
+//                     data[i + 2] = (lineData[i + 2] * alpha + data[i + 2] * existingAlpha * (1 - alpha)) / newAlpha;
+//                     data[i + 3] = newAlpha * 255;
+//                 }
+//             }
+//         }
+//     }
+//     ctx.putImageData(imageData, 0, 0);
+// }
+
 
 // Сохранение изображения
     saveImageBtn.addEventListener('click', exportImage);
@@ -50,170 +187,170 @@
 
 // полный экран.
 
-    const fullscreenBtn = document.getElementById('fullscreenBtn');
-    const baseContainer = document.querySelector('.base-container');
+    // const fullscreenBtn = document.getElementById('fullscreenBtn');
+    // const baseContainer = document.querySelector('.base-container');
 
-    fullscreenBtn.addEventListener('click', toggleFullscreen);
-    function toggleFullscreen() {
-        if (!document.fullscreenElement) {
-            if (baseContainer.requestFullscreen) {
-                baseContainer.requestFullscreen();
-            } else if (baseContainer.mozRequestFullScreen) { // Firefox
-                baseContainer.mozRequestFullScreen();
-            } else if (baseContainer.webkitRequestFullscreen) { // Chrome, Safari and Opera
-                baseContainer.webkitRequestFullscreen();
-            } else if (baseContainer.msRequestFullscreen) { // IE/Edge
-                baseContainer.msRequestFullscreen();
-            }
-        } else {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            } else if (document.mozCancelFullScreen) { // Firefox
-                document.mozCancelFullScreen();
-            } else if (document.webkitExitFullscreen) { // Chrome, Safari and Opera
-                document.webkitExitFullscreen();
-            } else if (document.msExitFullscreen) { // IE/Edge
-                document.msExitFullscreen();
-            }
-        }
-    }
+    // fullscreenBtn.addEventListener('click', toggleFullscreen);
+    // function toggleFullscreen() {
+    //     if (!document.fullscreenElement) {
+    //         if (baseContainer.requestFullscreen) {
+    //             baseContainer.requestFullscreen();
+    //         } else if (baseContainer.mozRequestFullScreen) { // Firefox
+    //             baseContainer.mozRequestFullScreen();
+    //         } else if (baseContainer.webkitRequestFullscreen) { // Chrome, Safari and Opera
+    //             baseContainer.webkitRequestFullscreen();
+    //         } else if (baseContainer.msRequestFullscreen) { // IE/Edge
+    //             baseContainer.msRequestFullscreen();
+    //         }
+    //     } else {
+    //         if (document.exitFullscreen) {
+    //             document.exitFullscreen();
+    //         } else if (document.mozCancelFullScreen) { // Firefox
+    //             document.mozCancelFullScreen();
+    //         } else if (document.webkitExitFullscreen) { // Chrome, Safari and Opera
+    //             document.webkitExitFullscreen();
+    //         } else if (document.msExitFullscreen) { // IE/Edge
+    //             document.msExitFullscreen();
+    //         }
+    //     }
+    // }
 
-    function handleFullscreenChange() {
-        if (document.fullscreenElement) {
-            enterFullscreenMode();
-        } else {
-            exitFullscreenMode();
-        }
-    }
+    // function handleFullscreenChange() {
+    //     if (document.fullscreenElement) {
+    //         enterFullscreenMode();
+    //     } else {
+    //         exitFullscreenMode();
+    //     }
+    // }
 
-    function enterFullscreenMode() {
-        baseContainer.classList.add('fullscreen-mode');
-        resizeCanvas();
-    }
+    // function enterFullscreenMode() {
+    //     baseContainer.classList.add('fullscreen-mode');
+    //     resizeCanvas();
+    // }
 
-    function exitFullscreenMode() {
-        baseContainer.classList.remove('fullscreen-mode');
-        resetCanvasSize();
-    }
-    function resizeCanvas() {
-        const fullscreenWidth = window.innerWidth - sidebar.offsetWidth;
-        const fullscreenHeight = window.innerHeight;
+    // function exitFullscreenMode() {
+    //     baseContainer.classList.remove('fullscreen-mode');
+    //     resetCanvasSize();
+    // }
+    // function resizeCanvas() {
+    //     const fullscreenWidth = window.innerWidth - sidebar.offsetWidth;
+    //     const fullscreenHeight = window.innerHeight;
         
-        Object.values(layers).forEach(layer => {
-            const ctx = layer.getContext('2d');
-            const tempCanvas = document.createElement('canvas');
-            const tempCtx = tempCanvas.getContext('2d');
+    //     Object.values(layers).forEach(layer => {
+    //         const ctx = layer.getContext('2d');
+    //         const tempCanvas = document.createElement('canvas');
+    //         const tempCtx = tempCanvas.getContext('2d');
             
-            // Сохраняем текущее содержимое
-            tempCanvas.width = layer.width;
-            tempCanvas.height = layer.height;
-            tempCtx.drawImage(layer, 0, 0);
+    //         // Сохраняем текущее содержимое
+    //         tempCanvas.width = layer.width;
+    //         tempCanvas.height = layer.height;
+    //         tempCtx.drawImage(layer, 0, 0);
             
-            // Изменяем размер канваса
-            layer.width = fullscreenWidth;
-            layer.height = fullscreenHeight;
+    //         // Изменяем размер канваса
+    //         layer.width = fullscreenWidth;
+    //         layer.height = fullscreenHeight;
             
-            // Восстанавливаем содержимое с учетом зума
-            ctx.save();
-            ctx.scale(zoomLevel, zoomLevel);
-            ctx.drawImage(tempCanvas, -offsetX / zoomLevel, -offsetY / zoomLevel);
-            ctx.restore();
-        });
+    //         // Восстанавливаем содержимое с учетом зума
+    //         ctx.save();
+    //         ctx.scale(zoomLevel, zoomLevel);
+    //         ctx.drawImage(tempCanvas, -offsetX / zoomLevel, -offsetY / zoomLevel);
+    //         ctx.restore();
+    //     });
         
-        updateZoom();
-    }
+    //     updateZoom();
+    // }
 
-    function resetCanvasSize() {
-        const originalWidth = 600;
-        const originalHeight = 400;
+    // function resetCanvasSize() {
+    //     const originalWidth = 600;
+    //     const originalHeight = 400;
         
-        Object.values(layers).forEach(layer => {
-            const ctx = layer.getContext('2d');
-            const tempCanvas = document.createElement('canvas');
-            const tempCtx = tempCanvas.getContext('2d');
+    //     Object.values(layers).forEach(layer => {
+    //         const ctx = layer.getContext('2d');
+    //         const tempCanvas = document.createElement('canvas');
+    //         const tempCtx = tempCanvas.getContext('2d');
             
-            // Сохраняем текущее содержимое
-            tempCanvas.width = layer.width;
-            tempCanvas.height = layer.height;
-            tempCtx.drawImage(layer, 0, 0);
+    //         // Сохраняем текущее содержимое
+    //         tempCanvas.width = layer.width;
+    //         tempCanvas.height = layer.height;
+    //         tempCtx.drawImage(layer, 0, 0);
             
-            // Возвращаем исходный размер канваса
-            layer.width = originalWidth;
-            layer.height = originalHeight;
+    //         // Возвращаем исходный размер канваса
+    //         layer.width = originalWidth;
+    //         layer.height = originalHeight;
             
-            // Восстанавливаем содержимое с учетом зума
-            ctx.save();
-            ctx.scale(1 / zoomLevel, 1 / zoomLevel);
-            ctx.drawImage(tempCanvas, offsetX, offsetY);
-            ctx.restore();
-        });
+    //         // Восстанавливаем содержимое с учетом зума
+    //         ctx.save();
+    //         ctx.scale(1 / zoomLevel, 1 / zoomLevel);
+    //         ctx.drawImage(tempCanvas, offsetX, offsetY);
+    //         ctx.restore();
+    //     });
         
-        // Сбрасываем зум и смещение
-        zoomLevel = 1;
-        offsetX = 0;
-        offsetY = 0;
+    //     // Сбрасываем зум и смещение
+    //     zoomLevel = 1;
+    //     offsetX = 0;
+    //     offsetY = 0;
         
-        updateZoom();
-    }
+    //     updateZoom();
+    // }
 
-    function updateZoom() {
-        const container = document.getElementById('canvasContainer');
-        const containerRect = container.getBoundingClientRect();
+    // function updateZoom() {
+    //     const container = document.getElementById('canvasContainer');
+    //     const containerRect = container.getBoundingClientRect();
         
-        Object.values(layers).forEach(layer => {
-            layer.style.transformOrigin = '0 0';
-            layer.style.transform = `scale(${zoomLevel})`;
+    //     Object.values(layers).forEach(layer => {
+    //         layer.style.transformOrigin = '0 0';
+    //         layer.style.transform = `scale(${zoomLevel})`;
             
-            // Обновляем позицию с учетом зума
-            const layerRect = layer.getBoundingClientRect();
-            offsetX = Math.min(Math.max(offsetX, containerRect.width - layerRect.width), 0);
-            offsetY = Math.min(Math.max(offsetY, containerRect.height - layerRect.height), 0);
+    //         // Обновляем позицию с учетом зума
+    //         const layerRect = layer.getBoundingClientRect();
+    //         offsetX = Math.min(Math.max(offsetX, containerRect.width - layerRect.width), 0);
+    //         offsetY = Math.min(Math.max(offsetY, containerRect.height - layerRect.height), 0);
             
-            layer.style.left = `${offsetX}px`;
-            layer.style.top = `${offsetY}px`;
-        });
+    //         layer.style.left = `${offsetX}px`;
+    //         layer.style.top = `${offsetY}px`;
+    //     });
         
-        canvasContainer.style.overflow = 'hidden';
-        document.getElementById('zoomLevelDisplay').textContent = `🔎${(zoomLevel * 100).toFixed(0)}%`;
-    }
+    //     canvasContainer.style.overflow = 'hidden';
+    //     document.getElementById('zoomLevelDisplay').textContent = `🔎${(zoomLevel * 100).toFixed(0)}%`;
+    // }
 
-    // Обновляем обработчик изменения размера окна
-    window.addEventListener('resize', () => {
-        if (document.fullscreenElement) {
-            resizeCanvas();
-        }
-    });
+    // // Обновляем обработчик изменения размера окна
+    // window.addEventListener('resize', () => {
+    //     if (document.fullscreenElement) {
+    //         resizeCanvas();
+    //     }
+    // });
 
 
-    // Добавляем слушатель события изменения полноэкранного режима
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
-    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
-    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+    // // Добавляем слушатель события изменения полноэкранного режима
+    // document.addEventListener('fullscreenchange', handleFullscreenChange);
+    // document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    // document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    // document.addEventListener('MSFullscreenChange', handleFullscreenChange);
 
-    // Обновляем стили для полноэкранного режима
-    const style = document.createElement('style');
-    style.textContent = `
-        .base-container.fullscreen-mode {
-            display: flex;
-            width: 100vw;
-            height: 100vh;
-        }
-        .base-container.fullscreen-mode .sidebar {
-            height: 100vh;
-            overflow-y: auto;
-        }
-        .base-container.fullscreen-mode .canvas-and-sliders {
-            flex-grow: 1;
-            height: 100vh;
-            overflow: hidden;
-        }
-        .base-container.fullscreen-mode .canvas-container {
-            width: 100%;
-            height: 100%;
-        }
-    `;
-    document.head.appendChild(style);
+    // // Обновляем стили для полноэкранного режима
+    // const style = document.createElement('style');
+    // style.textContent = `
+    //     .base-container.fullscreen-mode {
+    //         display: flex;
+    //         width: 100vw;
+    //         height: 100vh;
+    //     }
+    //     .base-container.fullscreen-mode .sidebar {
+    //         height: 100vh;
+    //         overflow-y: auto;
+    //     }
+    //     .base-container.fullscreen-mode .canvas-and-sliders {
+    //         flex-grow: 1;
+    //         height: 100vh;
+    //         overflow: hidden;
+    //     }
+    //     .base-container.fullscreen-mode .canvas-container {
+    //         width: 100%;
+    //         height: 100%;
+    //     }
+    // `;
+    // document.head.appendChild(style);
 
 
 

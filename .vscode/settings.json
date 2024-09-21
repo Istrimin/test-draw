@@ -1,4 +1,7 @@
-// {
+{
+	"editor.glyphMargin": false,
+	"CodeGPT.apiKey": "CodeGPT Plus Beta"
+} // {
 //   "workbench.colorCustomizations": {
 //     "editor.tokenColorCustomizations": {
 //       "textMateRules": [

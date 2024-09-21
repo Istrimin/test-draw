@@ -1,3 +1,22 @@
+
+
+/* #canvasContainer {
+  touch-action: none;
+} */
+
+/* добавлено Sat 21 12:47 */
+html, body {
+  /* touch-action: none; */
+
+/* commented 21 Sep 14:58 */
+  /* -ms-touch-action: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none; */
+}
 body {
     background-image: url('../images/logo.jpg');
     background-color: black;

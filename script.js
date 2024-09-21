@@ -1,9 +1,9 @@
 
 
-try {
-  isPressureSupported = !!window.PointerEvent && 'pressure' in PointerEvent.prototype;
-} catch (e) { }
-            const isPressureSupported = 'onpointermove' in window;
+// try {
+//   isPressureSupported = !!window.PointerEvent && 'pressure' in PointerEvent.prototype;
+// } catch (e) { }
+//             const isPressureSupported = 'onpointermove' in window;
 // *toggle eraser
         eraserBtn.addEventListener('click', toggleEraser);
         function toggleEraser() {
