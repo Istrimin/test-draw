@@ -19,7 +19,7 @@
       document.querySelector('.active-layer').classList.remove('active-layer');
       this.classList.add('active-layer');
       currentLayer = parseInt(this.dataset.layer);
-      currentCtx = window['ctx' + currentLayer];
+      curCtx = window['ctx' + currentLayer];
       isDrawing = false;
       });
     });
@@ -31,7 +31,7 @@
     reader.onload = (e) => {
       uploadedImage = new Image();
       uploadedImage.onload = () => {
-        currentCtx.drawImage(uploadedImage, 0, 0, layer2.width, layer2.height);
+        curCtx.drawImage(uploadedImage, 0, 0, layer2.width, layer2.height);
       };
       uploadedImage.src = e.target.result;
     };
@@ -51,11 +51,11 @@
     });
   });
   function setDrawingColor(color) {
-    if (currentCtx) {
+    if (curCtx) {
       // Store the color for the current layer
       layerColors[currentLayer] = color;
       // Update the current context's color for immediate visual feedback
-      currentCtx.strokeStyle = color;
+      curCtx.strokeStyle = color;
       // Update button color when drawing color changes
       updateLayerButtonColor(currentLayer);
     }
@@ -65,17 +65,17 @@
       if (history[currentLayer] && history[currentLayer].length > 0) {
         if (history[currentLayer].length === 1) {
           // Если это последнее состояние, сохраняем текущее состояние перед очисткой
-          const currentState = currentCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height);
+          const currentState = curCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height);
           redoHistory[currentLayer].push(currentState);
           // Очищаем холст
-          currentCtx.clearRect(0, 0, layers[currentLayer].width, layers[currentLayer].height);
+          curCtx.clearRect(0, 0, layers[currentLayer].width, layers[currentLayer].height);
         } else {
           // Сохраняем текущее состояние в redoHistory
-          const currentState = currentCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height);
+          const currentState = curCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height);
           redoHistory[currentLayer].push(currentState);
           // Возвращаемся к предыдущему состоянию
           const previousState = history[currentLayer].pop();
-          currentCtx.putImageData(previousState, 0, 0);
+          curCtx.putImageData(previousState, 0, 0);
         }
       }
     }
@@ -84,9 +84,9 @@
       if (redoHistory[currentLayer] && redoHistory[currentLayer].length > 0) {
         const nextState = redoHistory[currentLayer].pop();
         // Сохраняем текущее состояние в history перед применением redo
-        const currentState = currentCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height);
+        const currentState = curCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height);
         history[currentLayer].push(currentState);
-        currentCtx.putImageData(nextState, 0, 0);
+        curCtx.putImageData(nextState, 0, 0);
       }
     }
 // fix flood fill

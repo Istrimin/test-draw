@@ -1,8 +1,8 @@
 
 
-/* #canvasContainer {
-  touch-action: none;
-} */
+#canvasContainer {
+  /* touch-action: none; */
+}
 
 /* добавлено Sat 21 12:47 */
 html, body {

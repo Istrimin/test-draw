@@ -255,7 +255,7 @@
 
                 isSpider = false,
 
-                currentCtx,
+                curCtx,
                 isDrawing = false,
                 isErasing = false,
                 isDrawOnExisting = false,
@@ -321,14 +321,14 @@ const spiderStrengthSlider = document.getElementById('spiderStrength');
     }
 
     function drawSpider(startX, startY, endX, endY) {
-        currentCtx.globalAlpha = 1; // Set opacity
-        currentCtx.lineJoin = 'round'; // Rounded corners
-        currentCtx.lineCap = 'round'; // Rounded line ends
+        curCtx.globalAlpha = 1; // Set opacity
+        curCtx.lineJoin = 'round'; // Rounded corners
+        curCtx.lineCap = 'round'; // Rounded line ends
 
-        currentCtx.beginPath();
-        currentCtx.moveTo(startX, startY);
-        currentCtx.quadraticCurveTo(startX, startY, endX, endY); 
-        currentCtx.stroke();
+        curCtx.beginPath();
+        curCtx.moveTo(startX, startY);
+        curCtx.quadraticCurveTo(startX, startY, endX, endY); 
+        curCtx.stroke();
 
         points.push({ x: endX, y: endY }); // Store the current point
 
@@ -340,10 +340,10 @@ const spiderStrengthSlider = document.getElementById('spiderStrength');
             const dy = points[i].y - endY;
             const dd = dx * dx + dy * dy;
             if (dd < power) {
-                currentCtx.beginPath();
-                currentCtx.moveTo(endX + (dx * 0.2), endY + (dy * 0.2));
-                currentCtx.lineTo(points[i].x - (dx * 0.2), points[i].y - (dy * 0.2));
-                currentCtx.stroke();
+                curCtx.beginPath();
+                curCtx.moveTo(endX + (dx * 0.2), endY + (dy * 0.2));
+                curCtx.lineTo(points[i].x - (dx * 0.2), points[i].y - (dy * 0.2));
+                curCtx.stroke();
             }
         }
     }
@@ -356,12 +356,12 @@ const spiderStrengthSlider = document.getElementById('spiderStrength');
 <script>
         
             document.dispatchEvent(layerCreationComplete); 
-            Object.values(layers).forEach(addEventListenersToLayer);
+            // Object.values(layers).forEach(addEventListenersToLayer);
             drawOnExistingBtn.addEventListener('click', toggleDrawOnExisting);
-            backgroundPicker.addEventListener('input', (event) => {
-                contexts[0].fillStyle = event.target.value;
-                contexts[0].fillRect(0, 0, layers[0].width, layers[0].height);
-            });
+            // backgroundPicker.addEventListener('input', (event) => {
+            //     contexts[0].fillStyle = event.target.value;
+            //     contexts[0].fillRect(0, 0, layers[0].width, layers[0].height);
+            // });
 
         // ИНИЦИАЛИЗАЦИЯ 
             document.addEventListener('DOMContentLoaded', function () {
@@ -435,7 +435,7 @@ const spiderStrengthSlider = document.getElementById('spiderStrength');
             }
 
             currentLayer = layerNum;
-            currentCtx = contexts[currentLayer];
+            curCtx = contexts[currentLayer];
 
             // Update opacity slider and value
             const opacity = layerOpacities[layerNum] || 100; // Default to 100 if not set
@@ -454,7 +454,7 @@ const spiderStrengthSlider = document.getElementById('spiderStrength');
             }
 
             if (layerColors[layerNum]) {
-                currentCtx.strokeStyle = layerColors[layerNum];
+                curCtx.strokeStyle = layerColors[layerNum];
             }
         }
 
@@ -478,7 +478,7 @@ const spiderStrengthSlider = document.getElementById('spiderStrength');
 
 
     function saveState() {
-                if (!currentCtx) {
+                if (!curCtx) {
                     return;
                 }
 
@@ -486,16 +486,100 @@ const spiderStrengthSlider = document.getElementById('spiderStrength');
                     history[currentLayer].shift(); // Remove the oldest state
                 }
 
-                history[currentLayer].push(currentCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height));
+                history[currentLayer].push(curCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height));
                 redoHistory[currentLayer] = [];
 
                 historySlider.max = history[currentLayer].length - 1;
                 historySlider.value = history[currentLayer].length - 1;
             }
 
-//         
+// //         
+// function startDrawing(e) {
+//     if (currentLayer === 100 || !curCtx || isEyedropperActive || isCtrlPressed) { 
+//         return;
+//     }
+//     isDrawing = true;
+//     const rect = layers[currentLayer].getBoundingClientRect();
+//     const x = Math.floor((e.clientX - rect.left) / zoomLevel);
+//     const y = Math.floor((e.clientY - rect.top) / zoomLevel);
+
+//     points.length = 0;
+//     points.push({ x, y });
+
+//     [lastX, lastY] = [x, y];
+//     saveState(); 
+// }
+// function draw(e) {
+
+//     if (!isDrawing || !curCtx) {
+//         return;
+//     }
+//     if (isFinger) {
+//         fingerfunc(e);
+//         return;
+//     }
+//     const rect = layers[currentLayer].getBoundingClientRect();
+//     const x = Math.floor((e.clientX - rect.left) / zoomLevel);
+//     const y = Math.floor((e.clientY - rect.top) / zoomLevel);
+//     const pressure = e.pressure || 1;
+//     curCtx.lineWidth = brushSize.value * pressure;
+//     curCtx.lineCap = 'round';
+//     curCtx.lineJoin = 'round';
+//     curCtx.globalAlpha = opacity.value / 100;
+//     curCtx.globalCompositeOperation = isErasing ? 'destination-out' : 'source-over';
+
+//     // Проверяем, активен ли спайдер
+//     if (isSpider) {
+//         drawSpider(lastX, lastY, x, y);
+//     } else {
+//         // Если спайдер не активен, проверяем, активен ли режим рисования по нарисованному
+//         if (isDrawOnExisting) {
+//             tools.drawOn(lastX, lastY, x, y, curCtx);
+//         } else {
+//             curCtx.beginPath();
+//             curCtx.moveTo(lastX, lastY);
+//             curCtx.lineTo(x, y);
+//             curCtx.stroke();
+//         }
+//     }
+
+//     if (symmetry) {
+//         const centerX = layers[currentLayer].width / 2;
+//         const symmetricLastX = centerX + (centerX - lastX);
+//         const symmetricX = centerX + (centerX - x);
+
+//         if (isSpider) {
+//             drawSpider(symmetricLastX, lastY, symmetricX, y);
+//         } else {
+//             if (isDrawOnExisting) {
+//                 tools.drawOn(symmetricLastX, lastY, symmetricX, y, curCtx);
+//             } else {
+//                 curCtx.beginPath();
+//                 curCtx.moveTo(symmetricLastX, lastY);
+//                 curCtx.lineTo(symmetricX, y);
+//                 curCtx.stroke();
+//             }
+//         }
+//     }
+
+//     [lastX, lastY] = [x, y];
+//     pressureBar.value = pressure * 10000;
+//     pressureBar.nextElementSibling.textContent = Math.round(pressure * 100);
+// }
+
+// function stopDrawing() {
+//     if (isDrawing) {
+//         isDrawing = false;
+//         saveState();
+//         points.length = 0; 
+//     }
+//         lastX = null;
+//         lastY = null;
+// }
+
+
 function startDrawing(e) {
-    if (currentLayer === 100 || !currentCtx || isEyedropperActive || isCtrlPressed) { 
+    if (currentLayer === 100 || !curCtx || isEyedropperActive || isCtrlPressed) { 
         return;
     }
     isDrawing = true;
@@ -509,8 +593,9 @@ function startDrawing(e) {
     [lastX, lastY] = [x, y];
     saveState(); 
 }
+
 function draw(e) {
-    if (!isDrawing || !currentCtx) {
+    if (!isDrawing || !curCtx) {
         return;
     }
     if (isFinger) {
@@ -521,24 +606,22 @@ function draw(e) {
     const x = Math.floor((e.clientX - rect.left) / zoomLevel);
     const y = Math.floor((e.clientY - rect.top) / zoomLevel);
     const pressure = e.pressure || 1;
-    currentCtx.lineWidth = brushSize.value * pressure;
-    currentCtx.lineCap = 'round';
-    currentCtx.lineJoin = 'round';
-    currentCtx.globalAlpha = opacity.value / 100;
-    currentCtx.globalCompositeOperation = isErasing ? 'destination-out' : 'source-over';
+    curCtx.lineWidth = brushSize.value * pressure;
+    curCtx.lineCap = 'round';
+    curCtx.lineJoin = 'round';
+    curCtx.globalAlpha = opacity.value / 100;
+    curCtx.globalCompositeOperation = isErasing ? 'destination-out' : 'source-over';
 
-    // Проверяем, активен ли спайдер
     if (isSpider) {
         drawSpider(lastX, lastY, x, y);
     } else {
-        // Если спайдер не активен, проверяем, активен ли режим рисования по нарисованному
         if (isDrawOnExisting) {
-            tools.drawOn(lastX, lastY, x, y, currentCtx);
+            tools.drawOn(lastX, lastY, x, y, curCtx);
         } else {
-            currentCtx.beginPath();
-            currentCtx.moveTo(lastX, lastY);
-            currentCtx.lineTo(x, y);
-            currentCtx.stroke();
+            curCtx.beginPath();
+            curCtx.moveTo(lastX, lastY);
+            curCtx.lineTo(x, y);
+            curCtx.stroke();
         }
     }
 
@@ -551,12 +634,12 @@ function draw(e) {
             drawSpider(symmetricLastX, lastY, symmetricX, y);
         } else {
             if (isDrawOnExisting) {
-                tools.drawOn(symmetricLastX, lastY, symmetricX, y, currentCtx);
+                tools.drawOn(symmetricLastX, lastY, symmetricX, y, curCtx);
             } else {
-                currentCtx.beginPath();
-                currentCtx.moveTo(symmetricLastX, lastY);
-                currentCtx.lineTo(symmetricX, y);
-                currentCtx.stroke();
+                curCtx.beginPath();
+                curCtx.moveTo(symmetricLastX, lastY);
+                curCtx.lineTo(symmetricX, y);
+                curCtx.stroke();
             }
         }
     }
@@ -575,36 +658,14 @@ function stopDrawing() {
         lastX = null;
         lastY = null;
 }
+
 function endDrawing() {
     if (isDrawing) {
         isDrawing = false;
-        resetOriginalImage(currentLayer);
-        const size = outlineSizes[currentLayer];
-        var point=10
-        if (isSmoothLineMode ) {
-            const output = getSmoothLine(points);
-            
-            currentCtx.beginPath();
-            currentCtx.moveTo(output[0].x, output[0].y);
-            
-            for (let i = 1; i < output.length; i++) {
-                currentCtx.lineTo(output[i].x, output[i].y);
-            }
-            
-            currentCtx.stroke();
-        }
-        
         lastX = null;
         lastY = null;
     }
 }
-
-
-
-
-
-
-
 
     function addEventListenersToLayer(layer) {
             layer.addEventListener('pointerdown', startDrawing);
@@ -684,7 +745,7 @@ function handleEyedropperClick(e) {
             if (layerButton) {
                 layerButton.style.backgroundColor = color;
             }
-            currentCtx.strokeStyle = color;
+            curCtx.strokeStyle = color;
             isEyedropperActive = false;
             eyedropperBtn.classList.remove('active');
             return;
@@ -813,9 +874,9 @@ function identifyLayerClickHandler(e) {
         // layer.addEventListener('pointerup', handlePointerUp);
         // layer.addEventListener('pointerout', handlePointerOut);
 
-        layerPanel.addEventListener('pointerup', () => {
-            isDraggingScroll = false;
-         });
+        // layerPanel.addEventListener('pointerup', () => {
+
+        //  });
         canvasContainer.addEventListener('pointerdown', handleCanvasClick);
         function handleCanvasClick(e) {
             if (e.altKey) {
@@ -1019,7 +1080,7 @@ canvasContainer.addEventListener('mousemove', (e) => {
                 narrowToCenterBtn.classList.toggle('active', isFinger);
             });
     function fingerfunc(e) {
-        if (!isDrawing || !currentCtx || !isFinger) return;
+        if (!isDrawing || !curCtx || !isFinger) return;
 
         const rect = layers[currentLayer].getBoundingClientRect();
         const x = Math.floor((e.clientX - rect.left) / zoomLevel);
@@ -1028,22 +1089,22 @@ canvasContainer.addEventListener('mousemove', (e) => {
         const brushSize = parseInt(brushSize.value);
         const halfBrushSize = brushSize / 2;
 
-        currentCtx.save();
-        currentCtx.beginPath();
-        currentCtx.arc(x, y, halfBrushSize, 0, Math.PI * 2);
-        currentCtx.clip();
+        curCtx.save();
+        curCtx.beginPath();
+        curCtx.arc(x, y, halfBrushSize, 0, Math.PI * 2);
+        curCtx.clip();
 
         if (lastX !== null && lastY !== null) {
             const dx = x - lastX;
             const dy = y - lastY;
-            currentCtx.drawImage(
+            curCtx.drawImage(
                 layers[currentLayer],
                 x - halfBrushSize - dx, y - halfBrushSize - dy, brushSize, brushSize,
                 x - halfBrushSize, y - halfBrushSize, brushSize, brushSize
             );
         }
 
-        currentCtx.restore();
+        curCtx.restore();
 
         lastX = x;
         lastY = y;
