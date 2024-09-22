@@ -1,3 +1,44 @@
+// Функция для объединения слоев
+    const mergeLayersBtn = document.getElementById('mergeLayers');
+    // Добавляем обработчик события для кнопки
+    mergeLayersBtn.addEventListener('click', mergeLayers);
+
+
+        function mergeLayers() {
+            // Создаем новый холст для объединенного изображения
+            const mergedCanvas = document.createElement('canvas');
+            const mergedCtx = mergedCanvas.getContext('2d', { willReadFrequently: true });
+            mergedCanvas.width = layers[1].width;
+            mergedCanvas.height = layers[1].height;
+
+            // Получаем все кнопки слоев и сортируем их по z-index
+            const layerButtons = Array.from(document.querySelectorAll('.layer-button'));
+            layerButtons.sort((a, b) => {
+                const layerA = layers[parseInt(a.dataset.layer)];
+                const layerB = layers[parseInt(b.dataset.layer)];
+                return parseInt(layerA.style.zIndex || 0) - parseInt(layerB.style.zIndex || 0);
+            });
+
+            // Рисуем каждый слой на объединенном холсте
+            layerButtons.forEach((button) => {
+                const layerId = parseInt(button.dataset.layer);
+                if (layers[layerId] && layerId !== back) {
+                    mergedCtx.drawImage(layers[layerId], 0, 0);
+                    // Очищаем содержимое слоя, кроме текущего
+                    if (layerId !== currentLayer) {
+                        const ctx = contexts[layerId];
+                        ctx.clearRect(0, 0, layers[layerId].width, layers[layerId].height);
+                    }
+                }
+            });
+
+            // Рисуем объединенное изображение на текущем слое
+            curCtx.drawImage(mergedCanvas, 0, 0);
+
+            // Обновляем интерфейс
+            updateLayerOrder();
+        }
+
 export function drawOn(startX, startY, endX, endY, ctx) {
     const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
     const data = imageData.data;
@@ -463,10 +504,6 @@ export function drawOn(startX, startY, endX, endY, ctx) {
 
 // Объединяем слои
 // Получаем ссылку на кнопку объединения слоев
-const mergeLayersBtn = document.getElementById('mergeLayers');
-// Добавляем обработчик события для кнопки
-mergeLayersBtn.addEventListener('click', mergeLayers);
-
 
 // Очистка канваса
 
