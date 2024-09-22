@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // });
 });
 
+
 // настройки планшета
 document.addEventListener('touchstart', function (e) {
     if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT') {
@@ -36,12 +37,12 @@ document.addEventListener('mousedown', function (e) {
     }
 }, { passive: false });
 
-// отключаем все стандарные настройки кнопок
+// add commented 22 Sep 21:50 отключаем все стандарные настройки кнопок
 document.addEventListener('keydown', function(e) {
   e.preventDefault(); 
 });
 
-// отключаем обры линии при выходе из канваса
+// отключаем обрыв линии при выходе из канваса
 document.addEventListener('pointerleave', function(e) {
     e.preventDefault();
 });

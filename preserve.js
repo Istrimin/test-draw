@@ -252,7 +252,7 @@
                 }
             });
         });
-
+// ? тут странно, может быть проблемой
         function addEventListenersToLayer(layer) {
             layer.addEventListener('pointerdown', startDrawing);
             layer.addEventListener('pointermove', draw);

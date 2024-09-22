@@ -36,6 +36,131 @@ export function drawOn(startX, startY, endX, endY, ctx) {
     }
     ctx.putImageData(imageData, 0, 0);
 }
+// добавляем слой под текущий
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                createLayerBelowCurrent();
+                updateZoom();//?
+            }
+        });
+    function createLayerBelowCurrent() {
+                const layerButtons = Array.from(document.querySelectorAll('.layer-button'));
+                const currentIndex = layerButtons.findIndex(btn => parseInt(btn.dataset.layer) === currentLayer);
+                layerCount++;
+                const newLayerNum = layerCount;
+                const canvas = document.createElement('canvas');
+                canvas.id = `layer${newLayerNum}`;
+                canvas.width = 600;
+                canvas.height = 400;
+                canvas.style.position = 'absolute';
+                canvas.style.top = '0';
+                canvas.style.left = '0';
+                canvas.style.zIndex = newLayerNum;
+                if (currentIndex !== -1) {
+                    canvasContainer.insertBefore(canvas, layers[currentLayer]);
+                } else {
+                    canvasContainer.appendChild(canvas);
+                }
+                layers[newLayerNum] = canvas;
+                contexts[newLayerNum] = canvas.getContext('2d');
+                layerColors[newLayerNum] = '#' + Math.floor(Math.random() * 16777215).toString(16);
+                const button = document.createElement('button');
+                button.textContent = " ❤ ";
+                button.classList.add('layer-button');
+                button.dataset.layer = newLayerNum;
+                
+                // Add eye icon
+                const eyeIcon = document.createElement('span');
+                eyeIcon.textContent = "👁️";
+                eyeIcon.style.display = 'inline'; // Show the eye icon by default
+                eyeIcon.classList.add('eye-icon');
+                button.appendChild(eyeIcon);
+                
+                if (currentIndex !== -1) {
+                    layerButtons[currentIndex].parentNode.insertBefore(button, layerButtons[currentIndex].nextSibling);
+                } else {
+                    layerButtons.appendChild(button);
+                }
+                button.addEventListener('click', function () {
+                    setCurrentLayer(parseInt(this.dataset.layer));
+                });
+                addEventListenersToLayer(canvas);
+                history[newLayerNum] = [];
+                redoHistory[newLayerNum] = [];
+                setCurrentLayer(newLayerNum);
+                initializeLayer(newLayerNum);
+                updateLayerButtonColor(newLayerNum);
+                updateLayerOrder();
+                
+                // Mark the new layer as drawn on
+                layerDrawnOn[newLayerNum] = true;
+                updateLayerEyeIcon(newLayerNum);
+            }
+// добавляем слой над текущим
+    document.addEventListener('keydown', function (e) {
+        if (e.code === 'Backquote') { // так называется тильда 
+            e.preventDefault();
+            createLayerAboveCurrent();
+            updateZoom(); //?
+        }
+    });
+
+    function createLayerAboveCurrent() {
+        const layerButtons = Array.from(document.querySelectorAll('.layer-button'));
+        const currentIndex = layerButtons.findIndex(btn => parseInt(btn.dataset.layer) === currentLayer);
+        layerCount++;
+        const newLayerNum = layerCount;
+        const canvas = document.createElement('canvas');
+        canvas.id = `layer${newLayerNum}`;
+        canvas.width = 600;
+        canvas.height = 400;
+        canvas.style.position = 'absolute';
+        canvas.style.top = '0';
+        canvas.style.left = '0';
+        canvas.style.zIndex = newLayerNum;
+
+        if (currentIndex !== -1) {
+            canvasContainer.insertBefore(canvas, layers[currentLayer]);
+        } else {
+            canvasContainer.appendChild(canvas);
+        }
+
+        layers[newLayerNum] = canvas;
+        contexts[newLayerNum] = canvas.getContext('2d');
+        layerColors[newLayerNum] = '#' + Math.floor(Math.random() * 16777215).toString(16);
+        const button = document.createElement('button');
+        button.textContent = " ❤ ";
+        button.classList.add('layer-button');
+        button.dataset.layer = newLayerNum;
+
+        const eyeIcon = document.createElement('span');
+        eyeIcon.textContent = "👁️";
+        eyeIcon.style.display = 'inline';
+        eyeIcon.classList.add('eye-icon');
+        button.appendChild(eyeIcon);
+
+        if (currentIndex !== -1) {
+            layerButtons[currentIndex].parentNode.insertBefore(button, layerButtons[currentIndex]);
+        } else {
+            layerButtons.appendChild(button);
+        }
+
+        button.addEventListener('click', function () {
+            setCurrentLayer(parseInt(this.dataset.layer));
+        });
+        addEventListenersToLayer(canvas);
+        history[newLayerNum] = [];
+        redoHistory[newLayerNum] = [];
+        setCurrentLayer(newLayerNum);
+        initializeLayer(newLayerNum);
+        updateLayerButtonColor(newLayerNum);
+        updateLayerOrder();
+
+        // Mark the new layer as drawn on
+        layerDrawnOn[newLayerNum] = true;
+        updateLayerEyeIcon(newLayerNum);
+    }
 
 // *рисование под нарисованным
     // export function drawOn(startX, startY, endX, endY, ctx) {
@@ -94,7 +219,7 @@ export function drawOn(startX, startY, endX, endY, ctx) {
 
       layerButtons.forEach((button) => {
         const layerId = parseInt(button.dataset.layer);
-        if (layers[layerId] && layerId !== 100) {
+        if (layers[layerId] && layerId !== back) {
           // Apply layer opacity during drawing
           mergeCtx.globalAlpha = layerOpacities[layerId] / 100; 
           mergeCtx.drawImage(layers[layerId], 0, 0);
@@ -294,9 +419,6 @@ export function drawOn(startX, startY, endX, endY, ctx) {
     // document.head.appendChild(style);
 
 
-
-// Слушатели и константы
-
 // Удаление всего
     const deleteAllBtn = document.getElementById('deleteAllBtn');
     deleteAllBtn.addEventListener('click', () => {
@@ -306,9 +428,8 @@ export function drawOn(startX, startY, endX, endY, ctx) {
     });
     function deleteAllLayers() {
         Object.keys(layers).forEach(layerNum => {
-            // Convert layerNum to a number for comparison
-            if (parseInt(layerNum) === 100) {
-                return; // Skip deletion for layer 100
+            if (parseInt(layerNum) === back) {
+                return;
             }
             
             const ctx = contexts[layerNum];
@@ -321,8 +442,6 @@ export function drawOn(startX, startY, endX, endY, ctx) {
         });
     }
 // Назначаем горячие клавиши для выбора цветов(это не влияет на выбор цвет бэка)
-// 
-
     // Update color picker setup 
         const colorPickers = document.querySelectorAll('input[type="color"]');
         colorPickers.forEach((picker, index) => {
@@ -343,53 +462,10 @@ export function drawOn(startX, startY, endX, endY, ctx) {
 
 
 // Объединяем слои
-    // Получаем ссылку на кнопку объединения слоев
-    const mergeLayersBtn = document.getElementById('mergeLayers');
-    // Добавляем обработчик события для кнопки
-    mergeLayersBtn.addEventListener('click', mergeLayers);
-    // Функция для объединения слоев
-    function mergeLayers() {
-        // Создаем новый холст для объединенного изображения
-        const mergedCanvas = document.createElement('canvas');
-        const mergedCtx = mergedCanvas.getContext('2d');
-        mergedCanvas.width = layers[1].width;
-        mergedCanvas.height = layers[1].height;
-        // Получаем все кнопки слоев и сортируем их по z-index
-        const layerButtons = Array.from(document.querySelectorAll('.layer-button'));
-        layerButtons.sort((a, b) => {
-            const layerA = layers[parseInt(a.dataset.layer)];
-            const layerB = layers[parseInt(b.dataset.layer)];
-            return parseInt(layerA.style.zIndex || 0) - parseInt(layerB.style.zIndex || 0);
-        });
-        // Рисуем каждый слой на объединенном холсте
-        layerButtons.forEach((button) => {
-            const layerId = parseInt(button.dataset.layer);
-            if (layers[layerId]) {
-                mergedCtx.drawImage(layers[layerId], 0, 0);
-            }
-        });
-        // Удаляем все существующие слои
-        layerButtons.forEach((button) => {
-            const layerId = parseInt(button.dataset.layer);
-            if (layers[layerId]) {
-                canvasContainer.removeChild(layers[layerId]);
-                delete layers[layerId];
-                delete contexts[layerId];
-                delete layerColors[layerId];
-                delete history[layerId];
-                delete redoHistory[layerId];
-            }
-            button.remove();
-        });
-        // Сбрасываем счетчик слоев
-        layerCount = 0;
-        // Создаем новый слой с объединенным изображением
-        createLayer();
-        curCtx.drawImage(mergedCanvas, 0, 0);
-        // Обновляем интерфейс
-        updateLayerOrder();
-        setCurrentLayer(1);
-    }
+// Получаем ссылку на кнопку объединения слоев
+const mergeLayersBtn = document.getElementById('mergeLayers');
+// Добавляем обработчик события для кнопки
+mergeLayersBtn.addEventListener('click', mergeLayers);
 
 
 // Очистка канваса

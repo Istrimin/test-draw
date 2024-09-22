@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- отключение маштабирования -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Настоящий Художник</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
@@ -10,44 +13,30 @@
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jscolor/2.4.5/jscolor.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+</head>
 
-
-    </head>
-<style>
- #zoomLevelDisplay {
-    color: red; /* Set text color to red */
-    font-weight: bold; /* Make the text bold */
-    font-size: 16px; /* Adjust font size */
-    margin-top: 10px; 
- }
-/* пофиксить панель курсоров для планшета */
-
-    </style>
 <body>
-
+    <style>
+    </style>
     <div class="base-container">
         <div class="sidebar">
             <a href="index.html" target="_self" title="Выйти из команты" id="exitLink">🚪</a>
-            <button id="message" title="Сообщение">✉️</button>
+<button id="message" title="Сообщение">✉️</button>
+<div id="message-container" class="message-popup">
+  <p id="message-text"></p>
+</div>
 
-            <div id="message-container" style="display: none;">
-
-                <p id="message"></p>
-             </div>
             <div class="sidebar">
             </div>
-            <button id="smoothLineBtn" title="Сглаживание линий">🔄</button>
-
+            <button id="backgroundSettingsBtn" title="Настройки фона">🖼️</button>
+            <button id="canvasSettingsBtn" title="Настройки канваса">🖌️</button>
             <button id="fullscreenBtn" title="Полноэкранный режим">🔲</button>
-
-
-            <button id="narrowToCenter" title="Сужение к центру">🎯</button>
-
+            <button id="spider" title="Паутинка">🕷️</button>
+            <button id="fingerfunc" title="Сужение к центру">🎯</button>
             <button id="identifyLayerBtn" title="Определить слой">🔍</button>
             <button id="drawOnExistingBtn" title="Рисовать на существующем">➡️</button>
-
             <input type="file" id="imageInput" accept="image/*" style="display: none;">
-            <button id="UploadButton" title="Загрузить изображение (U)">🌺</button>
+            <button id="UploadB" title="Загрузить изображение (U)">🌺</button>
             <button id="saveImageBtn" title="Сохранить изображение">🎬</button>
             <button id="eraserBtn">🧽</button>
             <button id="changeCursorBtn" title="Сменить курсор">🎨</button>
@@ -57,25 +46,22 @@
             <button id="fillModeBtn" title="Заливка (F)">🌊</button>
             <button id="floodFillBtn" title="Залить цветом">✨</button>
             <button id="eyedropperBtn" title="Пипетка заливки (A)">💧</button>
-            <button id="brushEyedropperBtn" title="Пипетка кисти (D)">🖌️</button>
             <button id="deleteAllBtn" title="Удалить все">🗑️</button>
-
             <button id="mergeLayers" title="Объединить слои">🔗</button>
             <button id="settings" title="Настройки">⚙️</button>
-          </div>
 
-       <div class="canvas-and-sliders">
+        </div>
+        <div id="colorPreview"></div>
+        <div class="canvas-and-sliders">
             <div class="layer-panel-wrapper">
-
                 <button id="moveLayerUp" title="Слой вверх">▲</button>
                 <div class="layer-panel">
                     <div id="layerButtons"></div>
                 </div>
                 <button id="moveLayerDown" title="Слой вниз">▼</button>
-             </div>
+            </div>
             <div class="canvas-container">
                 <div class="color-picker-and-word">
-
                     <div class="color-picker-group">
                         <input type="color" id="colorPicker" value="#000000" title="Цвет заливки (C)">
                         <input type="color" id="colorPicker2" value="#ffffff" title="булый">
@@ -86,12 +72,10 @@
                         <input type="color" id="colorPicker7" value="#00ffff" title="Цвет кисти 7">
                         <input type="color" id="colorPicker8" value="#0000ff" title="Цвет кисти 8">
                         <input type="color" id="colorPicker9" value="#800080" title="Цвет кисти 9">
-                                                    <input type="color" id="backgroundPicker" value="#ffffff" title="Цвет фона (B)">
-
-<div class="color-picker-group-two">
+                        <input type="color" id="backgroundPicker" value="#ffffff" title="Цвет фона (B)">
+                        <div class="color-picker-group-two">
                         </div>
-                            <button id="symmetry" title="Симметрия (S)">🦋</button>
-
+                        <button id="symmetry" title="Симметрия (S)">🦋</button>
                     </div>
                     <div class="word-navigation">
                         <button id="previousWord" title="Предыдущее слово">&lt;</button>
@@ -103,150 +87,321 @@
                             <span id="time" class="time"></span>
                             <span id="startTime" class="time"></span>
                             <span id="elapsedTime" class="time"></span>
-            <button id="zoomBtn" title="Лупа"></button>
-            <div id="zoomLevelDisplay" title="Уровень зума"></div>
-
+                            <button id="zoomBtn" title="Лупа"></button>
+                            <div id="zoomLevelDisplay" title="Уровень зума"></div>
                         </div>
-
                     </div>
                 </div>
                 <div class="canv-container" id="canvasContainer">
-    <div id="cursorPanel" class="cursor-panel" style="display: none;">
-        <h3>Выберите курсор</h3>
-        <div id="cursorList"></div>
-     </div>
-                </div>
-    <div class="slider-group">
-                    <div class="tools-column">
-                        <label for="opacity" title="Прозрачность">👻</label>
-                        <input type="range" id="opacity" min="1" max="100" value="100">
-                        <span id="opacityValue" style="color: red;">100</span>
-                        <label for="layerOpacity" title="Прозрачность слоя">👓</label> 
-                        <input type="range" id="layerOpacity" min="0" max="100" value="100">
-                        <span id="layerOpacityValue" style="color: red;">100</span>
+                    <div id="cursorPanel" class="cursor-panel" style="display: none;">
+                        <h3>Выберите курсор</h3>
+                        <div id="cursorList"></div>
                     </div>
-                    <div class="tools-column">
-                        <label for="brushSize" title="Размер кисти">🖌️</label>
-                        <input type="range" id="brushSize" min="1" max="300" value="3">
-                        <span id="brushSizeValue" style="color: red;">3</span>
-                        <div class="pressure-bar-container">
-                            <label for="pressureBar" title="Нажим">🎯</label>
-                            <progress id="pressureBar" value="0" max="4000"></progress>
-                            <span id="pressureValue" class="pressure-value"></span>
-
-                    <div class="tools-column">
-                        <label for="outlineSize" title="Размер обводки">🖼️</label>
-                        <input type="range" id="outlineSize" min="0" max="20" value="0">
-                        <span id="outlineSizeValue" style="color: red;">0</span>
-
-</div>
-
-
-
-<style>
-    .pressure-value {
-        font-size: 12px;
-        color: blue;
-        margin-left: 5px;
-    }
-    </style>
+                </div>
+                <div class="sliders">
+                    <label for="spiderStrength" title="Сила паука" style="display: none;">🕸️</label>
+                    <input type="range" id="spiderStrength" min="50" max="10000" value="1000" title="Сила паука"
+                        style="display: none;">
+                </div>
+                <div class="sliders">
+                    <label for="opacity" title="Прозрачность">👻</label>
+                    <input type="range" id="opacity" min="1" max="100" value="100">
+                    <span id="opacityValue" style="color: red;">100</span>
+                    <label for="layerOpacitySlider" title="Прозрачность слоя">👓</label>
+                    <input type="range" id="layerOpacitySlider" min="0" max="100" value="100">
+                    <span id="layerOpacityValue" style="color: red;">100</span>
+                </div>
+                <div class="sliders">
+                    <label for="brushSize" title="Размер кисти">🖌️</label>
+                    <input type="range" id="brushSize" min="1" max="300" value="3">
+                    <span id="brushSizeValue" style="color: red;">3</span>
+                    <div class="pressure-bar-container">
+                        <label for="pressureBar" title="Нажим">🎯</label>
+                        <progress id="pressureBar" value="0" max="4000"></progress>
+                        <span id="pressureValue" class="pressure-value"></span>
+                        <div class="sliders">
+                            <label for="outlineSize" title="Размер обводки">🖼️</label>
+                            <input type="range" id="outlineSize" min="0" max="20" value="0">
+                            <span id="outlineSizeValue" style="color: red;">0</span>
                         </div>
                     </div>
+                    <style>
+                        .pressure-value {
+                            font-size: 12px;
+                            color: blue;
+                            margin-left: 5px;
+                        }
+                    </style>
                 </div>
             </div>
         </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    <!-- Background Settings Modal -->
+    <div id="backgroundSettingsModal" class="modal">
+        <div class="modal-content">
+            <span id="closeModal" style="float:right;cursor:pointer;">&times;</span>
+            <input type="color" id="backgroundColorPicker" value="#ffffff">
+            <br><br>
+
+            <input type="file" id="backgroundImageInput" accept="image/*" multiple>
+            <div id="backgroundImageGallery" style="display: flex; flex-wrap: wrap; margin-top: 10px;"></div>
+            <div id="backgroundPreview"
+                style="display: none; position: absolute; z-index: 1000; border: 2px solid #000;"></div>
         </div>
+    </div>
+    <!-- Canvas Settings Modal -->
+    <div id="canvasSettingsModal" class="modal">
+        <div class="modal-content">
+            <span id="closeCanvasModal" style="float:right;cursor:pointer;">&times;</span>
+            <input type="color" id="canvasColorPicker" value="#00">
+            <br><br>
+            <input type="file" id="canvasImageInput" accept="image/*">
+            <div id="canvasImageGallery" style="display: flex; flex-wrap: wrap; margin-top: 10px;"></div>
         </div>
-        </div>
-        </div>
+    </div>
+    <style>
+        #zoomLevelDisplay {
+            color: red;
+            font-weight: bold;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #4b0000;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+    </style>
+<style>
+/* иконка рядом со слоями */
+    .eye-icon {
+        margin-left: 5px;
+        font-size: 0.8em;
+    }
+</style>
 <script>
-        // Get DOM elements
-            // const isPressureSupported = 'onpointermove' in window;
+// добавлено 22 Sep 19:05
+document.querySelectorAll('button').forEach(button => {
+    button.addEventListener('contextmenu', (event) => {
+        event.preventDefault(); // Prevent the default context menu
+        // Your custom context menu logic here
+        console.log(`Context menu for ${button.title}`);
+    });
+});
 
-            const layerCreationComplete = new Event('layerCreationComplete');
-            // 
-            const brushSizeInput = document.getElementById('brushSize');
-            const opacityInput = document.getElementById('opacity');
-            const pressureBar = document.getElementById('pressureBar');
-            const backgroundPicker = document.getElementById('backgroundPicker');
-            const addLayerBtn = document.getElementById('addLayerBtn');
-            const removeLayerBtn = document.getElementById('removeLayerBtn');
-            const eraserBtn = document.getElementById('eraserBtn');
-            const layerButtons = document.getElementById('layerButtons');
-            const zoomBtn = document.getElementById('zoomBtn');
-            const canvasContainer = document.getElementById('canvasContainer');
-            const drawOnExistingBtn = document.getElementById('drawOnExistingBtn');
-            const container = document.getElementById('canvasContainer');
-            const containerRect = container.getBoundingClientRect();
-            // other constants
+    // Создаем элемент color input, если его еще нет
+    let colorPicker = document.getElementById('dynamicColorPicker');
+    if (!colorPicker) {
+      colorPicker = document.createElement('input');
+      colorPicker.type = 'color';
+      colorPicker.id = 'dynamicColorPicker';
+      colorPicker.style.position = 'absolute';
+      colorPicker.style.display = 'block';
+      document.body.appendChild(colorPicker);
+    }
 
-            const identifyLayerBtn = document.getElementById('identifyLayerBtn');
-            const layerPanel = document.querySelector('.layer-panel');
-            const sidebar =document.querySelector(".sidebar")
-            // прозрачность слоя
-            const layerOpacities = {};
-            const layerOpacitySlider = document.getElementById('layerOpacity');
-            const layerOpacityValue = document.getElementById('layerOpacityValue');
+    // Позиционируем color picker рядом с кнопкой
+    colorPicker.style.left = `${event.pageX}px`;
+    colorPicker.style.top = `${event.pageY}px`;
+    colorPicker.style.display = 'block';
 
-            const layers = [];
-            const contexts = {};
-            const layerColors = [];
-            const history = {};
-            const redoHistory = [];
-            let layerCount = 0;
-            let currentLayer = 1;
-            let previousLayer = 1;
-            let currentCtx;
-            let isDrawing = false;
-            let isErasing = false;
-            let isDrawOnExisting = false;
-            let zoomLevel =     1; // 1000% = 10 инициализация
-            let isIdentifyingLayer = false;
-            let wasDrawing = false;
-            let isDraggingScroll = false;
-            let startY;
-            let lastX = 0;
-            let currentCursor = 'auto'; 
-            let isZoomActive = false;
-            let offsetX = 0;
-            let offsetY = 0;
-            // zoom
-            let zoomOriginX = 0;
-            let zoomOriginY = 0;
-            let isCtrlPressed = false;
-            const MAX_ZOOM = 100;
-            const MIN_ZOOM = 1;
-            const ZOOM_STEP = 0.02;
-            // smooth
-            let isSmoothLineMode = false;
-            const smoothLineBtn = document.getElementById('smoothLineBtn');
-            const points = [];
-            //
-            document.dispatchEvent(layerCreationComplete); 
-            Object.values(layers).forEach(addEventListenersToLayer);
-            drawOnExistingBtn.addEventListener('click', toggleDrawOnExisting);
+    // Устанавливаем цвет кисти при выборе цвета
+    colorPicker.oninput = function() {
+      setBrushColor(this.value); // Предполагается, что у вас есть функция для установки цвета кисти
+    };
+
+// Скрываем color picker при клике в любом месте
+document.addEventListener('click', () => {
+  const colorPicker = document.getElementById('dynamicColorPicker');
+  if (colorPicker) {
+    colorPicker.style.display = 'none';
+  }
+});</script>
+<script>
+
+</script>
+<script>
+function setLayerBackground(layerIndex) {
+  const color = document.getElementById('backgroundPicker').value;
+  contexts[layerIndex].fillStyle = color;
+  contexts[layerIndex].fillRect(0, 0, layers[layerIndex].width, layers[layerIndex].height);
+}
+
+backgroundPicker.addEventListener('input', (event) => {
+  setLayerBackground(currentLayer); 
+});
+</script>
+    <script>
+        const layerCreationComplete = new Event('layerCreationComplete');
+
+        const elements = ['UploadB', 'fillModeBtn',
+            'brushSize', 'opacity', 'pressureBar', 'backgroundPicker',
+            'addLayerBtn', 'removeLayerBtn', 'eraserBtn', 'layerButtons',
+            'zoomBtn', 'canvasContainer', 'drawOnExistingBtn', 'identifyLayerBtn', 'layerOpacitySlider', 'layerOpacityValue',
+        ];
+
+        const container = document.getElementById('canvasContainer');
+        const containerRect = container.getBoundingClientRect();
+        const obj = Object.fromEntries(
+            elements.map(id => [id, document.getElementById(id)])
+        );
+        const layerPanel = document.querySelector('.layer-panel'),
+            sidebar = document.querySelector(".sidebar"),
+            layerOpacities = {},
+            layers = [],
+            contexts = {},
+            layerColors = [],
+            history = {},
+            points = [],
+            redoHistory = [];
+
+        const MAX_ZOOM = 100, MIN_ZOOM = 1, ZOOM_STEP = 0.02;
+
+        let layerCount = 0,
+            symmetry = true,
+            currentLayer = 1,
+            previousLayer = 1,
+
+            isSpider = false,
+
+            curCtx,
+            isDrawing = false,
+            isErasing = false,
+            isDrawOnExisting = false,
+            zoomLevel = 1, // 1000% = 10
+            isIdentifyingLayer = false,
+            wasDrawing = false,
+            isDraggingScroll = false,
+            startY,
+            currentCursor = 'auto',
+            isZoomActive = false,
+            offsetX = 0,
+            offsetY = 0,
+            lastX = null,
+            lastY = null,
+            uploadedImage = null,
+            clearedCanvasState = null,
+            isFillMode = false,
+            zoomOriginX = 0,
+            zoomOriginY = 0,
+            isSmoothLineMode = false,
+            isCtrlPressed = false;
 
 
 
 
-            backgroundPicker.addEventListener('input', (event) => {
-                contexts[0].fillStyle = event.target.value;
-                contexts[0].fillRect(0, 0, layers[0].width, layers[0].height);
-            });
+    </script>
+    <script>
 
-        // ИНИЦИАЛИЗАЦИЯ 
-            document.addEventListener('DOMContentLoaded', function () {
+    </script>
+    <script>
 
-                initializeApp();
-              });
 
+
+
+        const symmetryButton = document.getElementById('symmetry');
+
+        symmetryButton.addEventListener('click', toggleSymmetry);
+        // !
+        function toggleSymmetry() {
+            symmetry = !symmetry;
+            if (symmetry) {
+                symmetryButton.classList.add('active');
+            } else {
+                symmetryButton.classList.remove('active');
+            }
+        }
+
+        function toggleDrawOnExisting() {
+            isDrawOnExisting = !isDrawOnExisting;
+            drawOnExistingBtn.classList.toggle('active', isDrawOnExisting);
+        }</script>
+    <script>
+        const spiderStrengthSlider = document.getElementById('spiderStrength');
+
+        function toggleSpider() {
+            isSpider = !isSpider;
+            spider.classList.toggle('active', isSpider);
+            // Show or hide the slider based on the spider tool state
+            spiderStrengthSlider.style.display = isSpider ? 'block' : 'none';
+        }
+
+        function drawSpider(startX, startY, endX, endY) {
+            curCtx.globalAlpha = 1; // Set opacity
+            curCtx.lineJoin = 'round'; // Rounded corners
+            curCtx.lineCap = 'round'; // Rounded line ends
+
+            curCtx.beginPath();
+            curCtx.moveTo(startX, startY);
+            curCtx.quadraticCurveTo(startX, startY, endX, endY);
+            curCtx.stroke();
+
+            points.push({ x: endX, y: endY }); // Store the current point
+
+            // Use the slider value for power
+            var power = spiderStrengthSlider.value;
+
+            for (let i = 0; i < points.length; i++) {
+                const dx = points[i].x - endX;
+                const dy = points[i].y - endY;
+                const dd = dx * dx + dy * dy;
+                if (dd < power) {
+                    curCtx.beginPath();
+                    curCtx.moveTo(endX + (dx * 0.2), endY + (dy * 0.2));
+                    curCtx.lineTo(points[i].x - (dx * 0.2), points[i].y - (dy * 0.2));
+                    curCtx.stroke();
+                }
+            }
+        }
+
+        document.getElementById('spider').addEventListener('click', toggleSpider);
+    </script>
+    </script>
+    <script>
+
+        document.dispatchEvent(layerCreationComplete);
+        // Object.values(layers).forEach(addEventListenersToLayer);
+        drawOnExistingBtn.addEventListener('click', toggleDrawOnExisting);
+
+// ИНИЦИАЛИЗАЦИЯ 
+        document.addEventListener('DOMContentLoaded', function () {
+
+            initializeApp();
+        });
+
+        function initializeApp() {
+            createLayer();
+        }
+
+// установка бэкграунда
         function setLayerBackground(layerIndex, imageUrl) {
             const img = new Image();
-            img.onload = function() {
+            img.onload = function () {
                 contexts[layerIndex].drawImage(img, 0, 0, layers[layerIndex].width, layers[layerIndex].height);
             }
             img.src = imageUrl;
         }
+// создание слоев
         function createLayer() {
 
             updateZoom();
@@ -258,7 +413,7 @@
                 canvasContainer.appendChild(canvas);
                 layers[0] = canvas;
                 contexts[0] = canvas.getContext('2d');
-                setLayerBackground(100, 'images/bg_index.jpg'); 
+                setLayerBackground(100, 'images/canvas1.jpg');
             }
 
             layerCount++;
@@ -278,6 +433,16 @@
             button.textContent = " ❤ ";
             button.classList.add('layer-button');
             button.dataset.layer = layerCount;
+
+
+            // Add eye icon
+            const eyeIcon = document.createElement('span');
+            eyeIcon.textContent = "👁️";
+            eyeIcon.style.display = 'none';
+            eyeIcon.classList.add('eye-icon');
+            button.appendChild(eyeIcon);
+
+
             layerButtons.appendChild(button);
             button.addEventListener('click', function () {
                 setCurrentLayer(parseInt(this.dataset.layer));
@@ -289,13 +454,15 @@
             redoHistory[layerCount] = [];
             updateLayerButtonColor(layerCount);
             updateLayerOrder();
-            // Создаем слайдер истории
             createHistorySlider(layerCount);
+            layerDrawnOn[layerCount] = false; // Initialize as not drawn on
+
         }
+// установка текущего слоя
         function setCurrentLayer(layerNum) {
-          if (layerNum === 100) {
-            return; 
-          }
+            if (layerNum === 100) {
+                return;
+            }
             if (!layers[layerNum] || !contexts[layerNum]) {
                 console.warn(`Layer ${layerNum} does not exist. Cannot set as current layer.`);
                 return;
@@ -306,10 +473,9 @@
             }
 
             currentLayer = layerNum;
-            currentCtx = contexts[currentLayer];
+            curCtx = contexts[currentLayer];
 
-            // Update opacity slider and value
-            const opacity = layerOpacities[layerNum] || 100; // Default to 100 if not set
+            const opacity = layerOpacities[layerNum] || 100;
             layerOpacitySlider.value = opacity;
             layerOpacityValue.textContent = opacity;
 
@@ -325,585 +491,605 @@
             }
 
             if (layerColors[layerNum]) {
-                currentCtx.strokeStyle = layerColors[layerNum];
+                curCtx.strokeStyle = layerColors[layerNum];
+            }
+            // обновляем иконку тут
+            updateLayerEyeIcon(layerNum);
+
+        }
+// обновление цвета слоев
+        function updateLayerButtonColor(layerNum) {
+            const button = document.querySelector(`.layer-button[data-layer="${layerNum}"]`);
+            if (button && layerColors[layerNum]) {
+                button.style.backgroundColor = layerColors[layerNum];
             }
         }
+// инициализация слоя(нужно так же при создании нового слоя)
+        function initializeLayer(layerNum) {
 
-                function updateLayerButtonColor(layerNum) {
-                    const button = document.querySelector(`.layer-button[data-layer="${layerNum}"]`);
-                    if (button && layerColors[layerNum]) {
-                        button.style.backgroundColor = layerColors[layerNum];
-                    }
-                 }
-                function initializeLayer(layerNum) {
-                        if (layerNum === 0) {
-                            contexts[layerNum].fillStyle = '#' + Math.floor(Math.random() * 16777215).toString(16);
-                        } else {
-                            contexts[layerNum].fillStyle = 'rgba(0,0,0,0)'; // Transparent
-                        }
-                        contexts[layerNum].fillRect(0, 0, layers[layerNum].width, layers[layerNum].height);
-                    }
-                function initializeApp() {
-                         createLayer();
-                           }
-
-
-                function toggleDrawOnExisting() {
-                                isDrawOnExisting = !isDrawOnExisting;
-                                drawOnExistingBtn.classList.toggle('active', isDrawOnExisting);
-                            }
-
-
-
-        smoothLineBtn.addEventListener('click', () => {
-            isSmoothLineMode = !isSmoothLineMode;
-            smoothLineBtn.classList.toggle('active', isSmoothLineMode);
-        });
-
-        // function startDrawing(e) {
-        //     if (currentLayer === 100 || !currentCtx) {
-        //         return;
-        //     }
-            
-        //     isDrawing = true;
-        //     const rect = layers[currentLayer].getBoundingClientRect();
-        //     const x = Math.floor((e.clientX - rect.left) / zoomLevel);
-        //     const y = Math.floor((e.clientY - rect.top) / zoomLevel);
-            
-        //     points.length = 0;
-        //     points.push({x, y});
-            
-        //     [lastX, lastY] = [x, y];
-        //     saveState();
-        // }
-function startDrawing(e) {
-    if (currentLayer === 100 || !currentCtx) {
-        return;
-    }
-    
-    isDrawing = true;
-    const rect = layers[currentLayer].getBoundingClientRect();
-    const x = Math.floor((e.clientX - rect.left) / zoomLevel);
-    const y = Math.floor((e.clientY - rect.top) / zoomLevel);
-    
-    points.length = 0;
-    points.push({x, y});
-    
-    [lastX, lastY] = [x, y];
-    saveState();
-}
-function drawOnExistingContent(startX, startY, endX, endY, ctx) {
-    const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
-    const data = imageData.data;
-
-    // Создаем временный холст для рисования линии
-    const tempCanvas = document.createElement('canvas');
-    tempCanvas.width = ctx.canvas.width;
-    tempCanvas.height = ctx.canvas.height;
-    const tempCtx = tempCanvas.getContext('2d');
-
-    // Рисуем линию на временном холсте
-    tempCtx.strokeStyle = '#FFFFFF';  // Используем белый цвет для маски
-    tempCtx.lineWidth = ctx.lineWidth;
-    tempCtx.lineCap = ctx.lineCap;
-    tempCtx.lineJoin = ctx.lineJoin;
-    tempCtx.globalAlpha = 1;  // Полная непрозрачность
-    tempCtx.beginPath();
-    tempCtx.moveTo(startX, startY);
-    tempCtx.lineTo(endX, endY);
-    tempCtx.stroke();
-
-    // Получаем данные пикселей линии
-    const lineData = tempCtx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height).data;
-
-    // Получаем цвет кисти
-    const brushColor = hexToRgb(ctx.strokeStyle);
-
-    // Проходим по каждому пикселю
-    for (let i = 0; i < data.length; i += 4) {
-        if (data[i + 3] > 0 && lineData[i] > 0) {
-            // Изменяем цвет только если есть существующий контент и линия проходит через этот пиксель
-            const alpha = lineData[i] / 255 * ctx.globalAlpha;
-            data[i] = Math.round(data[i] * (1 - alpha) + brushColor.r * alpha);
-            data[i + 1] = Math.round(data[i + 1] * (1 - alpha) + brushColor.g * alpha);
-            data[i + 2] = Math.round(data[i + 2] * (1 - alpha) + brushColor.b * alpha);
-            // Не изменяем альфа-канал, чтобы сохранить форму
+            contexts[layerNum].fillStyle = 'rgba(0,0,0,0)';
+            contexts[layerNum].fillRect(0, 0, layers[layerNum].width, layers[layerNum].height);
         }
-    }
 
-    // Применяем изменения к основному холсту
-    ctx.putImageData(imageData, 0, 0);
-}
+// сохранение истории
+        function saveState() {
+            if (!curCtx) {
+                return;
+            }
 
-// Вспомогательная функция для преобразования HEX в RGB
-function hexToRgb(hex) {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16)
-    } : null;
-}
+            if (history[currentLayer].length >= MAX_HISTORY_STATES) {
+                history[currentLayer].shift();
+            }
 
-function draw(e) {
-    if (!isDrawing || !currentCtx) {
-        return;
-    }
-    if (isNarrowingToCenter) {
-        narrowToCenter(e);
-        return;
-    }
-    const rect = layers[currentLayer].getBoundingClientRect();
-    const x = Math.floor((e.clientX - rect.left) / zoomLevel);
-    const y = Math.floor((e.clientY - rect.top) / zoomLevel);
-    const pressure = e.pressure || 1;
-    currentCtx.lineWidth = brushSizeInput.value * pressure;
-    currentCtx.lineCap = 'round';
-    currentCtx.lineJoin = 'round';
-    currentCtx.globalAlpha = opacityInput.value / 100;
-    currentCtx.globalCompositeOperation = isErasing ? 'destination-out' : 'source-over';
+            history[currentLayer].push(curCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height));
+            redoHistory[currentLayer] = [];
 
-    if (isDrawOnExisting) {
-        drawOnExistingContent(lastX, lastY, x, y, currentCtx);
-    } else {
-        currentCtx.beginPath();
-        currentCtx.moveTo(lastX, lastY);
-        currentCtx.lineTo(x, y);
-        currentCtx.stroke();
-    }
-
-    if (symmetry) {
-        const centerX = layers[currentLayer].width / 2;
-        const symmetricLastX = centerX + (centerX - lastX);
-        const symmetricX = centerX + (centerX - x);
-        
-        if (isDrawOnExisting) {
-            drawOnExistingContent(symmetricLastX, lastY, symmetricX, y, currentCtx);
-        } else {
-            currentCtx.beginPath();
-            currentCtx.moveTo(symmetricLastX, lastY);
-            currentCtx.lineTo(symmetricX, y);
-            currentCtx.stroke();
+            historySlider.max = history[currentLayer].length - 1;
+            historySlider.value = history[currentLayer].length - 1;
         }
-    }
 
-    [lastX, lastY] = [x, y];
-    pressureBar.value = pressure * 10000;
-    pressureBar.nextElementSibling.textContent = Math.round(pressure * 100);
-}
+// процесс рисования startDrawing draw
+        function startDrawing(e) {
+            if (currentLayer === 100 || !curCtx || isEyedropperActive || isCtrlPressed) {
+                return;
+            }
+            isDrawing = true;
+            const rect = layers[currentLayer].getBoundingClientRect();
+            const x = Math.floor((e.clientX - rect.left) / zoomLevel);
+            const y = Math.floor((e.clientY - rect.top) / zoomLevel);
 
+            points.length = 0;
+            points.push({ x, y });
+
+            [lastX, lastY] = [x, y];
+            saveState();
+        }
+
+        function draw(e) {
+            if (!isDrawing || !curCtx) {
+                return;
+            }
+            if (isFinger) {
+                fingerfunc(e);
+                return;
+            }
+            const rect = layers[currentLayer].getBoundingClientRect();
+            const x = Math.floor((e.clientX - rect.left) / zoomLevel);
+            const y = Math.floor((e.clientY - rect.top) / zoomLevel);
+            const pressure = e.pressure || 1;
+            curCtx.lineWidth = brushSize.value * pressure;
+            curCtx.lineCap = 'round';
+            curCtx.lineJoin = 'round';
+            curCtx.globalAlpha = opacity.value / 100;
+            curCtx.globalCompositeOperation = isErasing ? 'destination-out' : 'source-over';
+
+            if (isSpider) {
+                drawSpider(lastX, lastY, x, y);
+            } else {
+                if (isDrawOnExisting) {
+                    tools.drawOn(lastX, lastY, x, y, curCtx);
+                } else {
+                    curCtx.beginPath();
+                    curCtx.moveTo(lastX, lastY);
+                    curCtx.lineTo(x, y);
+                    curCtx.stroke();
+                }
+            }
+
+            if (symmetry) {
+                const centerX = layers[currentLayer].width / 2;
+                const symmetricLastX = centerX + (centerX - lastX);
+                const symmetricX = centerX + (centerX - x);
+
+                if (isSpider) {
+                    drawSpider(symmetricLastX, lastY, symmetricX, y);
+                } else {
+                    if (isDrawOnExisting) {
+                        tools.drawOn(symmetricLastX, lastY, symmetricX, y, curCtx);
+                    } else {
+                        curCtx.beginPath();
+                        curCtx.moveTo(symmetricLastX, lastY);
+                        curCtx.lineTo(symmetricX, y);
+                        curCtx.stroke();
+                    }
+                }
+            }
+
+            [lastX, lastY] = [x, y];
+            pressureBar.value = pressure * 10000;
+            pressureBar.nextElementSibling.textContent = Math.round(pressure * 100);
+            // add иконка глаза для слоев
+            layerDrawnOn[currentLayer] = true;
+            updateLayerEyeIcon(currentLayer);
+            }
+
+        function stopDrawing() {
+            if (isDrawing) {
+                isDrawing = false;
+                saveState();
+                points.length = 0;
+            }
+            lastX = null;
+            lastY = null;
+        }
 
         function endDrawing() {
             if (isDrawing) {
                 isDrawing = false;
-                resetOriginalImage(currentLayer);
-                const size = outlineSizes[currentLayer];
-                
-                if (isSmoothLineMode && points.length > 2) {
-                    const output = getSmoothLine(points);
-                    
-                    currentCtx.beginPath();
-                    currentCtx.moveTo(output[0].x, output[0].y);
-                    
-                    for (let i = 1; i < output.length; i++) {
-                        currentCtx.lineTo(output[i].x, output[i].y);
-                    }
-                    
-                    currentCtx.stroke();
-                }
+                lastX = null;
+                lastY = null;
             }
         }
-
-
-
-
-
-
 
         function addEventListenersToLayer(layer) {
             layer.addEventListener('pointerdown', startDrawing);
             layer.addEventListener('pointermove', draw);
             layer.addEventListener('pointerup', endDrawing);
-            layer.addEventListener('pointerout', endDrawing);
         }
 
 
 
-        document.querySelectorAll('button, input').forEach(element => {
-             element.addEventListener('pointerdown', (e) => {
-                 e.stopPropagation();
-             });
-          });
-        function togglePreviousLayer() {
-             [currentLayer, previousLayer] = [previousLayer, currentLayer];
-             const layerButton = document.querySelector(`.layer-button[data-layer="${currentLayer}"]`);
-             if (layerButton) {
-                 layerButton.click();
-                     }
-                  }
 
-        // fix идентификатор слоя
-            canvasContainer.addEventListener('click', (e) => {
-                 if (isIdentifyingLayer) {
-                     identifyLayerClickHandler(e);
-                     canvasContainer.style.cursor = 'default';
-                     isDrawing = wasDrawing;
-                     isIdentifyingLayer = false;
-                     identifyLayerBtn.classList.remove('active');
-                 }
-              });
-            identifyLayerBtn.addEventListener('click', () => {
-                 isIdentifyingLayer = !isIdentifyingLayer;
-                 identifyLayerBtn.classList.toggle('active', isIdentifyingLayer);
-                 if (isIdentifyingLayer) {
-                     wasDrawing = isDrawing;
-                     isDrawing = false;
-                     canvasContainer.style.cursor = 'crosshair';
-                 } else {
-                     canvasContainer.style.cursor = 'auto';
-                     isDrawing = wasDrawing;
-                 }
-              });
-            function identifyLayerClickHandler(e) {
-                const rect = layers[1].getBoundingClientRect();
-                const x = (e.clientX - rect.left) / zoomLevel;
-                const y = (e.clientY - rect.top) / zoomLevel;
-                
-                // Start from the top layer (highest z-index), excluding background layer
-                for (let i = layerCount; i >= 1; i--) {
-                    const ctx = contexts[i];
-                    const pixelData = ctx.getImageData(x, y, 1, 1).data;
-                    // If a pixel is found on this layer (alpha > 0)
-                    if (pixelData[3] > 0) {
-                        setCurrentLayer(i);
-                        updateLayerButtonColor(i);
-                        return;
+
+
+
+
+
+
+
+    </script> 
+<script>
+// Функция для объединения слоев
+// Функция для объединения слоев
+function mergeLayers() {
+    // Создаем новый холст для объединенного изображения
+    const mergedCanvas = document.createElement('canvas');
+    const mergedCtx = mergedCanvas.getContext('2d');
+    mergedCanvas.width = layers[1].width;
+    mergedCanvas.height = layers[1].height;
+
+    // Получаем все кнопки слоев и сортируем их по z-index
+    const layerButtons = Array.from(document.querySelectorAll('.layer-button'));
+    layerButtons.sort((a, b) => {
+        const layerA = layers[parseInt(a.dataset.layer)];
+        const layerB = layers[parseInt(b.dataset.layer)];
+        return parseInt(layerA.style.zIndex || 0) - parseInt(layerB.style.zIndex || 0);
+    });
+
+    // Рисуем каждый слой на объединенном холсте
+    layerButtons.forEach((button) => {
+        const layerId = parseInt(button.dataset.layer);
+        if (layers[layerId] && layerId !== 100) { // Пропускаем 100-й слой
+            mergedCtx.drawImage(layers[layerId], 0, 0);
+            // Очищаем содержимое слоя, кроме текущего
+            if (layerId !== currentLayer) {
+                const ctx = contexts[layerId];
+                ctx.clearRect(0, 0, layers[layerId].width, layers[layerId].height);
+            }
+        }
+    });
+
+    // Рисуем объединенное изображение на текущем слое
+    curCtx.drawImage(mergedCanvas, 0, 0);
+
+    // Обновляем интерфейс
+    updateLayerOrder();
+    setCurrentLayer(1);
+}
+</script>
+    <script>
+// пипетка 
+        canvasContainer.addEventListener('click', handleEyedropperClick);
+        canvasContainer.addEventListener('touchstart', handleEyedropperClick);
+
+        const eyedropperBtn = document.getElementById('eyedropperBtn');
+        let isEyedropperActive = false;
+
+        eyedropperBtn.addEventListener('click', handleEyedropperActivation);
+        eyedropperBtn.addEventListener('touchstart', handleEyedropperActivation);
+
+        function handleEyedropperActivation(e) {
+            e.preventDefault();
+
+            isEyedropperActive = !isEyedropperActive;
+            document.body.style.cursor = isEyedropperActive ? 'url(cursors/pipette.png), auto' : 'auto';
+            eyedropperBtn.classList.toggle('active');
+
+            if (isEyedropperActive) {
+                isDrawing = false;
+            }
+        }
+
+
+        function handleEyedropperClick(e) {
+            if (!isEyedropperActive) return;
+            isDrawing = false;
+            e.preventDefault();
+            const rect = canvasContainer.getBoundingClientRect();
+            const x = Math.floor((e.clientX || e.touches[0].clientX - rect.left) / zoomLevel);
+            const y = Math.floor((e.clientY || e.touches[0].clientY - rect.top) / zoomLevel);
+
+            // Получаем z-index (от большего к меньшему)
+            const sortedLayers = Object.keys(layers)
+                // .filter(key => key !== '100' && key !== '0') // Исключаем фоновый слой и слой 0
+                .filter(key => key !== '100') // Исключаем фоновый слой
+                .sort((a, b) => parseInt(layers[b].style.zIndex) - parseInt(layers[a].style.zIndex));
+
+            for (let i = 0; i < sortedLayers.length; i++) {
+                const layerId = sortedLayers[i];
+                const ctx = contexts[layerId];
+                const imageData = ctx.getImageData(x, y, 1, 1);
+                const [r, g, b, a] = imageData.data;
+                if (a > 0) {
+                    const color = `rgba(${r},${g},${b},${a / 255})`;
+                    // Update the layer button color
+                    const layerButton = document.querySelector(`.layer-button[data-layer="${currentLayer}"]`);
+                    if (layerButton) {
+                        layerButton.style.backgroundColor = color;
                     }
+                    curCtx.strokeStyle = color;
+                    isEyedropperActive = false;
+                    eyedropperBtn.classList.remove('active');
+                    return;
                 }
             }
 
+            // Если не найден непрозрачный пиксель на всех слоях
+            isEyedropperActive = false;
+            document.body.style.cursor = 'auto';
+            eyedropperBtn.classList.remove('active');
+        }
 
-            layerPanel.addEventListener("pointerenter", (e)=>{
-                e.preventDefault();
-                isDraggingScroll = true;
-                startY = e.clientY;
-                    });
-            sidebar.addEventListener("pointerenter", (e)=>{
-                e.preventDefault();
-                isDraggingScroll = true;
-                startY = e.clientY;
-                    });
-            sidebar.addEventListener('pointermove', (e) => {
-                if (isDraggingScroll) {
-                    const deltaY = e.clientY - startY;
-                    sidebar.scrollTop += deltaY; 
-                    startY = e.clientY;
-                }
-            });
-            layerPanel.addEventListener('pointerdown', (e) => {
-                e.preventDefault();
-                isDraggingScroll = true;
-                startY = e.clientY;
-             });
+        // переключатель слоев
+        function togglePreviousLayer() {
+            [currentLayer, previousLayer] = [previousLayer, currentLayer];
+            const layerButton = document.querySelector(`.layer-button[data-layer="${currentLayer}"]`);
+            if (layerButton) {
+                layerButton.click();
+            }
+        }
 
-            layerPanel.addEventListener('pointermove', (e) => {
-                if (isDraggingScroll) {
-                    const deltaY = e.clientY - startY;
-                    layerPanel.scrollTop += deltaY;
-                    startY = e.clientY;
+        // идентификатор слоя
+        canvasContainer.addEventListener('click', (e) => {
+            if (isIdentifyingLayer) {
+                identifyLayerClickHandler(e);
+                canvasContainer.style.cursor = 'default';
+                isDrawing = wasDrawing;
+                isIdentifyingLayer = false;
+                identifyLayerBtn.classList.remove('active');
+            }
+        });
+        // идентификатор слоя
+        identifyLayerBtn.addEventListener('click', () => {
+            isIdentifyingLayer = !isIdentifyingLayer;
+            identifyLayerBtn.classList.toggle('active', isIdentifyingLayer);
+            if (isIdentifyingLayer) {
+                wasDrawing = isDrawing;
+                isDrawing = false;
+                canvasContainer.style.cursor = 'crosshair';
+            } else {
+                canvasContainer.style.cursor = 'auto';
+                isDrawing = wasDrawing;
+            }
+        });
+        function identifyLayerClickHandler(e) {
+            const rect = layers[1].getBoundingClientRect();
+            const x = (e.clientX - rect.left) / zoomLevel;
+            const y = (e.clientY - rect.top) / zoomLevel;
+
+            // Start from the bottom layer (lowest z-index), excluding background layer
+            for (let i = 1; i <= layerCount; i++) {
+                if (i === 100) continue; // Пропускаем слой 100 (бэкграунд)
+                const ctx = contexts[i];
+                const pixelData = ctx.getImageData(x, y, 1, 1).data;
+                // If a pixel is found on this layer (alpha > 0)
+                if (pixelData[3] > 0) {
+                    setCurrentLayer(i);
+                    updateLayerButtonColor(i);
+                    return;
                 }
-             });
-            layerPanel.addEventListener('pointerup', () => {
-                isDraggingScroll = false;
-             });
-            canvasContainer.addEventListener('pointerdown', handleCanvasClick);
-            function handleCanvasClick(e) {
-                if (e.altKey) {
-                    isDrawing=false;
-                    e.preventDefault();
-                    identifyLayerClickHandler(e);
-                }
-             }
-        // добавляем слой под текущий
-            document.addEventListener('keydown', function (e) {
-                if (e.key === 'Tab') {
-                    e.preventDefault();
-                    createLayerBelowCurrent();
-            updateZoom();
-                }
-             });
-            function createLayerBelowCurrent() {
-                const layerButtons = Array.from(document.querySelectorAll('.layer-button'));
-                const currentIndex = layerButtons.findIndex(btn => parseInt(btn.dataset.layer) === currentLayer);
-                layerCount++;
-                const newLayerNum = layerCount;
-                const canvas = document.createElement('canvas');
-                canvas.id = `layer${newLayerNum}`;
-                canvas.width = 600;
-                canvas.height = 400;
-                canvas.style.position = 'absolute';
-                canvas.style.top = '0';
-                canvas.style.left = '0';
-                canvas.style.zIndex = newLayerNum;
-                if (currentIndex !== -1) {
-                    canvasContainer.insertBefore(canvas, layers[currentLayer]);
+            }
+        }
+        // сократить
+        layerPanel.addEventListener("pointerenter", (e) => {
+            e.preventDefault();
+            isDraggingScroll = true;
+            startY = e.clientY;
+        });
+        sidebar.addEventListener("pointerenter", (e) => {
+            e.preventDefault();
+            isDraggingScroll = true;
+            startY = e.clientY;
+        });
+        sidebar.addEventListener('pointermove', (e) => {
+            if (isDraggingScroll) {
+                const deltaY = e.clientY - startY;
+                sidebar.scrollTop += deltaY;
+                startY = e.clientY;
+            }
+        });
+        layerPanel.addEventListener('pointerdown', (e) => {
+            e.preventDefault();
+            isDraggingScroll = true;
+            startY = e.clientY;
+        });
+
+        layerPanel.addEventListener('pointermove', (e) => {
+            if (isDraggingScroll) {
+                const deltaY = e.clientY - startY;
+                layerPanel.scrollTop += deltaY;
+                startY = e.clientY;
+            }
+        });
+        // added 21 Sep 15:14
+        // function isPointInsideCanvas(x, y) {
+        //     const canvasRect = canvasContainer.getBoundingClientRect();
+        //     return (
+        //         x >= canvasRect.left &&
+        //         x <= canvasRect.right &&
+        //         y >= canvasRect.top &&
+        //         y <= canvasRect.bottom
+        //     );
+        // }
+
+        // function handlePointerUp(e) {
+        //     const rect = layers[currentLayer].getBoundingClientRect();
+        //     const x = (e.clientX - rect.left) / zoomLevel;
+        //     const y = (e.clientY - rect.top) / zoomLevel;
+
+        //     if (!isPointInsideCanvas(e.clientX, e.clientY)) {
+        //         endDrawing();
+        //     }
+        // }
+
+        // function handlePointerOut(e) {
+        //     const rect = layers[currentLayer].getBoundingClientRect();
+        //     const x = (e.clientX - rect.left) / zoomLevel;
+        //     const y = (e.clientY - rect.top) / zoomLevel;
+
+        //     if (!isPointInsideCanvas(e.clientX, e.clientY)) {
+        //         endDrawing();
+        //     }
+        // }
+
+        // // Замените обработчики событий на новые функции
+        // layer.addEventListener('pointerup', handlePointerUp);
+        // layer.addEventListener('pointerout', handlePointerOut);
+
+        // layerPanel.addEventListener('pointerup', () => {
+
+        //  });
+        canvasContainer.addEventListener('pointerdown', handleCanvasClick);
+        function handleCanvasClick(e) {
+            if (e.altKey) {
+                isDrawing = false;
+                e.preventDefault();
+                identifyLayerClickHandler(e);
+            }
+        }
+function updateLayerOrder() {
+    const layerButtons = Array.from(document.querySelectorAll('.layer-button'));
+    layerButtons.forEach((button, index) => {
+        const layerId = parseInt(button.dataset.layer);
+        if (layers[layerId]) { 
+            if (layerId === 100) { // Проверяем, является ли слой фоновым
+                layers[layerId].style.zIndex = -100; // Устанавливаем z-index для фона
+            } else {
+                layers[layerId].style.zIndex = layerButtons.length - index + 110; 
+            }
+        }
+    });
+}
+
+// function updateLayerOrder() {
+//             const layerButtons = Array.from(document.querySelectorAll('.layer-button'));
+//             layerButtons.forEach((button, index) => {
+//                 const layerId = parseInt(button.dataset.layer);
+//                 if (layers[layerId] && layerId !== 0) {
+//                     layers[layerId].style.zIndex = layerButtons.length - index + 110; // +110 чтобы быть выше фона
+//                 }
+//             });
+//         }
+
+// двигаем слои кнопками
+        const moveLayerUpBtn = document.getElementById('moveLayerUp');
+        const moveLayerDownBtn = document.getElementById('moveLayerDown');
+        moveLayerUpBtn.addEventListener('click', () => {
+            moveLayerInStack(-1);
+        });
+        moveLayerDownBtn.addEventListener('click', () => {
+            moveLayerInStack(1);
+        });
+        function moveLayerInStack(direction) {
+            const currentLayerButton = document.querySelector(`.layer-button[data-layer="${currentLayer}"]`);
+            const targetLayerButton = direction === -1 ? currentLayerButton.previousElementSibling : currentLayerButton
+                .nextElementSibling;
+            if (targetLayerButton) {
+                if (direction === -1) {
+                    currentLayerButton.parentNode.insertBefore(currentLayerButton, targetLayerButton);
                 } else {
-                    canvasContainer.appendChild(canvas);
+                    currentLayerButton.parentNode.insertBefore(targetLayerButton, currentLayerButton);
                 }
-                layers[newLayerNum] = canvas;
-                contexts[newLayerNum] = canvas.getContext('2d');
-                layerColors[newLayerNum] = '#' + Math.floor(Math.random() * 16777215).toString(16);
-                const button = document.createElement('button');
-                button.textContent = " ❤ ";
-                button.classList.add('layer-button');
-                button.dataset.layer = newLayerNum;
-                if (currentIndex !== -1) {
-                    layerButtons[currentIndex].parentNode.insertBefore(button, layerButtons[currentIndex].nextSibling);
-                } else {
-                    layerButtons.appendChild(button);
-                }
-                button.addEventListener('click', function () {
-                    setCurrentLayer(parseInt(this.dataset.layer));
-                });
-                addEventListenersToLayer(canvas);
-                history[newLayerNum] = [];
-                redoHistory[newLayerNum] = [];
-                setCurrentLayer(newLayerNum);
-                initializeLayer(newLayerNum);
-                updateLayerButtonColor(newLayerNum);
                 updateLayerOrder();
-             }
-            function updateLayerOrder() {
-                    const layerButtons = Array.from(document.querySelectorAll('.layer-button'));
-                    layerButtons.forEach((button, index) => {
-                        const layerId = parseInt(button.dataset.layer);
-                        if (layers[layerId] && layerId !== 0) {
-                            layers[layerId].style.zIndex = layerButtons.length - index + 110; // +110 чтобы быть выше фона
-                        }
-                    });
-                }
-
-        // двигаем слои кнопками
-            const moveLayerUpBtn = document.getElementById('moveLayerUp');
-            const moveLayerDownBtn = document.getElementById('moveLayerDown');
-            moveLayerUpBtn.addEventListener('click', () => {
-                moveLayerInStack(-1);
-             });
-            moveLayerDownBtn.addEventListener('click', () => {
-                moveLayerInStack(1);
-             });
-            function moveLayerInStack(direction) {
-                const currentLayerButton = document.querySelector(`.layer-button[data-layer="${currentLayer}"]`);
-                const targetLayerButton = direction === -1 ? currentLayerButton.previousElementSibling : currentLayerButton
-                    .nextElementSibling;
-                if (targetLayerButton) {
-                    if (direction === -1) {
-                        currentLayerButton.parentNode.insertBefore(currentLayerButton, targetLayerButton);
-                    } else {
-                        currentLayerButton.parentNode.insertBefore(targetLayerButton, currentLayerButton);
-                    }
-                    updateLayerOrder();
-                    currentLayerButton.click();
-                }
-             }
-            const layerButtonsContainer = document.getElementById('layerButtons');
+                currentLayerButton.click();
+            }
+        }
+        const layerButtonsContainer = document.getElementById('layerButtons');
         // Zoom functions
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Control') {
+                isCtrlPressed = true;
+            }
+            // fix
+            lastX = null;
+            lastY = null;
+        });
 
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Control') {
-                    isCtrlPressed = true;
+        document.addEventListener('keyup', (e) => {
+            if (e.key === 'Control') {
+                isCtrlPressed = false;
+                // fix сбррос
+                lastX = null;
+                lastY = null;
+            }
+        });
+
+
+
+        canvasContainer.addEventListener('mousemove', (e) => {
+            e.preventDefault();
+            if (isEyedropperActive || !isCtrlPressed || isDrawing || isFinger) return;
+
+
+
+            const rect = canvasContainer.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+
+            if (lastX !== undefined) {
+                const deltaX = e.movementX;
+                const oldZoom = zoomLevel;
+                zoomLevel = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoomLevel + deltaX * ZOOM_STEP));
+
+                if (oldZoom !== zoomLevel) {
+                    zoomOriginX = (mouseX - offsetX) / oldZoom;
+                    zoomOriginY = (mouseY - offsetY) / oldZoom;
+
+                    offsetX = mouseX - zoomOriginX * zoomLevel;
+                    offsetY = mouseY - zoomOriginY * zoomLevel;
+
+                    updateZoom();
                 }
-            });
-                                      
-            document.addEventListener('keyup', (e) => {
-                if (e.key === 'Control') {
-                    isCtrlPressed = false;
-                }
-            });
+            }
 
-
-
-            canvasContainer.addEventListener('mousemove', (e) => {
-                if (!isCtrlPressed){return;}
-                if (isCtrlPressed) {
-                    e.preventDefault();
-                    const rect = canvasContainer.getBoundingClientRect();
-                    const mouseX = e.clientX - rect.left;
-                    const mouseY = e.clientY - rect.top;
-
-                    if (lastX !== undefined) {
-                        const deltaX = e.movementX;
-                        const oldZoom = zoomLevel;
-                        zoomLevel = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoomLevel + deltaX * ZOOM_STEP));
-
-                        if (oldZoom !== zoomLevel) {
-                            zoomOriginX = (mouseX - offsetX) / oldZoom;
-                            zoomOriginY = (mouseY - offsetY) / oldZoom;
-
-                            offsetX = mouseX - zoomOriginX * zoomLevel;
-                            offsetY = mouseY - zoomOriginY * zoomLevel;
-
-                            updateZoom();
-                        }
-                    }
-
-                    lastX = mouseX;
-                    lastY = mouseY;
-                }
-
-            });
+            lastX = mouseX;
+            lastY = mouseY;
+        });
 
 
 
 
         function updateZoom() {
 
-            
-          Object.values(layers).forEach(layer => {
 
-            layer.style.transformOrigin = '0 0';
-            
-            if (zoomLevel <= 1) {
-              offsetX = 0;
-              offsetY = 0;
-              layer.style.transform = `scale(${zoomLevel})`;
-              layer.style.left = '0';
-              layer.style.top = '0';
-            } else {
-              layer.style.transform = `scale(${zoomLevel})`;
-              
-              const layerRect = layer.getBoundingClientRect();
-              offsetX = Math.min(Math.max(offsetX, containerRect.width - layerRect.width), 0);
-              offsetY = Math.min(Math.max(offsetY, containerRect.height - layerRect.height), 0);
-              
-              layer.style.left = `${offsetX}px`;
-              layer.style.top = `${offsetY}px`;
+            Object.values(layers).forEach(layer => {
+
+                layer.style.transformOrigin = '0 0';
+
+                if (zoomLevel <= 1) {
+                    offsetX = 0;
+                    offsetY = 0;
+                    layer.style.transform = `scale(${zoomLevel})`;
+                    layer.style.left = '0';
+                    layer.style.top = '0';
+                } else {
+                    layer.style.transform = `scale(${zoomLevel})`;
+
+                    const layerRect = layer.getBoundingClientRect();
+                    offsetX = Math.min(Math.max(offsetX, containerRect.width - layerRect.width), 0);
+                    offsetY = Math.min(Math.max(offsetY, containerRect.height - layerRect.height), 0);
+
+                    layer.style.left = `${offsetX}px`;
+                    layer.style.top = `${offsetY}px`;
+                }
+            });
+
+            canvasContainer.style.overflow = 'hidden';
+            // иконка и зум в html
+            document.getElementById('zoomLevelDisplay').textContent = `🔎${(zoomLevel * 100).toFixed(0)}%`;
+        }
+
+
+    </script>
+    <script src="script.js" defer></script>
+    <script src="cursors.js" defer></script>
+    <script type="module" src="constants.js" defer></script>
+    <script type="module" src="main.js" defer></script>
+    <script type="module" src="test.js" defer></script>
+    <script type="module" src="settings.js" defer></script>
+    <script type="module" src="helperFunction.js" defer></script>
+    <script type="module" src="listners.js" defer></script>
+    <script type="module" src="buttons.js" defer></script>
+    <script type="module" src="hotkey.js" defer></script>
+    <script type="module" src="settingsPanel.js" defer></script>
+    <script type="module" src="tools.js" defer></script>
+
+    <script>
+
+
+        //  инструмент палец
+        let isFinger = false;
+
+        const narrowToCenterBtn = document.getElementById('fingerfunc');
+
+        narrowToCenterBtn.addEventListener('click', () => {
+            isFinger = !isFinger;
+            narrowToCenterBtn.classList.toggle('active', isFinger);
+        });
+        function fingerfunc(e) {
+            if (!isDrawing || !curCtx || !isFinger) return;
+
+            const rect = layers[currentLayer].getBoundingClientRect();
+            const x = Math.floor((e.clientX - rect.left) / zoomLevel);
+            const y = Math.floor((e.clientY - rect.top) / zoomLevel);
+
+            const brushSize = parseInt(brushSize.value);
+            const halfBrushSize = brushSize / 2;
+
+            curCtx.save();
+            curCtx.beginPath();
+            curCtx.arc(x, y, halfBrushSize, 0, Math.PI * 2);
+            curCtx.clip();
+
+            if (lastX !== null && lastY !== null) {
+                const dx = x - lastX;
+                const dy = y - lastY;
+                curCtx.drawImage(
+                    layers[currentLayer],
+                    x - halfBrushSize - dx, y - halfBrushSize - dy, brushSize, brushSize,
+                    x - halfBrushSize, y - halfBrushSize, brushSize, brushSize
+                );
             }
-          });
 
-          canvasContainer.style.overflow = 'hidden';
-        // иконка и зум в html
-          document.getElementById('zoomLevelDisplay').textContent = `🔎${(zoomLevel * 100).toFixed(0)}%`;
+            curCtx.restore();
+
+            lastX = x;
+            lastY = y;
+        }
+        // слайдер истории
+
+        function resetOriginalImage(layerNum) {
+            delete originalImages[layerNum];
+
+        }
+
+        const historySliders = {};
+        let currentHistorySlider;
+        const MAX_HISTORY_STATES = 50;
+
+        function createHistorySlider() {
+            const sliderContainer = document.createElement('div');
+            sliderContainer.classList.add('history-slider-container');
+
+            const label = document.createElement('label');
+            sliderContainer.appendChild(label);
+
+            historySlider = document.createElement('input');
+            historySlider.type = 'range';
+            historySlider.min = '0';
+            historySlider.max = '0';
+            historySlider.value = '0';
+            historySlider.classList.add('history-slider');
+            sliderContainer.appendChild(historySlider);
+
+            historySlider.addEventListener('input', function () {
+                restoreLayerState(currentLayer, parseInt(this.value)); // Restore state for the current layer
+            });
         }
 
 
 
-
-    //  инструмент сужение 
-            let isNarrowingToCenter = false;
-
-            const narrowToCenterBtn = document.getElementById('narrowToCenter');
-
-            narrowToCenterBtn.addEventListener('click', () => {
-                isNarrowingToCenter = !isNarrowingToCenter;
-                narrowToCenterBtn.classList.toggle('active', isNarrowingToCenter);
-            });
-            function narrowToCenter(e) {
-                if (!isDrawing || !currentCtx || !isNarrowingToCenter) return;
-
-                const rect = layers[currentLayer].getBoundingClientRect();
-                const x = Math.floor((e.clientX - rect.left) / zoomLevel);
-                const y = Math.floor((e.clientY - rect.top) / zoomLevel);
-
-                const brushSize = parseInt(brushSizeInput.value);
-                const narrowFactor = 0.9; // Фактор сужения (0.9 = сужение на 10% за проход)
-
-                const imageData = currentCtx.getImageData(x - brushSize/2, y - brushSize/2, brushSize, brushSize);
-                const newImageData = currentCtx.createImageData(brushSize, brushSize);
-
-                const centerX = brushSize / 2;
-                const centerY = brushSize / 2;
-
-                for (let i = 0; i < brushSize; i++) {
-                    for (let j = 0; j < brushSize; j++) {
-                        const index = (j * brushSize + i) * 4;
-                        
-                        // Вычисляем расстояние от текущего пикселя до центра кисти
-                        const distX = i - centerX;
-                        const distY = j - centerY;
-                        const distance = Math.sqrt(distX * distX + distY * distY);
-                        
-                        if (distance < brushSize / 2) {
-                            // Вычисляем новую позицию пикселя
-                            const newDist = distance * narrowFactor;
-                            const newX = Math.round(centerX + (distX / distance) * newDist);
-                            const newY = Math.round(centerY + (distY / distance) * newDist);
-                            
-                            if (newX >= 0 && newX < brushSize && newY >= 0 && newY < brushSize) {
-                                const newIndex = (newY * brushSize + newX) * 4;
-                                
-                                // Копируем пиксель в новую позицию
-                                for (let k = 0; k < 4; k++) {
-                                    newImageData.data[newIndex + k] = imageData.data[index + k];
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // Смешиваем новое изображение с оригинальным
-                for (let i = 0; i < imageData.data.length; i += 4) {
-                    if (newImageData.data[i + 3] === 0) { // Если пиксель прозрачный в новом изображении
-                        newImageData.data[i] = imageData.data[i];
-                        newImageData.data[i + 1] = imageData.data[i + 1];
-                        newImageData.data[i + 2] = imageData.data[i + 2];
-                        newImageData.data[i + 3] = imageData.data[i + 3];
-                    }
-                }
-
-                currentCtx.putImageData(newImageData, x - brushSize/2, y - brushSize/2);
-            }
-
-
-
-
-
-            
-
-
-
-    // слайдер истории
-                const historySliders = {};
-                let currentHistorySlider;
-                const MAX_HISTORY_STATES = 50;
-
-            function createHistorySlider() {
-                const sliderContainer = document.createElement('div');
-                sliderContainer.classList.add('history-slider-container');
-
-                const label = document.createElement('label');
-                sliderContainer.appendChild(label);
-
-                historySlider = document.createElement('input');
-                historySlider.type = 'range';
-                historySlider.min = '0';
-                historySlider.max = '0';
-                historySlider.value = '0';
-                historySlider.classList.add('history-slider');
-                sliderContainer.appendChild(historySlider);
-
-                historySlider.addEventListener('input', function() {
-                    restoreLayerState(currentLayer, parseInt(this.value)); // Restore state for the current layer
-                });
-            }
-            function saveState() {
-                if (!currentCtx) {
-                    return;
-                }
-
-                if (history[currentLayer].length >= MAX_HISTORY_STATES) {
-                    history[currentLayer].shift(); // Remove the oldest state
-                }
-
-                history[currentLayer].push(currentCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height));
-                redoHistory[currentLayer] = [];
-
-                historySlider.max = history[currentLayer].length - 1;
-                historySlider.value = history[currentLayer].length - 1;
-            }
-
-
-    // обводка
+        // обводка
 
         const originalImages = {};
         const outlineSizes = {};
@@ -913,7 +1099,7 @@ function draw(e) {
 
         outlineSizeInput.max = "5";
 
-        outlineSizeInput.addEventListener('input', function() {
+        outlineSizeInput.addEventListener('input', function () {
             // Сброс всех обводок
             Object.keys(layers).forEach(key => {
                 const layer = layers[key];
@@ -960,12 +1146,11 @@ function draw(e) {
                 ctx.putImageData(originalImages[layerNum], 0, 0);
                 return; // Exit if size is 0
             }
-            
-            const originalStrokeStyle = ctx.strokeStyle; 
+
+            const originalStrokeStyle = ctx.strokeStyle;
 
             ctx.lineWidth = size;
             ctx.strokeStyle = 'black';
-
             const imageData = tempCtx.getImageData(0, 0, canvas.width, canvas.height);
             const data = imageData.data;
 
@@ -981,8 +1166,11 @@ function draw(e) {
             }
 
             ctx.drawImage(tempCanvas, 0, 0);
-            ctx.strokeStyle = originalStrokeStyle; 
+            ctx.strokeStyle = originalStrokeStyle;
         }
+
+
+
         function updateOutlineForLayer(layerNum) {
 
             if (!layers[layerNum] || !contexts[layerNum]) {
@@ -996,28 +1184,62 @@ function draw(e) {
             applyOutline(layerNum, size);
 
         }
-
-        function resetOriginalImage(layerNum) {
-            delete originalImages[layerNum];
-
-        }
-
-
-
+    </script>
+    <script>
+        // !?
+        // document.querySelectorAll('button, input').forEach(element => {
+        //      element.addEventListener('pointerdown', (e) => {
+        //          e.stopPropagation();
+        //      });
+        //   });
 
 
     </script>
-    <script src="script.js" defer></script>
-    <script src="cursors.js" defer></script>
-    <script type="module" src="tools.js" defer></script>
-    <script type="module" src="constants.js" defer></script>
-    <script type="module" src="tools.js" defer></script>
-    <script type="module" src="main.js" defer></script>
-    <script type="module" src="test.js" defer></script>
-    <script type="module" src="settings.js" defer></script>
-    <script type="module" src="helperFunction.js" defer></script>
-    <script type="module" src="listners.js" defer></script>
-    <script type="module" src="buttons.js" defer></script>
-    <script type="module" src="hotkey.js" defer></script>
-    </body>
- </html>
+    <script>
+// добавляем иконку задействованных слоев
+    const layerDrawnOn = {};
+    function updateLayerEyeIcon(layerNum) {
+        const layerButton = document.querySelector(`.layer-button[data-layer="${layerNum}"]`);
+        if (layerButton) {
+            const eyeIcon = layerButton.querySelector('.eye-icon');
+            if (eyeIcon) {
+                eyeIcon.style.display = layerDrawnOn[layerNum] ? 'inline' : 'none';
+            }
+        }
+    }
+// сообщение
+    const messageButton = document.getElementById('message');
+    const messageContainer = document.getElementById('message-container');
+    const messageText = document.getElementById('message-text'); 
+
+    function showMessage(message) {
+      messageText.textContent = message; 
+      messageContainer.style.display = 'block'; 
+    }
+
+    messageButton.addEventListener('click', () => {
+      showMessage("Привет! Это тестовое сообщение."); // Show a test message
+    });
+
+    if (!messageContainer.querySelector('.close-button')) {
+      const closeButton = document.createElement('span');
+      closeButton.textContent = '×';
+      closeButton.classList.add('close-button');
+      messageContainer.appendChild(closeButton);
+
+      closeButton.addEventListener('click', () => {
+        messageContainer.style.display = 'none';
+      });
+    }
+
+    window.addEventListener('click', (event) => {
+      if (event.target === messageContainer) {
+        messageContainer.style.display = 'none';
+      }
+    });
+
+    </script>
+    </script>
+</body>
+
+</html>

@@ -114,7 +114,7 @@ function loadCanvasImages() {
     canvasImageGallery.appendChild(transparentBtn);
 }
 function setCanvasImage(src) {
-    const canvas = layers[100];
+    const canvas = layers[back];
     const ctx = canvas.getContext('2d');
     const img = new Image();
     img.onload = function() {
@@ -125,18 +125,18 @@ function setCanvasImage(src) {
 }
 
 function updateCanvasPreview(src) {
-    const previewCtx = contexts[100]; 
+    const previewCtx = contexts[back]; 
     const img = new Image();
     img.onload = function() {
-        previewCtx.clearRect(0, 0, layers[100].width, layers[100].height);
-        previewCtx.drawImage(img, 0, 0, layers[100].width, layers[100].height);
+        previewCtx.clearRect(0, 0, layers[back].width, layers[back].height);
+        previewCtx.drawImage(img, 0, 0, layers[back].width, layers[back].height);
     }
     img.src = src;
 }
 
 // Функция для установки прозрачного фона
     function setCanvasTransparent() {
-        const canvas = layers[100];
+        const canvas = layers[back];
         const ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         canvasSettingsModal.style.display = "none";
@@ -152,7 +152,7 @@ closeCanvasModal.onclick = function() {
 }
 
 canvasColorPicker.addEventListener('input', function() {
-    const canvas = layers[100];
+    const canvas = layers[back];
     const ctx = canvas.getContext('2d');
     ctx.fillStyle = this.value;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -172,16 +172,6 @@ canvasImageInput.addEventListener('change', function() {
     }
 });
 
-// setCanvasImageBtn.addEventListener('click', function() {
-//     const file = canvasImageInput.files[0];
-//     if (file) {
-//         const reader = new FileReader();
-//         reader.onload = function(e) {
-//             setCanvasImage(e.target.result);
-//         }
-//         reader.readAsDataURL(file);
-//     }
-// });
 
 window.onclick = function(event) {
     if (event.target === backgroundSettingsModal) {

@@ -16,28 +16,37 @@ document.addEventListener('keydown', (event) => {
     KeyV: toggleSpider,
   };
 
+
+
   const element = elementMap[keyCode];
 
   if (element) {
-    event.preventDefault();
+
     if (typeof element === 'string') {
       document.getElementById(element).click();
     } else if (typeof element === 'function') {
       element();
     }
   } else if (event.ctrlKey && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
-    event.preventDefault();
+
     moveLayerInStack(event.key === 'ArrowUp' ? -1 : 1);
   } else if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
-    event.preventDefault();
+
     moveLayerFocus(event.key === 'ArrowUp' ? -1 : 1);
   }
 });
 
 function moveLayerFocus(direction) {
-  const layerButtons = document.querySelectorAll('.layer-button');
-  let currentLayerIndex = Array.from(layerButtons).findIndex(button => button.classList.contains('active-layer'));
+  const lB = document.querySelectorAll('.layer-button');
+  let currentLayerIndex = Array.from(lB).findIndex(button => button.classList.contains('active-layer'));
 
-  let newIndex = (currentLayerIndex + direction + layerButtons.length) % layerButtons.length; // Wrap around
-  layerButtons[newIndex].click();
+  let newIndex = (currentLayerIndex + direction + lB.length) % lB.length; // Wrap around
+  lB[newIndex].click();
 }
+
+// buttons
+    const imageInput = document.getElementById('imageInput');
+    UploadB.addEventListener('click', () => imageInput.click());
+    imageInput.addEventListener('change', importImage);
+    undoBtn.addEventListener('click', undo);
+    redoBtn.addEventListener('click', redo);

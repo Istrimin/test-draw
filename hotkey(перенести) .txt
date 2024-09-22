@@ -1,3 +1,6 @@
+added 
+	alt+q close editor(close current file)
+
 Shift + Alt + I	Вставить курсор в конец каждой выбранной строки
 Shift + Alt + →	Расширить выбор
 
