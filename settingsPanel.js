@@ -60,13 +60,20 @@ backgroundImageInput.addEventListener('change', function() {
 });
 
 // JavaScript for canvas settings modal
-const canvasSettingsBtn = document.getElementById('canvasSettingsBtn');
-const canvasSettingsModal = document.getElementById('canvasSettingsModal');
-const closeCanvasModal = document.getElementById('closeCanvasModal');
-const canvasColorPicker = document.getElementById('canvasColorPicker');
-const canvasImageInput = document.getElementById('canvasImageInput');
-const setCanvasImageBtn = document.getElementById('setCanvasImageBtn');
-const canvasImageGallery = document.getElementById('canvasImageGallery');
+const elements = [
+  'canvasSettingsBtn',
+  'canvasSettingsModal',
+  'closeCanvasModal',
+  'canvasColorPicker',
+  'canvasImageInput',
+  'setCanvasImageBtn',
+  'canvasImageGallery'
+];
+
+const obj = Object.fromEntries(
+  elements.map(id => [id, document.getElementById(id)])
+);
+
 const canvasPreview = document.getElementById('canvasPreview');
 
 const initialCanvasImages = ['canvas1.jpg'];
@@ -92,8 +99,20 @@ function loadCanvasImages() {
 
         canvasImageGallery.appendChild(img);
     });
-}
+    // Добавляем кнопку для установки прозрачного фона
+    const transparentBtn = document.createElement('button');
+    transparentBtn.onclick = function() {
+        setCanvasTransparent();
+    };
 
+    // Применяем стили к кнопке
+    transparentBtn.style.width = '100px';
+    transparentBtn.style.height = '100px';
+    transparentBtn.style.margin = '5px';
+    transparentBtn.style.cursor = 'pointer'; 
+
+    canvasImageGallery.appendChild(transparentBtn);
+}
 function setCanvasImage(src) {
     const canvas = layers[100];
     const ctx = canvas.getContext('2d');
@@ -106,14 +125,22 @@ function setCanvasImage(src) {
 }
 
 function updateCanvasPreview(src) {
-    const previewCtx = canvasPreview.getContext('2d');
+    const previewCtx = contexts[100]; 
     const img = new Image();
     img.onload = function() {
-        previewCtx.clearRect(0, 0, canvasPreview.width, canvasPreview.height);
-        previewCtx.drawImage(img, 0, 0, canvasPreview.width, canvasPreview.height);
+        previewCtx.clearRect(0, 0, layers[100].width, layers[100].height);
+        previewCtx.drawImage(img, 0, 0, layers[100].width, layers[100].height);
     }
     img.src = src;
 }
+
+// Функция для установки прозрачного фона
+    function setCanvasTransparent() {
+        const canvas = layers[100];
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        canvasSettingsModal.style.display = "none";
+    }
 
 canvasSettingsBtn.onclick = function() {
     loadCanvasImages();
@@ -145,16 +172,16 @@ canvasImageInput.addEventListener('change', function() {
     }
 });
 
-setCanvasImageBtn.addEventListener('click', function() {
-    const file = canvasImageInput.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            setCanvasImage(e.target.result);
-        }
-        reader.readAsDataURL(file);
-    }
-});
+// setCanvasImageBtn.addEventListener('click', function() {
+//     const file = canvasImageInput.files[0];
+//     if (file) {
+//         const reader = new FileReader();
+//         reader.onload = function(e) {
+//             setCanvasImage(e.target.result);
+//         }
+//         reader.readAsDataURL(file);
+//     }
+// });
 
 window.onclick = function(event) {
     if (event.target === backgroundSettingsModal) {
@@ -168,3 +195,4 @@ window.onclick = function(event) {
 // Initialize
 loadBackgroundImages();
 loadCanvasImages();
+

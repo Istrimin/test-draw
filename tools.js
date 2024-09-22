@@ -1,59 +1,3 @@
-// старая версия(тут рисовалось на стертых участках)
-// export function drawOn(startX, startY, endX, endY, ctx) {
-//     const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
-//     const data = imageData.data;
-
-//     // Создаем временный холст для рисования линии
-//     const tempCanvas = document.createElement('canvas');
-//     tempCanvas.width = ctx.canvas.width;
-//     tempCanvas.height = ctx.canvas.height;
-//     const tempCtx = tempCanvas.getContext('2d');
-
-//     // Отключаем сглаживание для точного рисования пикселей
-//     tempCtx.imageSmoothingEnabled = false;
-
-//     // Копируем стили рисования из основного контекста
-//     tempCtx.strokeStyle = ctx.strokeStyle;
-//     tempCtx.lineWidth = ctx.lineWidth;
-//     tempCtx.lineCap = ctx.lineCap;
-//     tempCtx.lineJoin = ctx.lineJoin;
-
-//     // Рисуем линию на временном холсте
-//     tempCtx.beginPath();
-//     tempCtx.moveTo(startX, startY);
-//     tempCtx.lineTo(endX, endY);
-//     tempCtx.stroke();
-
-//     // Получаем данные изображения линии
-//     const lineData = tempCtx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height).data;
-
-//     // Оптимизация: проходим только по пикселям линии
-//     const lineWidth = ctx.lineWidth;
-//     for (let x = Math.floor(Math.min(startX, endX) - lineWidth); x <= Math.ceil(Math.max(startX, endX) + lineWidth); x++) {
-//         for (let y = Math.floor(Math.min(startY, endY) - lineWidth); y <= Math.ceil(Math.max(startY, endY) + lineWidth); y++) {
-//             if (x >= 0 && x < ctx.canvas.width && y >= 0 && y < ctx.canvas.height) {
-//                 const i = (y * ctx.canvas.width + x) * 4;
-
-//                 // Проверяем, находится ли пиксель на линии и есть ли уже что-то нарисованное в этом месте
-//                 if (lineData[i + 3] > 0 && data[i + 3] > 0) {
-//                     const alpha = ctx.globalAlpha;
-//                     const existingAlpha = data[i + 3] / 255;
-//                     const newAlpha = alpha + existingAlpha * (1 - alpha);
-
-//                     // Смешиваем цвета с учетом прозрачности
-//                     data[i] = (lineData[i] * alpha + data[i] * existingAlpha * (1 - alpha)) / newAlpha;
-//                     data[i + 1] = (lineData[i + 1] * alpha + data[i + 1] * existingAlpha * (1 - alpha)) / newAlpha;
-//                     data[i + 2] = (lineData[i + 2] * alpha + data[i + 2] * existingAlpha * (1 - alpha)) / newAlpha;
-//                     data[i + 3] = newAlpha * 255;
-//                 }
-//             }
-//         }
-//     }
-
-//     // Применяем изменения к основному холсту
-//     ctx.putImageData(imageData, 0, 0);
-// }
-
 export function drawOn(startX, startY, endX, endY, ctx) {
     const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
     const data = imageData.data;
@@ -93,47 +37,44 @@ export function drawOn(startX, startY, endX, endY, ctx) {
     ctx.putImageData(imageData, 0, 0);
 }
 
-
-
-
 // *рисование под нарисованным
-// export function drawOn(startX, startY, endX, endY, ctx) {
-//     const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
-//     const data = imageData.data;
-//     const tempCanvas = document.createElement('canvas');
-//     tempCanvas.width = ctx.canvas.width;
-//     tempCanvas.height = ctx.canvas.height;
-//     const tempCtx = tempCanvas.getContext('2d');
-//     tempCtx.imageSmoothingEnabled = false;
-//     tempCtx.strokeStyle = ctx.strokeStyle;
-//     tempCtx.lineWidth = ctx.lineWidth;
-//     tempCtx.lineCap = ctx.lineCap;
-//     tempCtx.lineJoin = ctx.lineJoin;
-//     tempCtx.beginPath();
-//     tempCtx.moveTo(startX, startY);
-//     tempCtx.lineTo(endX, endY);
-//     tempCtx.stroke();
-//     const lineData = tempCtx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height).data;
-//     const lineWidth = ctx.lineWidth;
-//     for (let x = Math.floor(Math.min(startX, endX) - lineWidth); x <= Math.ceil(Math.max(startX, endX) + lineWidth); x++) {
-//         for (let y = Math.floor(Math.min(startY, endY) - lineWidth); y <= Math.ceil(Math.max(startY, endY) + lineWidth); y++) {
-//             if (x >= 0 && x < ctx.canvas.width && y >= 0 && y < ctx.canvas.height) {
-//                 const i = (y * ctx.canvas.width + x) * 4;
-//                 // Проверяем, находится ли пиксель на линии и не является ли он полностью прозрачным
-//                 if (lineData[i + 3] > 0 && data[i + 3] < 255) {
-//                     const alpha = ctx.globalAlpha;
-//                     const existingAlpha = data[i + 3] / 255;
-//                     const newAlpha = alpha + existingAlpha * (1 - alpha);
-//                     data[i] = (lineData[i] * alpha + data[i] * existingAlpha * (1 - alpha)) / newAlpha;
-//                     data[i + 1] = (lineData[i + 1] * alpha + data[i + 1] * existingAlpha * (1 - alpha)) / newAlpha;
-//                     data[i + 2] = (lineData[i + 2] * alpha + data[i + 2] * existingAlpha * (1 - alpha)) / newAlpha;
-//                     data[i + 3] = newAlpha * 255;
-//                 }
-//             }
-//         }
-//     }
-//     ctx.putImageData(imageData, 0, 0);
-// }
+    // export function drawOn(startX, startY, endX, endY, ctx) {
+    //     const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+    //     const data = imageData.data;
+    //     const tempCanvas = document.createElement('canvas');
+    //     tempCanvas.width = ctx.canvas.width;
+    //     tempCanvas.height = ctx.canvas.height;
+    //     const tempCtx = tempCanvas.getContext('2d');
+    //     tempCtx.imageSmoothingEnabled = false;
+    //     tempCtx.strokeStyle = ctx.strokeStyle;
+    //     tempCtx.lineWidth = ctx.lineWidth;
+    //     tempCtx.lineCap = ctx.lineCap;
+    //     tempCtx.lineJoin = ctx.lineJoin;
+    //     tempCtx.beginPath();
+    //     tempCtx.moveTo(startX, startY);
+    //     tempCtx.lineTo(endX, endY);
+    //     tempCtx.stroke();
+    //     const lineData = tempCtx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height).data;
+    //     const lineWidth = ctx.lineWidth;
+    //     for (let x = Math.floor(Math.min(startX, endX) - lineWidth); x <= Math.ceil(Math.max(startX, endX) + lineWidth); x++) {
+    //         for (let y = Math.floor(Math.min(startY, endY) - lineWidth); y <= Math.ceil(Math.max(startY, endY) + lineWidth); y++) {
+    //             if (x >= 0 && x < ctx.canvas.width && y >= 0 && y < ctx.canvas.height) {
+    //                 const i = (y * ctx.canvas.width + x) * 4;
+    //                 // Проверяем, находится ли пиксель на линии и не является ли он полностью прозрачным
+    //                 if (lineData[i + 3] > 0 && data[i + 3] < 255) {
+    //                     const alpha = ctx.globalAlpha;
+    //                     const existingAlpha = data[i + 3] / 255;
+    //                     const newAlpha = alpha + existingAlpha * (1 - alpha);
+    //                     data[i] = (lineData[i] * alpha + data[i] * existingAlpha * (1 - alpha)) / newAlpha;
+    //                     data[i + 1] = (lineData[i + 1] * alpha + data[i + 1] * existingAlpha * (1 - alpha)) / newAlpha;
+    //                     data[i + 2] = (lineData[i + 2] * alpha + data[i + 2] * existingAlpha * (1 - alpha)) / newAlpha;
+    //                     data[i + 3] = newAlpha * 255;
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     ctx.putImageData(imageData, 0, 0);
+    // }
 
 
 // Сохранение изображения
@@ -380,21 +321,14 @@ export function drawOn(startX, startY, endX, endY, ctx) {
         });
     }
 // Назначаем горячие клавиши для выбора цветов(это не влияет на выбор цвет бэка)
-//Set the background color
-    function setBackgroundColor(color) {
-        backgroundColor = color; 
-        const backgroundCtx = contexts[0]; 
-        backgroundCtx.fillStyle = color;
-        backgroundCtx.fillRect(0, 0, canvas.width, canvas.height);
-    }
-
+// 
 
     // Update color picker setup 
         const colorPickers = document.querySelectorAll('input[type="color"]');
         colorPickers.forEach((picker, index) => {
             picker.addEventListener('input', (event) => {
                 if (picker.id === 'backgroundPicker') {
-                    setBackgroundColor(event.target.value);
+                    setLayerBackground(event.target.value);
                 } else {
                     setDrawingColor(event.target.value);
                 }
@@ -451,7 +385,7 @@ export function drawOn(startX, startY, endX, endY, ctx) {
         layerCount = 0;
         // Создаем новый слой с объединенным изображением
         createLayer();
-        currentCtx.drawImage(mergedCanvas, 0, 0);
+        curCtx.drawImage(mergedCanvas, 0, 0);
         // Обновляем интерфейс
         updateLayerOrder();
         setCurrentLayer(1);
@@ -465,8 +399,8 @@ export function drawOn(startX, startY, endX, endY, ctx) {
     clearBtn.addEventListener('click', clearCanvas);
     function clearCanvas() {
         saveState();
-        if (!currentCtx) return; 
-        currentCtx.clearRect(0, 0, layers[currentLayer].width, layers[currentLayer].height);
+        if (!curCtx) return; 
+        curCtx.clearRect(0, 0, layers[currentLayer].width, layers[currentLayer].height);
         saveState();
     }
 
@@ -485,13 +419,13 @@ export function drawOn(startX, startY, endX, endY, ctx) {
     //             floodFillBtn.classList.toggle('active', isFloodFillActive);
     //         });
     //         function floodFill(e) {
-    //             if (!currentCtx) {
-    //                 console.error('Error: currentCtx is undefined in floodFill. Current layer:', currentLayer);
+    //             if (!curCtx) {
+    //                 console.error('Error: curCtx is undefined in floodFill. Current layer:', currentLayer);
     //                 return;
     //             }
     //             const startX = e.offsetX;
     //             const startY = e.offsetY;
-    //             const imageData = currentCtx.getImageData(0, 0, drawingCanvas.width, drawingCanvas.height); // Use drawingCanvas
+    //             const imageData = curCtx.getImageData(0, 0, drawingCanvas.width, drawingCanvas.height); // Use drawingCanvas
     //             const data = imageData.data;
     //             const width = imageData.width;
     //             const height = imageData.height;
@@ -525,7 +459,7 @@ export function drawOn(startX, startY, endX, endY, ctx) {
     //                     }
     //                 }
     //             }
-    //             currentCtx.putImageData(imageData, 0, 0);
+    //             curCtx.putImageData(imageData, 0, 0);
     //             saveState();
     //         }
     //         // Modify the event listener for floodFill 
@@ -640,7 +574,7 @@ export function drawOn(startX, startY, endX, endY, ctx) {
 
 // ..функция сшивания(копия)
         // function ntc(e, narrowFactor = 0.9) {
-        //             if (!isDrawing || !currentCtx || !isFinger) return;
+        //             if (!isDrawing || !curCtx || !isFinger) return;
 
         //             const rect = layers[currentLayer].getBoundingClientRect();
         //             const x = Math.floor((e.clientX - rect.left) / zoomLevel);
@@ -648,8 +582,8 @@ export function drawOn(startX, startY, endX, endY, ctx) {
 
         //             const brushSize = parseInt(brushSizeInput.value);
         //             const halfBrushSize = brushSize / 2;
-        //             const imageData = currentCtx.getImageData(x - halfBrushSize, y - halfBrushSize, brushSize, brushSize);
-        //             const newImageData = currentCtx.createImageData(brushSize, brushSize);
+        //             const imageData = curCtx.getImageData(x - halfBrushSize, y - halfBrushSize, brushSize, brushSize);
+        //             const newImageData = curCtx.createImageData(brushSize, brushSize);
 
         //             // Определяем направление движения кисти
         //             if (lastX !== null && lastY !== null) {
@@ -702,7 +636,7 @@ export function drawOn(startX, startY, endX, endY, ctx) {
         //                 }
         //             }
 
-        //             currentCtx.putImageData(newImageData, x - halfBrushSize, y - halfBrushSize);
+        //             curCtx.putImageData(newImageData, x - halfBrushSize, y - halfBrushSize);
 
         //             // Обновляем последние координаты
         //             lastX = x;
@@ -712,62 +646,62 @@ export function drawOn(startX, startY, endX, endY, ctx) {
 // Цвет заливки пикер(отдельно от пикера цвета)
     // Это инструмент, позволяющий рисвовать контур и затем сразу заливать его вторым цветом.
     // fix 
+
 // function getPixelColorFromAllLayers(x, y) {
-//     // Start from the top layer and go down
-//     for (let i = layerCount; i >= 1; i--) {
-//         if (layers[i] && contexts[i]) {
-//             const ctx = contexts[i];
-//             const pixelData = ctx.getImageData(x, y, 1, 1).data;
-//             if (pixelData[3] > 0) {
-//                 return `#${pixelData[0].toString(16).padStart(2, '0')}${pixelData[1].toString(16).padStart(2, '0')}${pixelData[2].toString(16).padStart(2, '0')}`;
-//             }
-//         }
-//     }
-    
-//     // If no color is found in regular layers, check the background layer (100)
-//     if (layers[100] && contexts[100]) {
-//         const bgCtx = contexts[100];
-//         const bgPixelData = bgCtx.getImageData(x, y, 1, 1).data;
-//         if (bgPixelData[3] > 0) {
-//             return `#${bgPixelData[0].toString(16).padStart(2, '0')}${bgPixelData[1].toString(16).padStart(2, '0')}${bgPixelData[2].toString(16).padStart(2, '0')}`;
-//         }
-//     }
-    
-//     // If still no color is found, return the background color
-//     return backgroundPicker.value;
-// }
-
-// function handleEyedropperClick(e) {
-//     if (isEyedropperActive) {
-//         // Find the topmost visible layer
-//         let topmostLayer = null;
-//         for (let i = layerCount; i >= 1; i--) {
-//             if (layers[i] && layers[i].style.display !== 'none') {
-//                 topmostLayer = layers[i];
-//                 break;
-//             }
-//         }
-
-//         if (!topmostLayer) {
-//             console.error('No visible layers found');
-//             return;
-//         }
-
-//         const rect = topmostLayer.getBoundingClientRect();
-//         // Get coordinates correctly for both touch and mouse events
-//         const x = Math.floor((e.clientX || e.touches[0].clientX) - rect.left);
-//         const y = Math.floor((e.clientY || e.touches[0].clientY) - rect.top);
+    //     // Start from the top layer and go down
+    //     for (let i = layerCount; i >= 1; i--) {
+    //         if (layers[i] && contexts[i]) {
+    //             const ctx = contexts[i];
+    //             const pixelData = ctx.getImageData(x, y, 1, 1).data;
+    //             if (pixelData[3] > 0) {
+    //                 return `#${pixelData[0].toString(16).padStart(2, '0')}${pixelData[1].toString(16).padStart(2, '0')}${pixelData[2].toString(16).padStart(2, '0')}`;
+    //             }
+    //         }
+    //     }
         
-//         const pickedColor = getPixelColorFromAllLayers(x, y);
-//         document.getElementById('colorPicker').value = pickedColor;
-//         setDrawingColor(pickedColor);
+    //     // If no color is found in regular layers, check the background layer (100)
+    //     if (layers[100] && contexts[100]) {
+    //         const bgCtx = contexts[100];
+    //         const bgPixelData = bgCtx.getImageData(x, y, 1, 1).data;
+    //         if (bgPixelData[3] > 0) {
+    //             return `#${bgPixelData[0].toString(16).padStart(2, '0')}${bgPixelData[1].toString(16).padStart(2, '0')}${bgPixelData[2].toString(16).padStart(2, '0')}`;
+    //         }
+    //     }
         
-//         // Optionally deactivate eyedropper after picking
-//         isEyedropperActive = false;
-//         document.body.style.cursor = 'auto';
-//         eyedropperBtn.classList.remove('active');
-//     }
-// }
+    //     // If still no color is found, return the background color
+    //     return backgroundPicker.value;
+    // }
+
+    // function handleEyedropperClick(e) {
+    //     if (isEyedropperActive) {
+    //         // Find the topmost visible layer
+    //         let topmostLayer = null;
+    //         for (let i = layerCount; i >= 1; i--) {
+    //             if (layers[i] && layers[i].style.display !== 'none') {
+    //                 topmostLayer = layers[i];
+    //                 break;
+    //             }
+    //         }
+
+    //         if (!topmostLayer) {
+    //             console.error('No visible layers found');
+    //             return;
+    //         }
+
+    //         const rect = topmostLayer.getBoundingClientRect();
+    //         // Get coordinates correctly for both touch and mouse events
+    //         const x = Math.floor((e.clientX || e.touches[0].clientX) - rect.left);
+    //         const y = Math.floor((e.clientY || e.touches[0].clientY) - rect.top);
+            
+    //         const pickedColor = getPixelColorFromAllLayers(x, y);
+    //         document.getElementById('colorPicker').value = pickedColor;
+    //         setDrawingColor(pickedColor);
+            
+    //         // Optionally deactivate eyedropper after picking
+    //         isEyedropperActive = false;
+    //         document.body.style.cursor = 'auto';
+    //         eyedropperBtn.classList.remove('active');
+    //     }
+    // }
 
 
-// fix Пипетка(слева жмется, с права нет)

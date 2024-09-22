@@ -8,8 +8,7 @@ document.addEventListener('keydown', (event) => {
     KeyE: 'eraserBtn',
     KeyS: 'saveImageBtn',
     KeyR: 'clear',
-    // KeyQ: 'symmetry',
-KeyQ: toggleSymmetry,
+    KeyQ: toggleSymmetry,
     KeyF: 'fillModeBtn',
     KeyU: 'UploadButton',
     KeyW: togglePreviousLayer, 
@@ -19,11 +18,26 @@ KeyQ: toggleSymmetry,
 
   const element = elementMap[keyCode];
 
-  if (typeof element === 'string') {
+  if (element) {
     event.preventDefault();
-    document.getElementById(element).click();
-  } else if (typeof element === 'function') {
+    if (typeof element === 'string') {
+      document.getElementById(element).click();
+    } else if (typeof element === 'function') {
+      element();
+    }
+  } else if (event.ctrlKey && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
     event.preventDefault();
-    element();
+    moveLayerInStack(event.key === 'ArrowUp' ? -1 : 1);
+  } else if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+    event.preventDefault();
+    moveLayerFocus(event.key === 'ArrowUp' ? -1 : 1);
   }
 });
+
+function moveLayerFocus(direction) {
+  const layerButtons = document.querySelectorAll('.layer-button');
+  let currentLayerIndex = Array.from(layerButtons).findIndex(button => button.classList.contains('active-layer'));
+
+  let newIndex = (currentLayerIndex + direction + layerButtons.length) % layerButtons.length; // Wrap around
+  layerButtons[newIndex].click();
+}
