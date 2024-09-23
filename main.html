@@ -459,7 +459,7 @@ function drawSpider(startX, startY, endX, endY, isSymmetric = false) {
                 history[currentLayer].shift();
             }
 
-            history[currentLayer].push(curCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height));
+            history[currentLayer].push(curCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height, { willReadFrequently: true })); // проверить !
             redoHistory[currentLayer] = [];
         }
 

@@ -194,7 +194,7 @@
 
         function draw(e) {
             if (!isDrawing) return;
-            e.preventDefault();
+            // e.preventDefault();
 
             const [x, y] = getCoordinates(e);
 
@@ -364,6 +364,10 @@
         document.addEventListener('pointermove', draw);
         document.addEventListener('pointerup', stopDrawing);
         document.addEventListener('pointercancel', stopDrawing);
+    // drawingCanvas.addEventListener('mousedown', startDrawing);
+    // drawingCanvas.addEventListener('mousemove', draw);
+    // document.addEventListener('mouseup', stopDrawing);
+
 
         symmetryButton.addEventListener('click', toggleSymmetry);
         undoBtn.addEventListener('click', undo);

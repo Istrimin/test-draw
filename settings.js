@@ -64,6 +64,14 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+
+
+
+
+
+
+
+
 // // Отключение скроллинга колесиком мыши для всего документа, кроме слайдеров
 // document.addEventListener('wheel', function(e) {
 //     // Проверяем, находится ли курсор над слайдером

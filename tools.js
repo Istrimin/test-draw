@@ -1,44 +1,30 @@
 // Функция для объединения слоев
     const mergeLayersBtn = document.getElementById('mergeLayers');
-    // Добавляем обработчик события для кнопки
     mergeLayersBtn.addEventListener('click', mergeLayers);
-
-
         function mergeLayers() {
-            // Создаем новый холст для объединенного изображения
             const mergedCanvas = document.createElement('canvas');
             const mergedCtx = mergedCanvas.getContext('2d', { willReadFrequently: true });
             mergedCanvas.width = layers[1].width;
             mergedCanvas.height = layers[1].height;
-
-            // Получаем все кнопки слоев и сортируем их по z-index
             const layerButtons = Array.from(document.querySelectorAll('.layer-button'));
             layerButtons.sort((a, b) => {
                 const layerA = layers[parseInt(a.dataset.layer)];
                 const layerB = layers[parseInt(b.dataset.layer)];
                 return parseInt(layerA.style.zIndex || 0) - parseInt(layerB.style.zIndex || 0);
             });
-
-            // Рисуем каждый слой на объединенном холсте
             layerButtons.forEach((button) => {
                 const layerId = parseInt(button.dataset.layer);
                 if (layers[layerId] && layerId !== back) {
                     mergedCtx.drawImage(layers[layerId], 0, 0);
-                    // Очищаем содержимое слоя, кроме текущего
                     if (layerId !== currentLayer) {
                         const ctx = contexts[layerId];
                         ctx.clearRect(0, 0, layers[layerId].width, layers[layerId].height);
                     }
                 }
             });
-
-            // Рисуем объединенное изображение на текущем слое
             curCtx.drawImage(mergedCanvas, 0, 0);
-
-            // Обновляем интерфейс
             updateLayerOrder();
         }
-
 export function drawOn(startX, startY, endX, endY, ctx) {
     const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
     const data = imageData.data;
@@ -110,14 +96,12 @@ export function drawOn(startX, startY, endX, endY, ctx) {
                 button.textContent = " ❤ ";
                 button.classList.add('layer-button');
                 button.dataset.layer = newLayerNum;
-                
                 // Add eye icon
                 const eyeIcon = document.createElement('span');
                 eyeIcon.textContent = "👁️";
                 eyeIcon.style.display = 'inline'; // Show the eye icon by default
                 eyeIcon.classList.add('eye-icon');
                 button.appendChild(eyeIcon);
-                
                 if (currentIndex !== -1) {
                     layerButtons[currentIndex].parentNode.insertBefore(button, layerButtons[currentIndex].nextSibling);
                 } else {
@@ -133,7 +117,6 @@ export function drawOn(startX, startY, endX, endY, ctx) {
                 initializeLayer(newLayerNum);
                 updateLayerButtonColor(newLayerNum);
                 updateLayerOrder();
-                
                 // Mark the new layer as drawn on
                 layerDrawnOn[newLayerNum] = true;
                 updateLayerEyeIcon(newLayerNum);
@@ -146,7 +129,6 @@ export function drawOn(startX, startY, endX, endY, ctx) {
             updateZoom(); //?
         }
     });
-
     function createLayerAboveCurrent() {
         const layerButtons = Array.from(document.querySelectorAll('.layer-button'));
         const currentIndex = layerButtons.findIndex(btn => parseInt(btn.dataset.layer) === currentLayer);
@@ -160,13 +142,11 @@ export function drawOn(startX, startY, endX, endY, ctx) {
         canvas.style.top = '0';
         canvas.style.left = '0';
         canvas.style.zIndex = newLayerNum;
-
         if (currentIndex !== -1) {
             canvasContainer.insertBefore(canvas, layers[currentLayer]);
         } else {
             canvasContainer.appendChild(canvas);
         }
-
         layers[newLayerNum] = canvas;
         contexts[newLayerNum] = canvas.getContext('2d');
         layerColors[newLayerNum] = '#' + Math.floor(Math.random() * 16777215).toString(16);
@@ -174,19 +154,16 @@ export function drawOn(startX, startY, endX, endY, ctx) {
         button.textContent = " ❤ ";
         button.classList.add('layer-button');
         button.dataset.layer = newLayerNum;
-
         const eyeIcon = document.createElement('span');
         eyeIcon.textContent = "👁️";
         eyeIcon.style.display = 'inline';
         eyeIcon.classList.add('eye-icon');
         button.appendChild(eyeIcon);
-
         if (currentIndex !== -1) {
             layerButtons[currentIndex].parentNode.insertBefore(button, layerButtons[currentIndex]);
         } else {
             layerButtons.appendChild(button);
         }
-
         button.addEventListener('click', function () {
             setCurrentLayer(parseInt(this.dataset.layer));
         });
@@ -197,12 +174,10 @@ export function drawOn(startX, startY, endX, endY, ctx) {
         initializeLayer(newLayerNum);
         updateLayerButtonColor(newLayerNum);
         updateLayerOrder();
-
         // Mark the new layer as drawn on
         layerDrawnOn[newLayerNum] = true;
         updateLayerEyeIcon(newLayerNum);
     }
-
 // *рисование под нарисованным
     // export function drawOn(startX, startY, endX, endY, ctx) {
     //     const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -241,8 +216,6 @@ export function drawOn(startX, startY, endX, endY, ctx) {
     //     }
     //     ctx.putImageData(imageData, 0, 0);
     // }
-
-
 // Сохранение изображения
     saveImageBtn.addEventListener('click', exportImage);
     function exportImage() {
@@ -250,14 +223,12 @@ export function drawOn(startX, startY, endX, endY, ctx) {
       const mergeCtx = mergeCanvas.getContext('2d');
       mergeCanvas.width = layers[1].width;
       mergeCanvas.height = layers[1].height;
-
       const layerButtons = Array.from(document.querySelectorAll('.layer-button'));
       layerButtons.sort((a, b) => {
         const layerA = layers[parseInt(a.dataset.layer)];
         const layerB = layers[parseInt(b.dataset.layer)];
         return parseInt(layerA.style.zIndex || 0) - parseInt(layerB.style.zIndex || 0);
       });
-
       layerButtons.forEach((button) => {
         const layerId = parseInt(button.dataset.layer);
         if (layers[layerId] && layerId !== back) {
@@ -268,13 +239,11 @@ export function drawOn(startX, startY, endX, endY, ctx) {
           mergeCtx.globalAlpha = 1; 
         }
       });
-
       const link = document.createElement('a');
       link.download = 'my-drawing.png';
       link.href = mergeCanvas.toDataURL('image/png');
       link.click();
     }
-
 // Прозрачность слоев
         layerOpacitySlider.addEventListener('input', function() {
             const opacity = this.value;
@@ -282,21 +251,15 @@ export function drawOn(startX, startY, endX, endY, ctx) {
             setLayerOpacity(currentLayer, opacity / 100);
             layerOpacities[currentLayer] = opacity; 
         });
-
         function setLayerOpacity(layerNum, opacity) {
             if (layers[layerNum]) {
                 layers[layerNum].style.opacity = opacity;
                 layerOpacities[layerNum] = Math.round(opacity * 100); 
             }
         }
-
-
-
 // полный экран.
-
     // const fullscreenBtn = document.getElementById('fullscreenBtn');
     // const baseContainer = document.querySelector('.base-container');
-
     // fullscreenBtn.addEventListener('click', toggleFullscreen);
     // function toggleFullscreen() {
     //     if (!document.fullscreenElement) {
@@ -321,7 +284,6 @@ export function drawOn(startX, startY, endX, endY, ctx) {
     //         }
     //     }
     // }
-
     // function handleFullscreenChange() {
     //     if (document.fullscreenElement) {
     //         enterFullscreenMode();
@@ -329,12 +291,10 @@ export function drawOn(startX, startY, endX, endY, ctx) {
     //         exitFullscreenMode();
     //     }
     // }
-
     // function enterFullscreenMode() {
     //     baseContainer.classList.add('fullscreen-mode');
     //     resizeCanvas();
     // }
-
     // function exitFullscreenMode() {
     //     baseContainer.classList.remove('fullscreen-mode');
     //     resetCanvasSize();
@@ -342,99 +302,78 @@ export function drawOn(startX, startY, endX, endY, ctx) {
     // function resizeCanvas() {
     //     const fullscreenWidth = window.innerWidth - sidebar.offsetWidth;
     //     const fullscreenHeight = window.innerHeight;
-        
     //     Object.values(layers).forEach(layer => {
     //         const ctx = layer.getContext('2d');
     //         const tempCanvas = document.createElement('canvas');
     //         const tempCtx = tempCanvas.getContext('2d');
-            
     //         // Сохраняем текущее содержимое
     //         tempCanvas.width = layer.width;
     //         tempCanvas.height = layer.height;
     //         tempCtx.drawImage(layer, 0, 0);
-            
     //         // Изменяем размер канваса
     //         layer.width = fullscreenWidth;
     //         layer.height = fullscreenHeight;
-            
     //         // Восстанавливаем содержимое с учетом зума
     //         ctx.save();
     //         ctx.scale(zoomLevel, zoomLevel);
     //         ctx.drawImage(tempCanvas, -offsetX / zoomLevel, -offsetY / zoomLevel);
     //         ctx.restore();
     //     });
-        
     //     updateZoom();
     // }
-
     // function resetCanvasSize() {
     //     const originalWidth = 600;
     //     const originalHeight = 400;
-        
     //     Object.values(layers).forEach(layer => {
     //         const ctx = layer.getContext('2d');
     //         const tempCanvas = document.createElement('canvas');
     //         const tempCtx = tempCanvas.getContext('2d');
-            
     //         // Сохраняем текущее содержимое
     //         tempCanvas.width = layer.width;
     //         tempCanvas.height = layer.height;
     //         tempCtx.drawImage(layer, 0, 0);
-            
     //         // Возвращаем исходный размер канваса
     //         layer.width = originalWidth;
     //         layer.height = originalHeight;
-            
     //         // Восстанавливаем содержимое с учетом зума
     //         ctx.save();
     //         ctx.scale(1 / zoomLevel, 1 / zoomLevel);
     //         ctx.drawImage(tempCanvas, offsetX, offsetY);
     //         ctx.restore();
     //     });
-        
     //     // Сбрасываем зум и смещение
     //     zoomLevel = 1;
     //     offsetX = 0;
     //     offsetY = 0;
-        
     //     updateZoom();
     // }
-
     // function updateZoom() {
     //     const container = document.getElementById('canvasContainer');
     //     const containerRect = container.getBoundingClientRect();
-        
     //     Object.values(layers).forEach(layer => {
     //         layer.style.transformOrigin = '0 0';
     //         layer.style.transform = `scale(${zoomLevel})`;
-            
     //         // Обновляем позицию с учетом зума
     //         const layerRect = layer.getBoundingClientRect();
     //         offsetX = Math.min(Math.max(offsetX, containerRect.width - layerRect.width), 0);
     //         offsetY = Math.min(Math.max(offsetY, containerRect.height - layerRect.height), 0);
-            
     //         layer.style.left = `${offsetX}px`;
     //         layer.style.top = `${offsetY}px`;
     //     });
-        
     //     canvasContainer.style.overflow = 'hidden';
     //     document.getElementById('zoomLevelDisplay').textContent = `🔎${(zoomLevel * 100).toFixed(0)}%`;
     // }
-
     // // Обновляем обработчик изменения размера окна
     // window.addEventListener('resize', () => {
     //     if (document.fullscreenElement) {
     //         resizeCanvas();
     //     }
     // });
-
-
     // // Добавляем слушатель события изменения полноэкранного режима
     // document.addEventListener('fullscreenchange', handleFullscreenChange);
     // document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
     // document.addEventListener('mozfullscreenchange', handleFullscreenChange);
     // document.addEventListener('MSFullscreenChange', handleFullscreenChange);
-
     // // Обновляем стили для полноэкранного режима
     // const style = document.createElement('style');
     // style.textContent = `
@@ -458,8 +397,6 @@ export function drawOn(startX, startY, endX, endY, ctx) {
     //     }
     // `;
     // document.head.appendChild(style);
-
-
 // Удаление всего
     const deleteAllBtn = document.getElementById('deleteAllBtn');
     deleteAllBtn.addEventListener('click', () => {
@@ -472,7 +409,6 @@ export function drawOn(startX, startY, endX, endY, ctx) {
             if (parseInt(layerNum) === back) {
                 return;
             }
-            
             const ctx = contexts[layerNum];
             ctx.clearRect(0, 0, layers[layerNum].width, layers[layerNum].height);
             saveState();
@@ -495,19 +431,13 @@ export function drawOn(startX, startY, endX, endY, ctx) {
             });
             document.addEventListener('keydown', (e) => {
                 if (e.key === (index + 1).toString()) {
-
                         setDrawingColor(picker.value);
                 }
             });
         });
-
-
 // Объединяем слои
 // Получаем ссылку на кнопку объединения слоев
-
 // Очистка канваса
-
-
     const clearBtn = document.getElementById('clear');
     clearBtn.addEventListener('click', clearCanvas);
     function clearCanvas() {
@@ -516,12 +446,6 @@ export function drawOn(startX, startY, endX, endY, ctx) {
         curCtx.clearRect(0, 0, layers[currentLayer].width, layers[currentLayer].height);
         saveState();
     }
-
-
-
-
-
-
 // fix fill 
     // add fill (не удалять)
     // // Flood Fill Functionality
@@ -684,20 +608,16 @@ export function drawOn(startX, startY, endX, endY, ctx) {
     // //     floodFill(e);
     // //   }
     // // });
-
 // ..функция сшивания(копия)
         // function ntc(e, narrowFactor = 0.9) {
         //             if (!isDrawing || !curCtx || !isFinger) return;
-
         //             const rect = layers[currentLayer].getBoundingClientRect();
         //             const x = Math.floor((e.clientX - rect.left) / zoomLevel);
         //             const y = Math.floor((e.clientY - rect.top) / zoomLevel);
-
         //             const brushSize = parseInt(brushSizeInput.value);
         //             const halfBrushSize = brushSize / 2;
         //             const imageData = curCtx.getImageData(x - halfBrushSize, y - halfBrushSize, brushSize, brushSize);
         //             const newImageData = curCtx.createImageData(brushSize, brushSize);
-
         //             // Определяем направление движения кисти
         //             if (lastX !== null && lastY !== null) {
         //                 const dirX = x - lastX;
@@ -705,27 +625,21 @@ export function drawOn(startX, startY, endX, endY, ctx) {
         //                 const length = Math.sqrt(dirX * dirX + dirY * dirY);
         //                 const normDirX = dirX / length;
         //                 const normDirY = dirY / length;
-
         //                 for (let i = 0; i < brushSize; i++) {
         //                     for (let j = 0; j < brushSize; j++) {
         //                         const index = (j * brushSize + i) * 4;
-                                
         //                         // Вычисляем расстояние от текущего пикселя до центра кисти
         //                         const distX = i - halfBrushSize;
         //                         const distY = j - halfBrushSize;
         //                         const distance = Math.sqrt(distX * distX + distY * distY);
-                                
         //                         if (distance < halfBrushSize) {
         //                             // Вычисляем новую позицию пикселя
         //                             const newDist = distance * narrowFactor;
-
         //                             // Сжимаем пиксель в направлении кисти
         //                             const newX = Math.round(halfBrushSize + (distX / distance) * newDist);
         //                             const newY = Math.round(halfBrushSize + (distY / distance) * newDist);
-                                    
         //                             if (newX >= 0 && newX < brushSize && newY >= 0 && newY < brushSize) {
         //                                 const newIndex = (newY * brushSize + newX) * 4;
-                                        
         //                                 // Копируем пиксель в новую позицию только если он непрозрачный
         //                                 if (imageData.data[index + 3] > 0) { // Проверяем альфа-канал
         //                                     newImageData.data[newIndex] = imageData.data[index];     // R
@@ -738,7 +652,6 @@ export function drawOn(startX, startY, endX, endY, ctx) {
         //                     }
         //                 }
         //             }
-
         //             // Смешиваем новое изображение с оригинальным
         //             for (let i = 0; i < imageData.data.length; i += 4) {
         //                 if (newImageData.data[i + 3] === 0) { // Если пиксель прозрачный в новом изображении
@@ -748,18 +661,14 @@ export function drawOn(startX, startY, endX, endY, ctx) {
         //                     newImageData.data[i + 3] = imageData.data[i + 3];
         //                 }
         //             }
-
         //             curCtx.putImageData(newImageData, x - halfBrushSize, y - halfBrushSize);
-
         //             // Обновляем последние координаты
         //             lastX = x;
         //             lastY = y;
         //         }
-
 // Цвет заливки пикер(отдельно от пикера цвета)
     // Это инструмент, позволяющий рисвовать контур и затем сразу заливать его вторым цветом.
     // fix 
-
 // function getPixelColorFromAllLayers(x, y) {
     //     // Start from the top layer and go down
     //     for (let i = layerCount; i >= 1; i--) {
@@ -771,7 +680,6 @@ export function drawOn(startX, startY, endX, endY, ctx) {
     //             }
     //         }
     //     }
-        
     //     // If no color is found in regular layers, check the background layer (100)
     //     if (layers[100] && contexts[100]) {
     //         const bgCtx = contexts[100];
@@ -780,11 +688,9 @@ export function drawOn(startX, startY, endX, endY, ctx) {
     //             return `#${bgPixelData[0].toString(16).padStart(2, '0')}${bgPixelData[1].toString(16).padStart(2, '0')}${bgPixelData[2].toString(16).padStart(2, '0')}`;
     //         }
     //     }
-        
     //     // If still no color is found, return the background color
     //     return backgroundPicker.value;
     // }
-
     // function handleEyedropperClick(e) {
     //     if (isEyedropperActive) {
     //         // Find the topmost visible layer
@@ -795,26 +701,20 @@ export function drawOn(startX, startY, endX, endY, ctx) {
     //                 break;
     //             }
     //         }
-
     //         if (!topmostLayer) {
     //             console.error('No visible layers found');
     //             return;
     //         }
-
     //         const rect = topmostLayer.getBoundingClientRect();
     //         // Get coordinates correctly for both touch and mouse events
     //         const x = Math.floor((e.clientX || e.touches[0].clientX) - rect.left);
     //         const y = Math.floor((e.clientY || e.touches[0].clientY) - rect.top);
-            
     //         const pickedColor = getPixelColorFromAllLayers(x, y);
     //         document.getElementById('colorPicker').value = pickedColor;
     //         setDrawingColor(pickedColor);
-            
     //         // Optionally deactivate eyedropper after picking
     //         isEyedropperActive = false;
     //         document.body.style.cursor = 'auto';
     //         eyedropperBtn.classList.remove('active');
     //     }
     // }
-
-

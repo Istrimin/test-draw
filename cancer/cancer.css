@@ -50,14 +50,6 @@ img:hover {
 
 
 
-.drawingCursor {
-	cursor: url('../cursors/pencil.png'), auto;
-}
-
-.eraserCursor {
-	cursor: url('../cursors/eraser.png'), auto;
-}
-
 :root {
 	--button-color: rgb(25, 25, 25);
 	--button-text-color: rgb(211, 116, 255);
@@ -219,7 +211,7 @@ canvas {
 	-webkit-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
-	touch-action: none;
+	/* touch-action: none; */
 }
 
 
