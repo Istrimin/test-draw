@@ -25,18 +25,47 @@
     });
 // Functions
 // загрузка изображения
-  function importImage(event) {
-    const file = event.target.files[0];
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      uploadedImage = new Image();
-      uploadedImage.onload = () => {
-        curCtx.drawImage(uploadedImage, 0, 0, layer2.width, layer2.height);
-      };
-      uploadedImage.src = e.target.result;
+function importImage(event) {
+  saveState();
+  const file = event.target.files[0];
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    uploadedImage = new Image();
+    uploadedImage.onload = () => {
+      const canvas = layers[currentLayer];
+      const ctx = contexts[currentLayer];
+      
+      // Рассчитываем новые размеры, сохраняя пропорции
+      let newWidth, newHeight;
+      const ratio = uploadedImage.width / uploadedImage.height;
+      
+      if (ratio > canvas.width / canvas.height) {
+        // Изображение шире, чем канвас
+        newHeight = canvas.height;
+        newWidth = newHeight * ratio;
+      } else {
+        // Изображение выше, чем канвас или равно по пропорциям
+        newHeight = canvas.height;
+        newWidth = newHeight * ratio;
+      }
+      
+      // Очищаем текущий слой
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Рисуем изображение по центру канваса
+      const x = (canvas.width - newWidth) / 2;
+      const y = (canvas.height - newHeight) / 2;
+      ctx.drawImage(uploadedImage, x, y, newWidth, newHeight);
+      
+      // Обновляем состояние слоя
+      layerDrawnOn[currentLayer] = true;
+      updateLayerEyeIcon(currentLayer);
     };
-    reader.readAsDataURL(file);
-  }
+    uploadedImage.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
 // переключение симметрии
 
 // Exit functionality

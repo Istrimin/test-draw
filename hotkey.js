@@ -16,25 +16,40 @@ document.addEventListener('keydown', (event) => {
     KeyV: toggleSpider,
   };
 
-
-
-  const element = elementMap[keyCode];
-
-  if (element) {
+  // Check for Ctrl + Arrow keys first for canvas movement
+  if (event.ctrlKey && (event.key === 'ArrowUp' || event.key === 'ArrowDown' || event.key === 'ArrowLeft' || event.key === 'ArrowRight')) {
+    const moveAmount = 1; // Количество пикселей для перемещения
+    switch(event.key) {
+        case 'ArrowLeft':
+            moveCanvasContent(currentLayer, 'left', moveAmount);
+            break;
+        case 'ArrowRight':
+            moveCanvasContent(currentLayer, 'right', moveAmount);
+            break;
+        case 'ArrowUp':
+            moveCanvasContent(currentLayer, 'up', moveAmount);
+            break;
+        case 'ArrowDown':
+            moveCanvasContent(currentLayer, 'down', moveAmount);
+            break;
+    }
+  } else if (elementMap[keyCode]) { 
+    const element = elementMap[keyCode];
 
     if (typeof element === 'string') {
       document.getElementById(element).click();
     } else if (typeof element === 'function') {
       element();
-    }
-  } else if (event.ctrlKey && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
+    } 
+  } else if (event.altKey && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) { // Move layer in stack with Alt + Up/Down
 
     moveLayerInStack(event.key === 'ArrowUp' ? -1 : 1);
-  } else if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+  } else if (event.key === 'ArrowUp' || event.key === 'ArrowDown') { 
 
     moveLayerFocus(event.key === 'ArrowUp' ? -1 : 1);
   }
 });
+
 
 function moveLayerFocus(direction) {
   const lB = document.querySelectorAll('.layer-button');
