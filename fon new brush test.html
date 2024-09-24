@@ -4,14 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- отключение маштабирования -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Настоящий Художник</title>
+    <title>тест кистей</title>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jscolor/2.4.5/jscolor.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+
 </head>
 
 <body>
@@ -24,30 +21,18 @@
             <div id="message-container" class="message-popup">
                 <p id="message-text"></p>
             </div>
-
             <div class="sidebar">
             </div>
-            <button id="backgroundSettingsBtn" title="Настройки фона">🖼️</button>
-            <button id="canvasSettingsBtn" title="Настройки канваса">🖌️</button>
-            <button id="fullscreenBtn" title="Полноэкранный режим">🔲</button>
+
             <button id="spider" title="Паутинка">🕷️</button>
-            <button id="fingerBtn" title="Сужение к центру">🎯</button>
+            <button id="fingerBt" title="Сужение к центру">🎯</button>
             <button id="identifyLayerBtn" title="Определить слой">🔍</button>
             <button id="drawOnExistingBtn" title="Рисовать на существующем">➡️</button>
             <input type="file" id="imageInput" accept="image/*" style="display: none;">
             <button id="UploadB" title="Загрузить изображение (U)">🌺</button>
             <button id="saveImageBtn" title="Сохранить изображение">🎬</button>
             <button id="eraserBtn">🧽</button>
-            <button id="changeCursorBtn" title="Сменить курсор">🎨</button>
-            <button id="undoBtn" title="Отменить (Z)">⟲</button>
-            <button id="redoBtn" title="Повторить (X)">⟳</button>
-            <button id="clear" title="Очистить">💀</button>
-            <button id="fillModeBtn" title="Заливка (F)">🌊</button>
-            <button id="floodFillBtn" title="Залить цветом">✨</button>
-            <button id="eyedropperBtn" title="Пипетка заливки (A)">💧</button>
-            <button id="deleteAllBtn" title="Удалить все">🗑️</button>
-            <button id="mergeLayers" title="Объединить слои">🔗</button>
-            <button id="settings" title="Настройки">⚙️</button>
+
         </div>
         <div id="colorPreview"></div>
         <div class="canvas-and-sliders">
@@ -139,31 +124,21 @@
     </div>
     </div>
     </div>
-    <!-- Background Settings Modal -->
-    <div id="backgroundSettingsModal" class="modal">
-        <div class="modal-content">
-            <span id="closeModal" style="float:right;cursor:pointer;">&times;</span>
-            <input type="color" id="backgroundColorPicker" value="#ffffff">
-            <br><br>
-            <input type="file" id="backgroundImageInput" accept="image/*" multiple>
-            <div id="backgroundImageGallery" style="display: flex; flex-wrap: wrap; margin-top: 10px;"></div>
-            <div id="backgroundPreview"
-                style="display: none; position: absolute; z-index: 1000; border: 2px solid #000;"></div>
-        </div>
+    
     </div>
-    <!-- Canvas Settings Modal -->
-    <div id="canvasSettingsModal" class="modal">
-        <div class="modal-content">
-            <span id="closeCanvasModal" style="float:right;cursor:pointer;">&times;</span>
-            <input type="color" id="canvasColorPicker" value="#00">
-            <br><br>
-            <input type="file" id="canvasImageInput" accept="image/*">
-            <div id="canvasImageGallery" style="display: flex; flex-wrap: wrap; margin-top: 10px;"></div>
-        </div>
-    </div>
-
+    <style>
+    </style>
     <script>
-        const symmetricPoints = [];
+
+
+
+
+
+    </script>
+    <script>
+
+    </script>
+    <script>
         const back = 0
         const layerCreationComplete = new Event('layerCreationComplete');
 
@@ -220,6 +195,18 @@
             isSmoothLineMode = false,
             isCtrlPressed = false;
 
+
+
+
+    </script>
+    <script>
+
+    </script>
+    <script>
+
+
+
+
         const symmetryButton = document.getElementById('symmetry');
 
         symmetryButton.addEventListener('click', toggleSymmetry);
@@ -236,7 +223,8 @@
         function toggleDrawOnExisting() {
             isDrawOnExisting = !isDrawOnExisting;
             drawOnExistingBtn.classList.toggle('active', isDrawOnExisting);
-        }
+        }</script>
+    <script>
         const spiderStrengthSlider = document.getElementById('spiderStrength');
 
         function toggleSpider() {
@@ -246,7 +234,34 @@
             spiderStrengthSlider.style.display = isSpider ? 'block' : 'none';
         }
 
+function drawSpider(startX, startY, endX, endY, isSymmetric = false) {
+    curCtx.beginPath();
+    curCtx.moveTo(startX, startY);
+    curCtx.quadraticCurveTo(startX, startY, endX, endY);
+    curCtx.stroke();
 
+    const targetPoints = isSymmetric ? symmetricPoints : points;
+    targetPoints.push({ x: endX, y: endY });
+
+    var power = spiderStrengthSlider.value;
+
+    for (let i = 0; i < targetPoints.length; i++) {
+        const dx = targetPoints[i].x - endX;
+        const dy = targetPoints[i].y - endY;
+        const dd = dx * dx + dy * dy;
+        if (dd < power) {
+            var mul = 0.1
+            curCtx.beginPath();
+            curCtx.moveTo(endX + (dx * mul), endY + (dy * mul));
+            curCtx.lineTo(targetPoints[i].x - (dx * mul), targetPoints[i].y - (dy * mul));
+            curCtx.stroke();
+        }
+    }
+}
+
+
+        document.getElementById('spider').addEventListener('click', toggleSpider);
+    </script>
     </script>
     <script>
 
@@ -401,10 +416,24 @@
             redoHistory[currentLayer] = [];
         }
 
+        // процесс рисования startDrawing draw
+        function startDrawing(e) {
+            if (currentLayer === 100 || !curCtx || isEyedropperActive || isCtrlPressed) {
+                return;
+            }
+            isDrawing = true;
+            const rect = layers[currentLayer].getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            const x = Math.floor((clientX - rect.left) / zoomLevel);
+            const y = Math.floor((clientY - rect.top) / zoomLevel);
 
+            points.length = 0;
+            points.push({ x, y });
 
-
-
+            [lastX, lastY] = [x, y];
+            saveState();
+        }
 
 function drawSpider(startX, startY, endX, endY, isSymmetric = false) {
     curCtx.beginPath();
@@ -431,31 +460,12 @@ function drawSpider(startX, startY, endX, endY, isSymmetric = false) {
     }
 }
 
-function startDrawing(e) {
-    if (currentLayer === 100 || !curCtx || isEyedropperActive || isCtrlPressed) {
-        return;
-    }
-    isDrawing = true;
-    const rect = layers[currentLayer].getBoundingClientRect();
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    const x = Math.floor((clientX - rect.left) / zoomLevel);
-    const y = Math.floor((clientY - rect.top) / zoomLevel);
-
-    points.length = 0;
-    symmetricPoints.length = 0;
-    points.push({ x, y });
-
-    [lastX, lastY] = [x, y];
-    saveState();
-}
-
 function draw(e) {
     if (!isDrawing || !curCtx) {
         return;
     }
     if (isFinger) {
-        finger(e);
+        fingerBt(e);
         return;
     }
     const rect = layers[currentLayer].getBoundingClientRect();
@@ -509,6 +519,113 @@ function draw(e) {
     pressureBar.nextElementSibling.textContent = Math.round(pressure * 100);
     layerDrawnOn[currentLayer] = true;
     updateLayerEyeIcon(currentLayer);
+}
+
+const symmetricPoints = [];
+
+function drawSpider(startX, startY, endX, endY, isSymmetric = false) {
+    curCtx.beginPath();
+    curCtx.moveTo(startX, startY);
+    curCtx.quadraticCurveTo(startX, startY, endX, endY);
+    curCtx.stroke();
+
+    const targetPoints = isSymmetric ? symmetricPoints : points;
+    targetPoints.push({ x: endX, y: endY });
+
+    var power = spiderStrengthSlider.value;
+
+    for (let i = 0; i < targetPoints.length; i++) {
+        const dx = targetPoints[i].x - endX;
+        const dy = targetPoints[i].y - endY;
+        const dd = dx * dx + dy * dy;
+        if (dd < power) {
+            var mul = 0.1
+            curCtx.beginPath();
+            curCtx.moveTo(endX + (dx * mul), endY + (dy * mul));
+            curCtx.lineTo(targetPoints[i].x - (dx * mul), targetPoints[i].y - (dy * mul));
+            curCtx.stroke();
+        }
+    }
+}
+
+function draw(e) {
+    if (!isDrawing || !curCtx) {
+        return;
+    }
+    if (isFinger) {
+        fingerBt(e);
+        return;
+    }
+    const rect = layers[currentLayer].getBoundingClientRect();
+
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const x = Math.floor((clientX - rect.left) / zoomLevel);
+    const y = Math.floor((clientY - rect.top) / zoomLevel);
+
+    const pressure = e.pressure || 1;
+    curCtx.lineWidth = brushSize.value * pressure;
+    curCtx.lineCap = 'round';
+    curCtx.lineJoin = 'round';
+    curCtx.globalAlpha = opacity.value / 100;
+    curCtx.globalCompositeOperation = isErasing ? 'destination-out' : 'source-over';
+
+    if (isSpider) {
+        drawSpider(lastX, lastY, x, y, false);
+    } else {
+        if (isDrawOnExisting) {
+            tools.drawOn(lastX, lastY, x, y, curCtx);
+        } else {
+            curCtx.beginPath();
+            curCtx.moveTo(lastX, lastY);
+            curCtx.lineTo(x, y);
+            curCtx.stroke();
+        }
+    }
+
+    if (symmetry) {
+        const centerX = layers[currentLayer].width / 2;
+        const symmetricLastX = centerX + (centerX - lastX);
+        const symmetricX = centerX + (centerX - x);
+
+        if (isSpider) {
+            drawSpider(symmetricLastX, lastY, symmetricX, y, true);
+        } else {
+            if (isDrawOnExisting) {
+                tools.drawOn(symmetricLastX, lastY, symmetricX, y, curCtx);
+            } else {
+                curCtx.beginPath();
+                curCtx.moveTo(symmetricLastX, lastY);
+                curCtx.lineTo(symmetricX, y);
+                curCtx.stroke();
+            }
+        }
+    }
+
+    [lastX, lastY] = [x, y];
+    pressureBar.value = pressure * 10000;
+    pressureBar.nextElementSibling.textContent = Math.round(pressure * 100);
+    layerDrawnOn[currentLayer] = true;
+    updateLayerEyeIcon(currentLayer);
+}
+
+function startDrawing(e) {
+    if (currentLayer === 100 || !curCtx || isEyedropperActive || isCtrlPressed) {
+        return;
+    }
+    isDrawing = true;
+    const rect = layers[currentLayer].getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const x = Math.floor((clientX - rect.left) / zoomLevel);
+    const y = Math.floor((clientY - rect.top) / zoomLevel);
+
+    points.length = 0;
+    symmetricPoints.length = 0;
+    points.push({ x, y });
+
+    [lastX, lastY] = [x, y];
+    saveState();
 }
 
 function stopDrawing() {
@@ -897,202 +1014,7 @@ function endDrawing() {
     <script type="module" src="tools.js" defer></script>
     <script>
 
-
-        //  инструмент палец
-        let isFinger = false;
-
-        const fingerBtn = document.getElementById('fingerBtn');
-
-        fingerBtn.addEventListener('click', () => {
-            isFinger = !isFinger;
-            fingerBtn.classList.toggle('active', isFinger);
-        });
-        function finger(e) {
-            
-            if (!isDrawing || !curCtx || !isFinger) return;
-
-            const rect = layers[currentLayer].getBoundingClientRect();
-            const x = Math.floor((e.clientX - rect.left) / zoomLevel);
-            const y = Math.floor((e.clientY - rect.top) / zoomLevel);
-
-            const brushSize = parseInt(brushSize.value);
-            const halfBrushSize = brushSize / 2;
-
-            curCtx.save();
-            curCtx.beginPath();
-            curCtx.arc(x, y, halfBrushSize, 0, Math.PI * 2);
-            curCtx.clip();
-
-            if (lastX !== null && lastY !== null) {
-                const dx = x - lastX;
-                const dy = y - lastY;
-                curCtx.drawImage(
-                    layers[currentLayer],
-                    x - halfBrushSize - dx, y - halfBrushSize - dy, brushSize, brushSize,
-                    x - halfBrushSize, y - halfBrushSize, brushSize, brushSize
-                );
-            }
-
-            curCtx.restore();
-
-            lastX = x;
-            lastY = y;
-        }
-        const MAX_HISTORY_STATES = 1000;
-
-
-
-// обводка
-
-        const originalImages = {};
-        const outlineSizes = {};
-
-        const outlineSizeInput = document.getElementById('outlineSize');
-        const outlineSizeValue = document.getElementById('outlineSizeValue');
-
-        outlineSizeInput.max = "5";
-
-        outlineSizeInput.addEventListener('input', function () {
-            // Сброс всех обводок
-            Object.keys(layers).forEach(key => {
-                const layer = layers[key];
-                const layerCtx = contexts[key];
-                if (originalImages[key]) {
-                    layerCtx.putImageData(originalImages[key], 0, 0);
-                }
-            });
-
-            const size = parseInt(this.value);
-            outlineSizeValue.textContent = size;
-            applyOutline(currentLayer, size);
-        });
-
-        function applyOutline(layerNum, size) {
-
-
-            if (!layers[layerNum] || !contexts[layerNum]) {
-                return;
-            }
-            const canvas = layers[layerNum];
-            const ctx = contexts[layerNum];
-
-            // RESET OUTLINE BEFORE APPLYING NEW ONE
-            if (!originalImages[layerNum]) {
-                originalImages[layerNum] = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            } else {
-                ctx.putImageData(originalImages[layerNum], 0, 0); // Restore to original before applying new outline
-            }
-
-            outlineSizes[layerNum] = size;
-
-            const tempCanvas = document.createElement('canvas');
-            tempCanvas.width = canvas.width;
-            tempCanvas.height = canvas.height;
-            const tempCtx = tempCanvas.getContext('2d', { willReadFrequently: true });
-            // Используем текущее состояние слоя вместо originalImages
-            tempCtx.drawImage(canvas, 0, 0);
-            tempCtx.putImageData(originalImages[layerNum], 0, 0);
-
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            if (size === 0) {
-                ctx.putImageData(originalImages[layerNum], 0, 0);
-                return; // Exit if size is 0
-            }
-
-            const originalStrokeStyle = ctx.strokeStyle;
-
-            ctx.lineWidth = size;
-            ctx.strokeStyle = 'black';
-            const imageData = tempCtx.getImageData(0, 0, canvas.width, canvas.height);
-            const data = imageData.data;
-
-            for (let y = 0; y < canvas.height; y++) {
-                for (let x = 0; x < canvas.width; x++) {
-                    const index = (y * canvas.width + x) * 4;
-                    if (data[index + 3] > 0) {
-                        ctx.beginPath();
-                        ctx.arc(x, y, size / 2, 0, Math.PI * 2);
-                        ctx.stroke();
-                    }
-                }
-            }
-
-            ctx.drawImage(tempCanvas, 0, 0);
-            ctx.strokeStyle = originalStrokeStyle;
-        }
-
-
-
-        function updateOutlineForLayer(layerNum) {
-
-            if (!layers[layerNum] || !contexts[layerNum]) {
-                console.warn(`Layer ${layerNum} does not exist. Skipping outline update.`);
-                return;
-            }
-
-            const size = outlineSizes[layerNum] || 0;
-            outlineSizeInput.value = size;
-            outlineSizeValue.textContent = size;
-            applyOutline(layerNum, size);
-
-        }
-    </script>
-    <script>
-        // !?
-        // document.querySelectorAll('button, input').forEach(element => {
-        //      element.addEventListener('pointerdown', (e) => {
-        //          e.stopPropagation();
-        //      });
-        //   });
-
-
-    </script>
-    <script>
-        // добавляем иконку задействованных слоев
-        const layerDrawnOn = {};
-        function updateLayerEyeIcon(layerNum) {
-            const layerButton = document.querySelector(`.layer-button[data-layer="${layerNum}"]`);
-            if (layerButton) {
-                const eyeIcon = layerButton.querySelector('.eye-icon');
-                if (eyeIcon) {
-                    eyeIcon.style.display = layerDrawnOn[layerNum] ? 'inline' : 'none';
-                }
-            }
-        }
-        // сообщение
-        const messageButton = document.getElementById('message');
-        const messageContainer = document.getElementById('message-container');
-        const messageText = document.getElementById('message-text');
-
-        function showMessage(message) {
-            messageText.textContent = message;
-            messageContainer.style.display = 'block';
-        }
-
-        messageButton.addEventListener('click', () => {
-            showMessage("Привет! Это тестовое сообщение."); // Show a test message
-        });
-
-        if (!messageContainer.querySelector('.close-button')) {
-            const closeButton = document.createElement('span');
-            closeButton.textContent = '×';
-            closeButton.classList.add('close-button');
-            messageContainer.appendChild(closeButton);
-
-            closeButton.addEventListener('click', () => {
-                messageContainer.style.display = 'none';
-            });
-        }
-
-        window.addEventListener('click', (event) => {
-            if (event.target === messageContainer) {
-                messageContainer.style.display = 'none';
-            }
-        });
-
-    </script>
-    </script>
+</script>
 </body>
 
 </html>

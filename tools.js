@@ -1,3 +1,4 @@
+
 // Функция для объединения слоев
     const mergeLayersBtn = document.getElementById('mergeLayers');
     mergeLayersBtn.addEventListener('click', mergeLayers);
@@ -418,13 +419,26 @@ export function drawOn(startX, startY, endX, endY, ctx) {
             layer.style.display = 'block';
         });
     }
-// Назначаем горячие клавиши для выбора цветов(это не влияет на выбор цвет бэка)
-    // Update color picker setup 
+
+
+// Назначаем горячие клавиши для выбора цветов А ТАК ЖЕ ДОБАВЛЯЕМ ВОЗМОЖНОСТЬ УСТАНОВИТЬ БЭК ДЛЯ ТЕКУЩЕГО СЛОЯ
+        // залитие слоя нужным цветом
+            function setCurBackground(layerIndex) {
+                const color = document.getElementById('backgroundPicker').value;
+                contexts[layerIndex].fillStyle = color;
+                contexts[layerIndex].fillRect(0, 0, layers[layerIndex].width, layers[layerIndex].height);
+                layerColors[layerIndex] = color;
+                updateLayerButtonColor(layerIndex);
+                layerDrawnOn[layerIndex] = true;
+                updateLayerEyeIcon(layerIndex);
+            }
+                
+
         const colorPickers = document.querySelectorAll('input[type="color"]');
         colorPickers.forEach((picker, index) => {
             picker.addEventListener('input', (event) => {
                 if (picker.id === 'backgroundPicker') {
-                    setLayerBackground(event.target.value);
+                    setCurBackground(currentLayer);
                 } else {
                     setDrawingColor(event.target.value);
                 }
