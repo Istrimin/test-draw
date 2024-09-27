@@ -24,49 +24,49 @@
     });
 // Functions
 // загрузка изображения
-function importImage(event) {
-  saveState();
-  const file = event.target.files[0];
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    uploadedImage = new Image();
-    uploadedImage.onload = () => {
-      const canvas = layers[currentLayer];
-      const ctx = contexts[currentLayer];
-     
-      // Рассчитываем новые размеры, сохраняя пропорции
-      let newWidth, newHeight;
-      const ratio = uploadedImage.width / uploadedImage.height;
-     
-      if (ratio > canvas.width / canvas.height) {
-        // Изображение шире, чем канвас
-        newWidth = canvas.width;
-        newHeight = newWidth / ratio;
-      } else {
-        // Изображение выше, чем канвас или равно по пропорциям
-        newHeight = canvas.height;
-        newWidth = newHeight * ratio;
-      }
-     
-      // Очищаем текущий слой
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-     
-      // Рисуем изображение по центру канваса
-      const x = (canvas.width - newWidth) / 2;
-      const y = (canvas.height - newHeight) / 2;
-      ctx.drawImage(uploadedImage, x, y, newWidth, newHeight);
-     
-      // Обновляем состояние слоя
-      layerDrawnOn[currentLayer] = true;
-      updateLayerEyeIcon(currentLayer);
+  function importImage(event) {
+    saveState();
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      uploadedImage = new Image();
+      uploadedImage.onload = () => {
+        const canvas = layers[currentLayer];
+        const ctx = contexts[currentLayer];
+       
+        // Рассчитываем новые размеры, сохраняя пропорции
+        let newWidth, newHeight;
+        const ratio = uploadedImage.width / uploadedImage.height;
+       
+        if (ratio > canvas.width / canvas.height) {
+          // Изображение шире, чем канвас
+          newWidth = canvas.width;
+          newHeight = newWidth / ratio;
+        } else {
+          // Изображение выше, чем канвас или равно по пропорциям
+          newHeight = canvas.height;
+          newWidth = newHeight * ratio;
+        }
+       
+        // Очищаем текущий слой
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+       
+        // Рисуем изображение по центру канваса
+        const x = (canvas.width - newWidth) / 2;
+        const y = (canvas.height - newHeight) / 2;
+        ctx.drawImage(uploadedImage, x, y, newWidth, newHeight);
+       
+        // Обновляем состояние слоя
+        layerDrawnOn[currentLayer] = true;
+        updateLayerEyeIcon(currentLayer);
 
-      // Применяем текущие фильтры к слою
-      applyFiltersToLayer(currentLayer);
+        // Применяем текущие фильтры к слою
+        applyFiltersToLayer(currentLayer);
+      };
+      uploadedImage.src = e.target.result;
     };
-    uploadedImage.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
-}
+    reader.readAsDataURL(file);
+  }
 
 
 // переключение симметрии
@@ -82,13 +82,11 @@ function importImage(event) {
       window.location.href = 'index.html';
     });
   });
+// установка цвета кисти
   function setDrawingColor(color) {
     if (curCtx) {
-      // Store the color for the current layer
       layerColors[currentLayer] = color;
-      // Update the current context's color for immediate visual feedback
       curCtx.strokeStyle = color;
-      // Update button color when drawing color changes
       updateLayerButtonColor(currentLayer);
     }
   }

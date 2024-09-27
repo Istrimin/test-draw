@@ -162,15 +162,13 @@
     </div>
 <script>
 
+const layerFilters = {};
 
 
 
 </script>
 <script>
 // фильтры
-const layerFilters = {};
-
-
     const filterSliders = [
         'lightnessSlider', 
         'saturationSlider', 
@@ -182,68 +180,27 @@ const layerFilters = {};
         document.getElementById(sliderId).addEventListener('input', updateFilters);
     });
 
-let brightness, saturation, contrast, hueShift;
-function updateFilters() {
-  const brightness = lightnessSlider.value;
-  const saturation = saturationSlider.value;
-  const contrast = contrastSlider.value;
-  const hueShift = hueShiftSlider.value;
-
-  lightnessValue.textContent = brightness;
-  saturationValue.textContent = saturation;
-  contrastValue.textContent = contrast;
-  hueShiftValue.textContent = hueShift;
-
-  if (!layerFilters[currentLayer]) {
-    layerFilters[currentLayer] = {};
-  }
-  
-  layerFilters[currentLayer] = {
-    brightness,
-    saturation,
-    contrast,
-    hueShift
-  };
-
-  applyFilterToLayer(currentLayer);
-}
-
-function applyFilterToLayer(layerId) {
-  if (layerFilters[layerId]) {
-    const { brightness, saturation, contrast, hueShift } = layerFilters[layerId];
-    layers[layerId].style.filter = `brightness(${brightness}%) saturate(${saturation}%) contrast(${contrast}%) hue-rotate(${hueShift}deg)`;
-  }
-}
-
-
-filterSliders.forEach(sliderId => {
-  document.getElementById(sliderId).addEventListener('input', updateFilters);
-});
-function loadLayerFilters(layerId) {
-  if (layerFilters[layerId]) {
-    const { brightness, saturation, contrast, hueShift } = layerFilters[layerId];
-    lightnessSlider.value = brightness;
-    saturationSlider.value = saturation;
-    contrastSlider.value = contrast;
-    hueShiftSlider.value = hueShift;
-    
-    lightnessValue.textContent = brightness;
-    saturationValue.textContent = saturation;
-    contrastValue.textContent = contrast;
-    hueShiftValue.textContent = hueShift;
-  } else {
-    // Установите значения по умолчанию, если для слоя еще нет сохраненных значений
-    lightnessSlider.value = 100;
-    saturationSlider.value = 100;
-    contrastSlider.value = 100;
-    hueShiftSlider.value = 0;
-    
-    lightnessValue.textContent = 100;
-    saturationValue.textContent = 100;
-    contrastValue.textContent = 100;
-    hueShiftValue.textContent = 0;
-  }
-}
+    function updateFilters() {
+        const brightness = lightnessSlider.value;
+        const saturation = saturationSlider.value;
+        const contrast = contrastSlider.value;
+        const hueShift = hueShiftSlider.value;
+        
+        lightnessValue.textContent = brightness;
+        saturationValue.textContent = saturation;
+        contrastValue.textContent = contrast;
+        hueShiftValue.textContent = hueShift;
+        layers[currentLayer].style.filter = `brightness(${brightness}%) saturate(${saturation}%) contrast(${contrast}%) hue-rotate(${hueShift}deg)`;
+    }
+    // Функция для применения фильтров к слою
+    function applyFiltersToLayer(layerId) {
+        const brightness = lightnessSlider.value;
+        const saturation = saturationSlider.value;
+        const contrast = contrastSlider.value;
+        const hueShift = hueShiftSlider.value;
+        
+        layers[layerId].style.filter = `brightness(${brightness}%) saturate(${saturation}%) contrast(${contrast}%) hue-rotate(${hueShift}deg)`;
+    }
 
 </script>
     <script>
@@ -466,8 +423,7 @@ function loadLayerFilters(layerId) {
                 curCtx.strokeStyle = layerColors[layerNum];
             }
             updateLayerEyeIcon(layerNum);
-  loadLayerFilters(layerNum);
-  applyFilterToLayer(layerNum);
+
         }
         // обновление цвета слоев
         function updateLayerButtonColor(layerNum) {

@@ -261,42 +261,45 @@
     const newLayerNum = layerCount;
     const canvas = document.createElement('canvas');
     canvas.id = `layer${newLayerNum}`;
-    canvas.width = 600;
-    canvas.height = 400;
+    canvas.width = realWidth;
+    canvas.height = realHeight;
+    canvas.style.width = `${displayWidth}px`;
+    canvas.style.height = `${displayHeight}px`;
     canvas.style.position = 'absolute';
     canvas.style.top = '0';
     canvas.style.left = '0';
-    
+   
     // Устанавливаем z-index на основе текущего слоя
     const currentZIndex = parseInt(layers[currentLayer].style.zIndex);
     canvas.style.zIndex = currentZIndex;
-    layers[currentLayer].style.zIndex = currentZIndex - 0.5;
-
+    layers[currentLayer].style.zIndex = currentZIndex + 1;
+    
     if (currentIndex !== -1) {
         canvasContainer.insertBefore(canvas, layers[currentLayer]);
     } else {
         canvasContainer.appendChild(canvas);
     }
     layers[newLayerNum] = canvas;
-    contexts[newLayerNum] = canvas.getContext('2d');
+    contexts[newLayerNum] = canvas.getContext('2d', { willReadFrequently: true });
     layerColors[newLayerNum] = '#' + Math.floor(Math.random() * 16777215).toString(16);
+    
     const button = document.createElement('button');
     button.textContent = " ❤ ";
     button.classList.add('layer-button');
     button.dataset.layer = newLayerNum;
-    
+   
     const eyeIcon = document.createElement('span');
     eyeIcon.textContent = "👁️";
     eyeIcon.style.display = 'inline';
     eyeIcon.classList.add('eye-icon');
     button.appendChild(eyeIcon);
-    
+   
     if (currentIndex !== -1) {
         layerButtons[currentIndex].parentNode.insertBefore(button, layerButtons[currentIndex].nextSibling);
     } else {
         document.querySelector('.layer-buttons').appendChild(button);
     }
-    
+   
     button.addEventListener('click', function () {
         setCurrentLayer(parseInt(this.dataset.layer));
     });
@@ -309,8 +312,11 @@
     updateLayerOrder();
     layerDrawnOn[newLayerNum] = true;
     updateLayerEyeIcon(newLayerNum);
-
+    updateZoom();
     }
+
+
+
 
 
 // добавляем слой над текущим
@@ -322,59 +328,63 @@
         }
     });
     function createLayerAboveCurrent() {
-        const layerButtons = Array.from(document.querySelectorAll('.layer-button'));
-        const currentIndex = layerButtons.findIndex(btn => parseInt(btn.dataset.layer) === currentLayer);
-        layerCount++;
-        const newLayerNum = layerCount;
-        const canvas = document.createElement('canvas');
-        canvas.id = `layer${newLayerNum}`;
-        canvas.width = 600;
-        canvas.height = 400;
-        canvas.style.position = 'absolute';
-        canvas.style.top = '0';
-        canvas.style.left = '0';
-        
-        // Устанавливаем z-index на основе текущего слоя
-        const currentZIndex = parseInt(layers[currentLayer].style.zIndex);
-        canvas.style.zIndex = currentZIndex + 0.5;
-
-        if (currentIndex !== -1) {
-            canvasContainer.insertBefore(canvas, layers[currentLayer].nextSibling);
-        } else {
-            canvasContainer.appendChild(canvas);
-        }
-        layers[newLayerNum] = canvas;
-        contexts[newLayerNum] = canvas.getContext('2d');
-        layerColors[newLayerNum] = '#' + Math.floor(Math.random() * 16777215).toString(16);
-        const button = document.createElement('button');
-        button.textContent = " ❤ ";
-        button.classList.add('layer-button');
-        button.dataset.layer = newLayerNum;
-        
-        const eyeIcon = document.createElement('span');
-        eyeIcon.textContent = "👁️";
-        eyeIcon.style.display = 'inline';
-        eyeIcon.classList.add('eye-icon');
-        button.appendChild(eyeIcon);
-        
-        if (currentIndex !== -1) {
-            layerButtons[currentIndex].parentNode.insertBefore(button, layerButtons[currentIndex]);
-        } else {
-            document.querySelector('.layer-buttons').appendChild(button);
-        }
-        
-        button.addEventListener('click', function () {
-            setCurrentLayer(parseInt(this.dataset.layer));
-        });
-        addEventListenersToLayer(canvas);
-        history[newLayerNum] = [];
-        redoHistory[newLayerNum] = [];
-        setCurrentLayer(newLayerNum);
-        initializeLayer(newLayerNum);
-        updateLayerButtonColor(newLayerNum);
-        updateLayerOrder();
-        layerDrawnOn[newLayerNum] = true;
-        updateLayerEyeIcon(newLayerNum);
+    const layerButtons = Array.from(document.querySelectorAll('.layer-button'));
+    const currentIndex = layerButtons.findIndex(btn => parseInt(btn.dataset.layer) === currentLayer);
+    layerCount++;
+    const newLayerNum = layerCount;
+    const canvas = document.createElement('canvas');
+    canvas.id = `layer${newLayerNum}`;
+    canvas.width = realWidth;
+    canvas.height = realHeight;
+    canvas.style.width = `${displayWidth}px`;
+    canvas.style.height = `${displayHeight}px`;
+    canvas.style.position = 'absolute';
+    canvas.style.top = '0';
+    canvas.style.left = '0';
+   
+    // Устанавливаем z-index на основе текущего слоя
+    const currentZIndex = parseInt(layers[currentLayer].style.zIndex);
+    canvas.style.zIndex = currentZIndex + 1;
+    
+    if (currentIndex !== -1) {
+        canvasContainer.insertBefore(canvas, layers[currentLayer].nextSibling);
+    } else {
+        canvasContainer.appendChild(canvas);
+    }
+    layers[newLayerNum] = canvas;
+    contexts[newLayerNum] = canvas.getContext('2d', { willReadFrequently: true });
+    layerColors[newLayerNum] = '#' + Math.floor(Math.random() * 16777215).toString(16);
+    
+    const button = document.createElement('button');
+    button.textContent = " ❤ ";
+    button.classList.add('layer-button');
+    button.dataset.layer = newLayerNum;
+   
+    const eyeIcon = document.createElement('span');
+    eyeIcon.textContent = "👁️";
+    eyeIcon.style.display = 'inline';
+    eyeIcon.classList.add('eye-icon');
+    button.appendChild(eyeIcon);
+   
+    if (currentIndex !== -1) {
+        layerButtons[currentIndex].parentNode.insertBefore(button, layerButtons[currentIndex]);
+    } else {
+        document.querySelector('.layer-buttons').appendChild(button);
+    }
+   
+    button.addEventListener('click', function () {
+        setCurrentLayer(parseInt(this.dataset.layer));
+    });
+    addEventListenersToLayer(canvas);
+    history[newLayerNum] = [];
+    redoHistory[newLayerNum] = [];
+    setCurrentLayer(newLayerNum);
+    initializeLayer(newLayerNum);
+    updateLayerButtonColor(newLayerNum);
+    updateLayerOrder();
+    layerDrawnOn[newLayerNum] = true;
+    updateLayerEyeIcon(newLayerNum);
+    updateZoom();
     }
 
 // *рисование под нарисованным
@@ -443,41 +453,99 @@
     //   link.href = mergeCanvas.toDataURL('image/png');
     //   link.click();
     // }
-    function exportImage() {
-      const mergeCanvas = document.createElement('canvas');
-      const mergeCtx = mergeCanvas.getContext('2d');
-      mergeCanvas.width = layers[1].width;
-      mergeCanvas.height = layers[1].height;
+// 2
+    // function exportImage() {
+    //   const mergeCanvas = document.createElement('canvas');
+    //   const mergeCtx = mergeCanvas.getContext('2d');
+    //   mergeCanvas.width = layers[1].width;
+    //   mergeCanvas.height = layers[1].height;
 
-      // Создаем массив всех слоев, включая обводки
-      const allLayers = Object.keys(layers).reduce((acc, layerId) => {
+    //   // Создаем массив всех слоев, включая обводки
+    //   const allLayers = Object.keys(layers).reduce((acc, layerId) => {
+    //     if (layerId !== back.toString()) {
+    //       acc.push({id: layerId, type: 'main', zIndex: parseInt(layers[layerId].style.zIndex)});
+    //       if (outlineLayers[layerId]) {
+    //         acc.push({id: outlineLayers[layerId].id, type: 'outline', zIndex: parseInt(layers[outlineLayers[layerId].id].style.zIndex)});
+    //       }
+    //     }
+    //     return acc;
+    //   }, []);
+
+    //   // Сортируем все слои по z-index
+    //   allLayers.sort((a, b) => a.zIndex - b.zIndex);
+
+    //   // Отрисовываем слои в правильном порядке
+    //   allLayers.forEach((layer) => {
+    //     const layerId = layer.id;
+    //     mergeCtx.globalAlpha = layerOpacities[layerId] / 100;
+    //     mergeCtx.drawImage(layers[layerId], 0, 0);
+    //   });
+
+    //   mergeCtx.globalAlpha = 1;
+
+    //   const link = document.createElement('a');
+    //   link.download = 'my-drawing.png';
+    //   link.href = mergeCanvas.toDataURL('image/png');
+    //   link.click();
+    // }
+// 3
+function exportImage() {
+    const exportCanvas = document.createElement('canvas');
+    const exportCtx = exportCanvas.getContext('2d');
+    exportCanvas.width = realWidth;
+    exportCanvas.height = realHeight;
+
+    // Создаем массив всех слоев, включая обводки
+    const allLayers = Object.keys(layers).reduce((acc, layerId) => {
         if (layerId !== back.toString()) {
-          acc.push({id: layerId, type: 'main', zIndex: parseInt(layers[layerId].style.zIndex)});
-          if (outlineLayers[layerId]) {
-            acc.push({id: outlineLayers[layerId].id, type: 'outline', zIndex: parseInt(layers[outlineLayers[layerId].id].style.zIndex)});
-          }
+            acc.push({id: layerId, type: 'main', zIndex: parseInt(layers[layerId].style.zIndex)});
+            if (outlineLayers[layerId]) {
+                acc.push({id: outlineLayers[layerId].id, type: 'outline', zIndex: parseInt(layers[outlineLayers[layerId].id].style.zIndex)});
+            }
         }
         return acc;
-      }, []);
+    }, []);
 
-      // Сортируем все слои по z-index
-      allLayers.sort((a, b) => a.zIndex - b.zIndex);
+    // Сортируем все слои по z-index
+    allLayers.sort((a, b) => a.zIndex - b.zIndex);
 
-      // Отрисовываем слои в правильном порядке
-      allLayers.forEach((layer) => {
+    // Отрисовываем слои в правильном порядке
+    allLayers.forEach((layer) => {
         const layerId = layer.id;
-        mergeCtx.globalAlpha = layerOpacities[layerId] / 100;
-        mergeCtx.drawImage(layers[layerId], 0, 0);
-      });
+        const canvas = layers[layerId];
+        const ctx = canvas.getContext('2d');
 
-      mergeCtx.globalAlpha = 1;
+        // Создаем временный канвас для применения фильтров
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = realWidth;
+        tempCanvas.height = realHeight;
+        const tempCtx = tempCanvas.getContext('2d');
 
-      const link = document.createElement('a');
-      link.download = 'my-drawing.png';
-      link.href = mergeCanvas.toDataURL('image/png');
-      link.click();
-    }
+        // Копируем содержимое слоя на временный канвас
+        tempCtx.drawImage(canvas, 0, 0);
 
+        // Применяем фильтры
+        if (layerFilters[layerId]) {
+            tempCtx.filter = layerFilters[layerId];
+            tempCtx.drawImage(tempCanvas, 0, 0);
+            tempCtx.filter = 'none';
+        }
+
+        // Устанавливаем прозрачность
+        exportCtx.globalAlpha = layerOpacities[layerId] / 100;
+
+        // Отрисовываем содержимое слоя на экспортируемый канвас
+        exportCtx.drawImage(tempCanvas, 0, 0);
+    });
+
+    exportCtx.globalAlpha = 1;
+
+    // Создаем ссылку для скачивания
+    const link = document.createElement('a');
+    link.download = 'my-drawing.png';
+    link.href = exportCanvas.toDataURL('image/png');
+    link.click();
+}
 
 // Прозрачность слоев
         layerOpacitySlider.addEventListener('input', function() {

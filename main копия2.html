@@ -114,9 +114,12 @@
                             <progress id="pressureBar" value="0" max="4000"></progress>
                             <span id="pressureValue" class="pressure-value"></span>
                         </div>
+                        <!-- <input type="number" id="resolutionWidth" value="2000">
+<input type="number" id="resolutionHeight" value="2000">
+<button onclick="updateResolutionSettings()">Применить</button> -->
                     </div>
-                    <label for="outlineSize" title="Размер обводки">🖼️</label>
-                    <span style="font-size: 1.5em;">&#8690;</span>
+                    <label for="outlineSize" title="Размер обводки">🖼️</label> <span
+                        style="font-size: 1.5em;">&#8690;</span>
                     <input type="range" id="outlineSize" min="0" max="20" value="0">
                     <span id="outlineSizeValue" style="color: red;">0</span>
                     <button id="toggleOutlineTypeBtn" title="Переключить тип обводки">🔄</button>
@@ -146,8 +149,7 @@
                         <div id="backgroundImageGallery" style="display: flex; flex-wrap: wrap; margin-top: 10px;">
                         </div>
                         <div id="backgroundPreview"
-                            style="display: none; position: absolute; z-index: 1000; border: 2px solid #000;">
-                        </div>
+                            style="display: none; position: absolute; z-index: 1000; border: 2px solid #000;"></div>
                     </div>
                     <!-- Canvas Settings Modal -->
                     <div id="canvasSettingsModal" class="modal">
@@ -161,8 +163,18 @@
                         </div>
                     </div>
                     <script>
+                        // Глобальные переменные для размеров
+                        let realWidth = 500;
+                        let realHeight = 400;
+                        let displayWidth = 600;
+                        let displayHeight = 400;
+                        let scale = displayWidth / realWidth;
+                    </script>
+                    <script>
 
                         const layerFilters = {};
+
+
 
                     </script>
                     <script>
@@ -209,8 +221,7 @@
                         const elements = ['UploadB', 'fillModeBtn',
                             'brushSize', 'opacity', 'pressureBar', 'backgroundPicker',
                             'addLayerBtn', 'removeLayerBtn', 'eraserBtn', 'layerButtons',
-                            'zoomBtn', 'canvasContainer', 'drawOnExistingBtn', 'identifyLayerBtn', 'layerOpacitySlider', 'layerOpacityValue',
-                            'layerOpacityValue', 'moveLayerUp',
+                            'zoomBtn', 'canvasContainer', 'drawOnExistingBtn', 'identifyLayerBtn', 'layerOpacitySlider', 'layerOpacityValue', 'moveLayerUp',
                             'moveLayerDown'
                         ];
 
@@ -297,7 +308,6 @@
                     <script>
 
                         // document.dispatchEvent(layerCreationComplete);
-                        // Object.values(layers).forEach(addEventListenersToLayer);
                         drawOnExistingBtn.addEventListener('click', toggleDrawOnExisting);
 
                         // ИНИЦИАЛИЗАЦИЯ 
@@ -335,10 +345,13 @@
 
                             layerCount++;
                             layerColors[layerCount] = '#' + Math.floor(Math.random() * 16777215).toString(16);
+
                             const canvas = document.createElement('canvas');
                             canvas.id = `layer${layerCount}`;
-                            canvas.width = 600;
-                            canvas.height = 400;
+                            canvas.width = realWidth;
+                            canvas.height = realHeight;
+                            canvas.style.width = `${displayWidth}px`;
+                            canvas.style.height = `${displayHeight}px`;
                             canvas.style.position = 'absolute';
                             canvas.style.top = '0';
                             canvas.style.left = '0';
@@ -433,11 +446,9 @@
                             contexts[layerNum].fillRect(0, 0, layers[layerNum].width, layers[layerNum].height);
                         }
 
-                        // сохранение истории
+                        // сохранение истории saveState
                         function saveState() {
-                            if (!curCtx) {
-                                return;
-                            }
+                            if (!curCtx) return;
 
                             if (history[currentLayer].length >= MAX_HISTORY_STATES) {
                                 history[currentLayer].shift();
@@ -522,14 +533,23 @@
                                 finger(e);
                                 return;
                             }
-                            const rect = layers[currentLayer].getBoundingClientRect();
+                            // const rect = layers[currentLayer].getBoundingClientRect();
 
+                            // const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                            // const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                            // const x = Math.floor((clientX - rect.left) / zoomLevel);
+                            // const y = Math.floor((clientY - rect.top) / zoomLevel);
+                            if (!isDrawing || !curCtx) return;
+
+                            const rect = layers[currentLayer].getBoundingClientRect();
                             const clientX = e.touches ? e.touches[0].clientX : e.clientX;
                             const clientY = e.touches ? e.touches[0].clientY : e.clientY;
                             const x = Math.floor((clientX - rect.left) / zoomLevel);
                             const y = Math.floor((clientY - rect.top) / zoomLevel);
+                            // curCtx.lineWidth = brushSize.value / scale;
 
                             const pressure = e.pressure || 1;
+                            // curCtx.lineWidth = (brushSize.value * pressure) / scale;
                             curCtx.lineWidth = brushSize.value * pressure;
                             curCtx.lineCap = 'round';
                             curCtx.lineJoin = 'round';
@@ -573,6 +593,40 @@
                             pressureBar.nextElementSibling.textContent = Math.round(pressure * 100);
                             layerDrawnOn[currentLayer] = true;
                             updateLayerEyeIcon(currentLayer);
+                        }
+
+                        function changeResolution(newWidth, newHeight) {
+                            realWidth = newWidth;
+                            realHeight = newHeight;
+
+                            Object.values(layers).forEach(layer => {
+                                const tempCanvas = document.createElement('canvas');
+                                tempCanvas.width = newWidth;
+                                tempCanvas.height = newHeight;
+                                const tempCtx = tempCanvas.getContext('2d');
+                                tempCtx.drawImage(layer, 0, 0, layer.width, layer.height, 0, 0, newWidth, newHeight);
+
+                                layer.width = newWidth;
+                                layer.height = newHeight;
+                                layer.getContext('2d').drawImage(tempCanvas, 0, 0);
+                            });
+
+                            updateCanvasScale();
+                        }
+
+                        // Пример использования в настройках
+                        function updateResolutionSettings() {
+                            const newWidth = document.getElementById('resolutionWidth').value;
+                            const newHeight = document.getElementById('resolutionHeight').value;
+                            changeResolution(newWidth, newHeight);
+                        }
+
+                        function getCanvasCoordinates(clientX, clientY) {
+                            const rect = layers[currentLayer].getBoundingClientRect();
+                            return {
+                                x: (clientX - rect.left) / scale,
+                                y: (clientY - rect.top) / scale
+                            };
                         }
 
                         function stopDrawing() {
@@ -741,8 +795,6 @@
                             moveLayerInStack(direction);
                         }
 
-                        // moveLayerUpBtn.addEventListener('click', handleMoveLayerClick);
-                        // moveLayerDownBtn.addEventListener('click', handleMoveLayerClick);
 
                         moveLayerUp.addEventListener('click', () => {
                             moveLayerInStack(-1);
@@ -1283,8 +1335,6 @@
 
                     </script>
                     </script>
-
-
                     <script src="script.js" defer></script>
                     <script src="cursors.js" defer></script>
                     <script type="module" src="constants.js" defer></script>
