@@ -1,5 +1,4 @@
 
-
 // try {
 //   isPressureSupported = !!window.PointerEvent && 'pressure' in PointerEvent.prototype;
 // } catch (e) { }
@@ -34,37 +33,41 @@ function importImage(event) {
     uploadedImage.onload = () => {
       const canvas = layers[currentLayer];
       const ctx = contexts[currentLayer];
-      
+     
       // Рассчитываем новые размеры, сохраняя пропорции
       let newWidth, newHeight;
       const ratio = uploadedImage.width / uploadedImage.height;
-      
+     
       if (ratio > canvas.width / canvas.height) {
         // Изображение шире, чем канвас
-        newHeight = canvas.height;
-        newWidth = newHeight * ratio;
+        newWidth = canvas.width;
+        newHeight = newWidth / ratio;
       } else {
         // Изображение выше, чем канвас или равно по пропорциям
         newHeight = canvas.height;
         newWidth = newHeight * ratio;
       }
-      
+     
       // Очищаем текущий слой
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
+     
       // Рисуем изображение по центру канваса
       const x = (canvas.width - newWidth) / 2;
       const y = (canvas.height - newHeight) / 2;
       ctx.drawImage(uploadedImage, x, y, newWidth, newHeight);
-      
+     
       // Обновляем состояние слоя
       layerDrawnOn[currentLayer] = true;
       updateLayerEyeIcon(currentLayer);
+
+      // Применяем текущие фильтры к слою
+      applyFiltersToLayer(currentLayer);
     };
     uploadedImage.src = e.target.result;
   };
   reader.readAsDataURL(file);
 }
+
 
 // переключение симметрии
 

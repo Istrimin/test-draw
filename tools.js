@@ -1,4 +1,185 @@
 
+// идентификатор слоя
+        canvasContainer.addEventListener('pointerdown', handleCanvasClick);
+        function handleCanvasClick(e) {
+            if (e.altKey) {
+                isDrawing = false;
+                e.preventDefault();
+                identifyLayerClickHandler(e);
+            }
+        }
+        canvasContainer.addEventListener('click', (e) => {
+            if (isIdentifyingLayer) {
+                identifyLayerClickHandler(e);
+                canvasContainer.style.cursor = 'auto';
+                isDrawing = wasDrawing;
+                isIdentifyingLayer = false;
+                identifyLayerBtn.classList.remove('active');
+            }
+        });
+        identifyLayerBtn.addEventListener('click', () => {
+            isIdentifyingLayer = !isIdentifyingLayer;
+            identifyLayerBtn.classList.toggle('active', isIdentifyingLayer);
+            if (isIdentifyingLayer) {
+                wasDrawing = isDrawing;
+                isDrawing = false;
+                canvasContainer.style.cursor = 'crosshair';
+            } else {
+                canvasContainer.style.cursor = 'auto';
+                isDrawing = wasDrawing;
+            }
+        });
+        function identifyLayerClickHandler(e) {
+            const rect = layers[1].getBoundingClientRect();
+            const x = (e.clientX - rect.left) / zoomLevel;
+            const y = (e.clientY - rect.top) / zoomLevel;
+
+            // Collect all layer IDs except the background
+            const layerIds = Object.keys(layers).filter(key => key !== back);
+
+
+            layerIds.sort((a, b) => layers[b].style.zIndex - layers[a].style.zIndex);
+
+            // Iterate through layers from top to bottom
+            for (const layerId of layerIds) {
+                const ctx = contexts[layerId];
+                const pixelData = ctx.getImageData(x, y, 1, 1).data;
+                if (pixelData[3] > 0) {
+                    setCurrentLayer(parseInt(layerId));
+                    updateLayerButtonColor(parseInt(layerId));
+                    return;
+                }
+            }
+        }
+
+// слияние с нижележащим слоем
+    const mergeDownBtn = document.getElementById('mergeDownBtn');
+
+    mergeDownBtn.addEventListener('click', mergeLayerDown);
+
+    function mergeLayerDown() {
+        const currentLayerIndex = parseInt(currentLayer);
+        const layerBelow = findLayerBelow(currentLayerIndex);
+
+        if (layerBelow === null) {
+            showMessage("Нет слоя ниже для слияния.");
+            return;
+        }
+
+        // Создаем временный canvas для объединения слоев
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = layers[currentLayer].width;
+        tempCanvas.height = layers[currentLayer].height;
+        const tempCtx = tempCanvas.getContext('2d');
+
+        // Рисуем нижний слой
+        tempCtx.drawImage(layers[layerBelow], 0, 0);
+
+        // Рисуем текущий слой поверх
+        tempCtx.globalAlpha = layerOpacities[currentLayer] / 100;
+        tempCtx.drawImage(layers[currentLayer], 0, 0);
+
+        // Очищаем нижний слой и копируем на него результат
+        contexts[layerBelow].clearRect(0, 0, layers[layerBelow].width, layers[layerBelow].height);
+        contexts[layerBelow].drawImage(tempCanvas, 0, 0);
+
+        // Удаляем текущий слой
+        deleteLayer(currentLayerIndex);
+
+        // Устанавливаем нижний слой как текущий
+        setCurrentLayer(layerBelow);
+
+        // Обновляем отображение слоев
+        updateLayerList();
+        showMessage("Слои объединены.");
+    }
+    function findLayerBelow(currentLayerIndex) {
+        const layerIds = Object.keys(layers)
+            .filter(id => id !== back.toString())
+            .sort((a, b) => parseInt(layers[b].style.zIndex) - parseInt(layers[a].style.zIndex));
+
+        const currentLayerPosition = layerIds.indexOf(currentLayerIndex.toString());
+        if (currentLayerPosition < layerIds.length - 1) {
+            return parseInt(layerIds[currentLayerPosition + 1]);
+        }
+        return null;
+    }
+
+
+// удаление слоя
+    function deleteLayer(layerId) {
+        // Удаляем canvas слоя
+        layers[layerId].remove();
+        
+        // Удаляем слой из всех объектов
+        delete layers[layerId];
+        delete contexts[layerId];
+        delete layerColors[layerId];
+        delete layerOpacities[layerId];
+        delete history[layerId];
+        delete redoHistory[layerId];
+        
+        // Удаляем кнопку слоя
+        const layerButton = document.querySelector(`.layer-button[data-layer="${layerId}"]`);
+        if (layerButton) {
+            layerButton.remove();
+        }
+        
+        // Если у слоя была обводка, удаляем и ее
+        if (outlineLayers[layerId]) {
+            const outlineLayerId = outlineLayers[layerId].id;
+            layers[outlineLayerId].remove();
+            delete layers[outlineLayerId];
+            delete contexts[outlineLayerId];
+            delete outlineLayers[layerId];
+        }
+    }
+
+// применение обводки
+    const applyOutlineBtn = document.getElementById('applyOutlineBtn');
+
+    applyOutlineBtn.addEventListener('click', () => {
+        mergeOutlineWithCurrentLayer();
+    });
+
+    function mergeOutlineWithCurrentLayer() {
+        if (!outlineLayers[currentLayer]) {
+            showMessage("Нет обводки для слияния.");
+            return;
+        }
+
+        const outlineLayerId = outlineLayers[currentLayer].id;
+        const outlineCanvas = layers[outlineLayerId];
+        const currentCanvas = layers[currentLayer];
+
+        // Создаем временный canvas для объединения слоев
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = currentCanvas.width;
+        tempCanvas.height = currentCanvas.height;
+        const tempCtx = tempCanvas.getContext('2d');
+
+        // Рисуем текущий слой
+        tempCtx.drawImage(currentCanvas, 0, 0);
+
+        // Рисуем слой обводки поверх
+        tempCtx.drawImage(outlineCanvas, 0, 0);
+
+        // Очищаем текущий слой и копируем на него результат
+        contexts[currentLayer].clearRect(0, 0, currentCanvas.width, currentCanvas.height);
+        contexts[currentLayer].drawImage(tempCanvas, 0, 0);
+
+        // Удаляем слой обводки
+        canvasContainer.removeChild(outlineCanvas);
+        delete layers[outlineLayerId];
+        delete contexts[outlineLayerId];
+        delete outlineLayers[currentLayer];
+
+        // Обновляем отображение слоев
+        updateLayerList();
+        
+        // Добавляем информацию об обводке в историю текущего слоя
+        saveState();
+    }
 // Функция для объединения слоев
     const mergeLayersBtn = document.getElementById('mergeLayers');
     mergeLayersBtn.addEventListener('click', mergeLayers);
@@ -26,44 +207,45 @@
             curCtx.drawImage(mergedCanvas, 0, 0);
             updateLayerOrder();
         }
-export function drawOn(startX, startY, endX, endY, ctx) {
-    const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
-    const data = imageData.data;
-    const tempCanvas = document.createElement('canvas');
-    tempCanvas.width = ctx.canvas.width;
-    tempCanvas.height = ctx.canvas.height;
-    const tempCtx = tempCanvas.getContext('2d');
-    tempCtx.imageSmoothingEnabled = false;
-    tempCtx.strokeStyle = ctx.strokeStyle;
-    tempCtx.lineWidth = ctx.lineWidth;
-    tempCtx.lineCap = ctx.lineCap;
-    tempCtx.lineJoin = ctx.lineJoin;
-    tempCtx.beginPath();
-    tempCtx.moveTo(startX, startY);
-    tempCtx.lineTo(endX, endY);
-    tempCtx.stroke();
-    const lineData = tempCtx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height).data;
-    const lineWidth = ctx.lineWidth;
-    for (let x = Math.floor(Math.min(startX, endX) - lineWidth); x <= Math.ceil(Math.max(startX, endX) + lineWidth); x++) {
-        for (let y = Math.floor(Math.min(startY, endY) - lineWidth); y <= Math.ceil(Math.max(startY, endY) + lineWidth); y++) {
-            if (x >= 0 && x < ctx.canvas.width && y >= 0 && y < ctx.canvas.height) {
-                const i = (y * ctx.canvas.width + x) * 4;
-                // Проверяем, находится ли пиксель на линии и есть ли уже что-то нарисованное в этом месте
-                if (lineData[i + 3] > 0 && data[i + 3] > 0) {
-                    const alpha = ctx.globalAlpha;
-                    const existingAlpha = data[i + 3] / 255;
-                    const newAlpha = alpha + existingAlpha * (1 - alpha);
-                    // Смешиваем цвета с учетом прозрачности
-                    data[i] = (lineData[i] * alpha + data[i] * existingAlpha * (1 - alpha)) / newAlpha;
-                    data[i + 1] = (lineData[i + 1] * alpha + data[i + 1] * existingAlpha * (1 - alpha)) / newAlpha;
-                    data[i + 2] = (lineData[i + 2] * alpha + data[i + 2] * existingAlpha * (1 - alpha)) / newAlpha;
-                    data[i + 3] = newAlpha * 255;
+// рисование на нарисованном
+    export function drawOn(startX, startY, endX, endY, ctx) {
+        const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+        const data = imageData.data;
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = ctx.canvas.width;
+        tempCanvas.height = ctx.canvas.height;
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCtx.imageSmoothingEnabled = false;
+        tempCtx.strokeStyle = ctx.strokeStyle;
+        tempCtx.lineWidth = ctx.lineWidth;
+        tempCtx.lineCap = ctx.lineCap;
+        tempCtx.lineJoin = ctx.lineJoin;
+        tempCtx.beginPath();
+        tempCtx.moveTo(startX, startY);
+        tempCtx.lineTo(endX, endY);
+        tempCtx.stroke();
+        const lineData = tempCtx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height).data;
+        const lineWidth = ctx.lineWidth;
+        for (let x = Math.floor(Math.min(startX, endX) - lineWidth); x <= Math.ceil(Math.max(startX, endX) + lineWidth); x++) {
+            for (let y = Math.floor(Math.min(startY, endY) - lineWidth); y <= Math.ceil(Math.max(startY, endY) + lineWidth); y++) {
+                if (x >= 0 && x < ctx.canvas.width && y >= 0 && y < ctx.canvas.height) {
+                    const i = (y * ctx.canvas.width + x) * 4;
+                    // Проверяем, находится ли пиксель на линии и есть ли уже что-то нарисованное в этом месте
+                    if (lineData[i + 3] > 0 && data[i + 3] > 0) {
+                        const alpha = ctx.globalAlpha;
+                        const existingAlpha = data[i + 3] / 255;
+                        const newAlpha = alpha + existingAlpha * (1 - alpha);
+                        // Смешиваем цвета с учетом прозрачности
+                        data[i] = (lineData[i] * alpha + data[i] * existingAlpha * (1 - alpha)) / newAlpha;
+                        data[i + 1] = (lineData[i + 1] * alpha + data[i + 1] * existingAlpha * (1 - alpha)) / newAlpha;
+                        data[i + 2] = (lineData[i + 2] * alpha + data[i + 2] * existingAlpha * (1 - alpha)) / newAlpha;
+                        data[i + 3] = newAlpha * 255;
+                    }
                 }
             }
         }
+        ctx.putImageData(imageData, 0, 0);
     }
-    ctx.putImageData(imageData, 0, 0);
-}
 // добавляем слой под текущий
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Tab') {
@@ -73,55 +255,64 @@ export function drawOn(startX, startY, endX, endY, ctx) {
             }
         });
     function createLayerBelowCurrent() {
-                const layerButtons = Array.from(document.querySelectorAll('.layer-button'));
-                const currentIndex = layerButtons.findIndex(btn => parseInt(btn.dataset.layer) === currentLayer);
-                layerCount++;
-                const newLayerNum = layerCount;
-                const canvas = document.createElement('canvas');
-                canvas.id = `layer${newLayerNum}`;
-                canvas.width = 600;
-                canvas.height = 400;
-                canvas.style.position = 'absolute';
-                canvas.style.top = '0';
-                canvas.style.left = '0';
-                canvas.style.zIndex = newLayerNum;
-                if (currentIndex !== -1) {
-                    canvasContainer.insertBefore(canvas, layers[currentLayer]);
-                } else {
-                    canvasContainer.appendChild(canvas);
-                }
-                layers[newLayerNum] = canvas;
-                contexts[newLayerNum] = canvas.getContext('2d');
-                layerColors[newLayerNum] = '#' + Math.floor(Math.random() * 16777215).toString(16);
-                const button = document.createElement('button');
-                button.textContent = " ❤ ";
-                button.classList.add('layer-button');
-                button.dataset.layer = newLayerNum;
-                // Add eye icon
-                const eyeIcon = document.createElement('span');
-                eyeIcon.textContent = "👁️";
-                eyeIcon.style.display = 'inline'; // Show the eye icon by default
-                eyeIcon.classList.add('eye-icon');
-                button.appendChild(eyeIcon);
-                if (currentIndex !== -1) {
-                    layerButtons[currentIndex].parentNode.insertBefore(button, layerButtons[currentIndex].nextSibling);
-                } else {
-                    layerButtons.appendChild(button);
-                }
-                button.addEventListener('click', function () {
-                    setCurrentLayer(parseInt(this.dataset.layer));
-                });
-                addEventListenersToLayer(canvas);
-                history[newLayerNum] = [];
-                redoHistory[newLayerNum] = [];
-                setCurrentLayer(newLayerNum);
-                initializeLayer(newLayerNum);
-                updateLayerButtonColor(newLayerNum);
-                updateLayerOrder();
-                // Mark the new layer as drawn on
-                layerDrawnOn[newLayerNum] = true;
-                updateLayerEyeIcon(newLayerNum);
-            }
+    const layerButtons = Array.from(document.querySelectorAll('.layer-button'));
+    const currentIndex = layerButtons.findIndex(btn => parseInt(btn.dataset.layer) === currentLayer);
+    layerCount++;
+    const newLayerNum = layerCount;
+    const canvas = document.createElement('canvas');
+    canvas.id = `layer${newLayerNum}`;
+    canvas.width = 600;
+    canvas.height = 400;
+    canvas.style.position = 'absolute';
+    canvas.style.top = '0';
+    canvas.style.left = '0';
+    
+    // Устанавливаем z-index на основе текущего слоя
+    const currentZIndex = parseInt(layers[currentLayer].style.zIndex);
+    canvas.style.zIndex = currentZIndex;
+    layers[currentLayer].style.zIndex = currentZIndex - 0.5;
+
+    if (currentIndex !== -1) {
+        canvasContainer.insertBefore(canvas, layers[currentLayer]);
+    } else {
+        canvasContainer.appendChild(canvas);
+    }
+    layers[newLayerNum] = canvas;
+    contexts[newLayerNum] = canvas.getContext('2d');
+    layerColors[newLayerNum] = '#' + Math.floor(Math.random() * 16777215).toString(16);
+    const button = document.createElement('button');
+    button.textContent = " ❤ ";
+    button.classList.add('layer-button');
+    button.dataset.layer = newLayerNum;
+    
+    const eyeIcon = document.createElement('span');
+    eyeIcon.textContent = "👁️";
+    eyeIcon.style.display = 'inline';
+    eyeIcon.classList.add('eye-icon');
+    button.appendChild(eyeIcon);
+    
+    if (currentIndex !== -1) {
+        layerButtons[currentIndex].parentNode.insertBefore(button, layerButtons[currentIndex].nextSibling);
+    } else {
+        document.querySelector('.layer-buttons').appendChild(button);
+    }
+    
+    button.addEventListener('click', function () {
+        setCurrentLayer(parseInt(this.dataset.layer));
+    });
+    addEventListenersToLayer(canvas);
+    history[newLayerNum] = [];
+    redoHistory[newLayerNum] = [];
+    setCurrentLayer(newLayerNum);
+    initializeLayer(newLayerNum);
+    updateLayerButtonColor(newLayerNum);
+    updateLayerOrder();
+    layerDrawnOn[newLayerNum] = true;
+    updateLayerEyeIcon(newLayerNum);
+
+    }
+
+
 // добавляем слой над текущим
     document.addEventListener('keydown', function (e) {
         if (e.code === 'Backquote') { // так называется тильда 
@@ -142,9 +333,13 @@ export function drawOn(startX, startY, endX, endY, ctx) {
         canvas.style.position = 'absolute';
         canvas.style.top = '0';
         canvas.style.left = '0';
-        canvas.style.zIndex = newLayerNum;
+        
+        // Устанавливаем z-index на основе текущего слоя
+        const currentZIndex = parseInt(layers[currentLayer].style.zIndex);
+        canvas.style.zIndex = currentZIndex + 0.5;
+
         if (currentIndex !== -1) {
-            canvasContainer.insertBefore(canvas, layers[currentLayer]);
+            canvasContainer.insertBefore(canvas, layers[currentLayer].nextSibling);
         } else {
             canvasContainer.appendChild(canvas);
         }
@@ -155,16 +350,19 @@ export function drawOn(startX, startY, endX, endY, ctx) {
         button.textContent = " ❤ ";
         button.classList.add('layer-button');
         button.dataset.layer = newLayerNum;
+        
         const eyeIcon = document.createElement('span');
         eyeIcon.textContent = "👁️";
         eyeIcon.style.display = 'inline';
         eyeIcon.classList.add('eye-icon');
         button.appendChild(eyeIcon);
+        
         if (currentIndex !== -1) {
             layerButtons[currentIndex].parentNode.insertBefore(button, layerButtons[currentIndex]);
         } else {
-            layerButtons.appendChild(button);
+            document.querySelector('.layer-buttons').appendChild(button);
         }
+        
         button.addEventListener('click', function () {
             setCurrentLayer(parseInt(this.dataset.layer));
         });
@@ -175,10 +373,10 @@ export function drawOn(startX, startY, endX, endY, ctx) {
         initializeLayer(newLayerNum);
         updateLayerButtonColor(newLayerNum);
         updateLayerOrder();
-        // Mark the new layer as drawn on
         layerDrawnOn[newLayerNum] = true;
         updateLayerEyeIcon(newLayerNum);
     }
+
 // *рисование под нарисованным
     // export function drawOn(startX, startY, endX, endY, ctx) {
     //     const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -219,32 +417,68 @@ export function drawOn(startX, startY, endX, endY, ctx) {
     // }
 // Сохранение изображения
     saveImageBtn.addEventListener('click', exportImage);
+    // function exportImage() {
+    //   const mergeCanvas = document.createElement('canvas');
+    //   const mergeCtx = mergeCanvas.getContext('2d');
+    //   mergeCanvas.width = layers[1].width;
+    //   mergeCanvas.height = layers[1].height;
+    //   const layerButtons = Array.from(document.querySelectorAll('.layer-button'));
+    //   layerButtons.sort((a, b) => {
+    //     const layerA = layers[parseInt(a.dataset.layer)];
+    //     const layerB = layers[parseInt(b.dataset.layer)];
+    //     return parseInt(layerA.style.zIndex || 0) - parseInt(layerB.style.zIndex || 0);
+    //   });
+    //   layerButtons.forEach((button) => {
+    //     const layerId = parseInt(button.dataset.layer);
+    //     if (layers[layerId] && layerId !== back) {
+    //       // Apply layer opacity during drawing
+    //       mergeCtx.globalAlpha = layerOpacities[layerId] / 100; 
+    //       mergeCtx.drawImage(layers[layerId], 0, 0);
+    //       // Reset globalAlpha for the next layer
+    //       mergeCtx.globalAlpha = 1; 
+    //     }
+    //   });
+    //   const link = document.createElement('a');
+    //   link.download = 'my-drawing.png';
+    //   link.href = mergeCanvas.toDataURL('image/png');
+    //   link.click();
+    // }
     function exportImage() {
       const mergeCanvas = document.createElement('canvas');
       const mergeCtx = mergeCanvas.getContext('2d');
       mergeCanvas.width = layers[1].width;
       mergeCanvas.height = layers[1].height;
-      const layerButtons = Array.from(document.querySelectorAll('.layer-button'));
-      layerButtons.sort((a, b) => {
-        const layerA = layers[parseInt(a.dataset.layer)];
-        const layerB = layers[parseInt(b.dataset.layer)];
-        return parseInt(layerA.style.zIndex || 0) - parseInt(layerB.style.zIndex || 0);
-      });
-      layerButtons.forEach((button) => {
-        const layerId = parseInt(button.dataset.layer);
-        if (layers[layerId] && layerId !== back) {
-          // Apply layer opacity during drawing
-          mergeCtx.globalAlpha = layerOpacities[layerId] / 100; 
-          mergeCtx.drawImage(layers[layerId], 0, 0);
-          // Reset globalAlpha for the next layer
-          mergeCtx.globalAlpha = 1; 
+
+      // Создаем массив всех слоев, включая обводки
+      const allLayers = Object.keys(layers).reduce((acc, layerId) => {
+        if (layerId !== back.toString()) {
+          acc.push({id: layerId, type: 'main', zIndex: parseInt(layers[layerId].style.zIndex)});
+          if (outlineLayers[layerId]) {
+            acc.push({id: outlineLayers[layerId].id, type: 'outline', zIndex: parseInt(layers[outlineLayers[layerId].id].style.zIndex)});
+          }
         }
+        return acc;
+      }, []);
+
+      // Сортируем все слои по z-index
+      allLayers.sort((a, b) => a.zIndex - b.zIndex);
+
+      // Отрисовываем слои в правильном порядке
+      allLayers.forEach((layer) => {
+        const layerId = layer.id;
+        mergeCtx.globalAlpha = layerOpacities[layerId] / 100;
+        mergeCtx.drawImage(layers[layerId], 0, 0);
       });
+
+      mergeCtx.globalAlpha = 1;
+
       const link = document.createElement('a');
       link.download = 'my-drawing.png';
       link.href = mergeCanvas.toDataURL('image/png');
       link.click();
     }
+
+
 // Прозрачность слоев
         layerOpacitySlider.addEventListener('input', function() {
             const opacity = this.value;

@@ -211,10 +211,8 @@ const layerFilters = {};
         const elements = ['UploadB', 'fillModeBtn',
             'brushSize', 'opacity', 'pressureBar', 'backgroundPicker',
             'addLayerBtn', 'removeLayerBtn', 'eraserBtn', 'layerButtons',
-            'zoomBtn', 'canvasContainer', 'drawOnExistingBtn', 'identifyLayerBtn', 'layerOpacitySlider', 'layerOpacityValue','moveLayerUp','moveLayerDown'
+            'zoomBtn', 'canvasContainer', 'drawOnExistingBtn', 'identifyLayerBtn', 'layerOpacitySlider', 'layerOpacityValue',
         ];
-
-
 
         const container = document.getElementById('canvasContainer');
         const containerRect = container.getBoundingClientRect();
@@ -263,11 +261,6 @@ const layerFilters = {};
             isSmoothLineMode = false,
             isCtrlPressed = false;
 
-        // const moveLayerUp = document.getElementById('moveLayerUp');
-        // const moveLayerDown = document.getElementById('moveLayerDown');
-
-        moveLayerUp.addEventListener('click', handleMoveLayerClick);
-        moveLayerDown.addEventListener('click', handleMoveLayerClick);
         const symmetryButton = document.getElementById('symmetry');
 
         symmetryButton.addEventListener('click', toggleSymmetry);
@@ -689,6 +682,51 @@ function endDrawing() {
             }
         }
 
+        // идентификатор слоя
+        canvasContainer.addEventListener('click', (e) => {
+            if (isIdentifyingLayer) {
+                identifyLayerClickHandler(e);
+                canvasContainer.style.cursor = 'default';
+                isDrawing = wasDrawing;
+                isIdentifyingLayer = false;
+                identifyLayerBtn.classList.remove('active');
+            }
+        });
+        identifyLayerBtn.addEventListener('click', () => {
+            isIdentifyingLayer = !isIdentifyingLayer;
+            identifyLayerBtn.classList.toggle('active', isIdentifyingLayer);
+            if (isIdentifyingLayer) {
+                wasDrawing = isDrawing;
+                isDrawing = false;
+                canvasContainer.style.cursor = 'crosshair';
+            } else {
+                canvasContainer.style.cursor = 'auto';
+                isDrawing = wasDrawing;
+            }
+        });
+        function identifyLayerClickHandler(e) {
+            const rect = layers[1].getBoundingClientRect();
+            const x = (e.clientX - rect.left) / zoomLevel;
+            const y = (e.clientY - rect.top) / zoomLevel;
+
+            // Collect all layer IDs except the background
+            const layerIds = Object.keys(layers).filter(key => key !== back);
+
+
+            layerIds.sort((a, b) => layers[b].style.zIndex - layers[a].style.zIndex);
+
+            // Iterate through layers from top to bottom
+            for (const layerId of layerIds) {
+                const ctx = contexts[layerId];
+                const pixelData = ctx.getImageData(x, y, 1, 1).data;
+                if (pixelData[3] > 0) {
+                    setCurrentLayer(parseInt(layerId));
+                    updateLayerButtonColor(parseInt(layerId));
+                    return;
+                }
+            }
+        }
+
         // сократить
         layerPanel.addEventListener("pointerenter", (e) => {
             e.preventDefault();
@@ -721,50 +759,58 @@ function endDrawing() {
             }
         });
     
-
-function updateLayerOrder() {
-    const layerButtons = Array.from(document.querySelectorAll('.layer-button'));
-    const baseZIndex = 110;
-    
-    layerButtons.forEach((button, index) => {
-        const layerId = parseInt(button.dataset.layer);
-        if (layers[layerId]) {
-            const zIndex = layerId === back ? -100 : baseZIndex + layerButtons.length - index;
-            layers[layerId].style.zIndex = zIndex;
-            
-            if (outlineLayers[layerId]) {
-                layers[outlineLayers[layerId].id].style.zIndex = zIndex + 1;
+        canvasContainer.addEventListener('pointerdown', handleCanvasClick);
+        function handleCanvasClick(e) {
+            if (e.altKey) {
+                isDrawing = false;
+                e.preventDefault();
+                identifyLayerClickHandler(e);
             }
         }
-    });
-}
+// function updateLayerOrder() {
+//     const layerButtons = Array.from(document.querySelectorAll('.layer-button'));
+//     const baseZIndex = 110;
+    
+//     layerButtons.forEach((button, index) => {
+//         const layerId = parseInt(button.dataset.layer);
+//         if (layers[layerId]) {
+//             const zIndex = layerId === back ? -100 : baseZIndex + layerButtons.length - index;
+//             layers[layerId].style.zIndex = zIndex;
+            
+//             if (outlineLayers[layerId]) {
+//                 layers[outlineLayers[layerId].id].style.zIndex = zIndex + 1;
+//             }
+//         }
+//     });
+// }
 
-
+moveLayerUpBtn.addEventListener('click', handleMoveLayerClick);
+moveLayerDownBtn.addEventListener('click', handleMoveLayerClick);
 
 function handleMoveLayerClick(event) {
-    const direction = event.target === moveLayerUp ? -1 : 1;
+    const direction = event.target === moveLayerUpBtn ? -1 : 1;
     moveLayerInStack(direction);
 }
 
 
-        moveLayerUp.addEventListener('click', () => {
+        moveLayerUpBtn.addEventListener('click', () => {
             moveLayerInStack(-1);
         });
-        moveLayerDown.addEventListener('click', () => {
+        moveLayerDownBtn.addEventListener('click', () => {
             moveLayerInStack(1);
         });
 function moveLayerInStack(direction) {
-    const curLB = document.querySelector(`.layer-button[data-layer="${currentLayer}"]`);
+    const currentLayerButton = document.querySelector(`.layer-button[data-layer="${currentLayer}"]`);
     const targetLayerButton = direction === -1 
-        ? curLB.previousElementSibling 
-        : curLB.nextElementSibling;
+        ? currentLayerButton.previousElementSibling 
+        : currentLayerButton.nextElementSibling;
 
     if (targetLayerButton) {
         // Перемещаем кнопку слоя в DOM
         if (direction === -1) {
-            curLB.parentNode.insertBefore(curLB, targetLayerButton);
+            currentLayerButton.parentNode.insertBefore(currentLayerButton, targetLayerButton);
         } else {
-            curLB.parentNode.insertBefore(targetLayerButton, curLB);
+            currentLayerButton.parentNode.insertBefore(targetLayerButton, currentLayerButton);
         }
 
         // Обновляем порядок слоев
@@ -779,7 +825,7 @@ function moveLayerInStack(direction) {
         }
 
         // Активируем перемещенный слой
-        curLB.click();
+        currentLayerButton.click();
     }
 
         }
@@ -1139,15 +1185,15 @@ function hexToRgb(hex) {
 
 // Обновленная функция для перемещения слоя в стеке (вверх/вниз)
 function moveLayerInStack(direction) {
-    const curLB = document.querySelector(`.layer-button[data-layer="${currentLayer}"]`);
-    const targetLayerButton = direction === -1 ? curLB.previousElementSibling : curLB.nextElementSibling;
+    const currentLayerButton = document.querySelector(`.layer-button[data-layer="${currentLayer}"]`);
+    const targetLayerButton = direction === -1 ? currentLayerButton.previousElementSibling : currentLayerButton.nextElementSibling;
     
     if (targetLayerButton) {
         // Перемещаем кнопку слоя в DOM
         if (direction === -1) {
-            curLB.parentNode.insertBefore(curLB, targetLayerButton);
+            currentLayerButton.parentNode.insertBefore(currentLayerButton, targetLayerButton);
         } else {
-            curLB.parentNode.insertBefore(targetLayerButton, curLB);
+            currentLayerButton.parentNode.insertBefore(targetLayerButton, currentLayerButton);
         }
         
         // Обновляем порядок слоев
@@ -1162,7 +1208,7 @@ function moveLayerInStack(direction) {
         }
         
         // Активируем перемещенный слой
-        curLB.click();
+        currentLayerButton.click();
     }
 }
 

@@ -1,21 +1,4 @@
 {
 	"editor.glyphMargin": false,
 	"CodeGPT.apiKey": "CodeGPT Plus Beta"
-} // {
-//   "workbench.colorCustomizations": {
-//     "editor.tokenColorCustomizations": {
-//       "textMateRules": [
-//         {
-//           "scope": [
-//             "meta.tag",
-//             "meta.tag.html",
-//             "meta.tag.self-closing.html"
-//           ],
-//           "settings": {
-//             "foreground": "#FF0000" // Замените на нужный вам цвет
-//           }
-//         }
-//       ]
-//     }
-//   }
-// }
+} 

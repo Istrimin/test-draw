@@ -1,13 +1,18 @@
-
 #canvasContainer {
     pointer-events: none;
-  -webkit-pointer-events: none;
-}
-#canvasContainer canvas { 
-  pointer-events: auto;
-  -webkit-pointer-events: auto;
+    -webkit-pointer-events: none;
 }
 
+#canvasContainer canvas {
+    pointer-events: auto;
+    -webkit-pointer-events: auto;
+}
+
+.pressure-value {
+    font-size: 12px;
+    color: blue;
+    margin-left: 5px;
+}
 
 body {
     background-image: url('../images/logo.jpg');
@@ -140,6 +145,94 @@ a {
     flex-direction: row;
     align-items: center;
 }
+.filter-sliders{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+/* Базовые стили для всех слайдеров */
+.filter-sliders input[type="range"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  height: 8px;
+  background: #d3d3d3;
+  outline: none;
+  border-radius: 10px;
+}
+
+/* Стили ползунка для всех слайдеров */
+.filter-sliders input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #4CAF50;
+  cursor: pointer;
+}
+
+/* Стили ползунка для Firefox */
+.filter-sliders input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #4CAF50;
+  cursor: pointer;
+}
+
+/* --- Индивидуальные стили для каждого слайдера --- */
+
+/* Слайдер Светлость */
+#lightnessSlider {
+  background: linear-gradient(to right, #000000, #ffffff); /* Градиент от черного к белому */
+}
+#lightnessSlider::-webkit-slider-thumb {
+  background: #f0f0f0; /* Светло-серый */
+}
+#lightnessSlider::-moz-range-thumb {
+  background: #f0f0f0;
+}
+
+/* Слайдер Цветность */
+#saturationSlider {
+  background: linear-gradient(to right, #777777, #ff0000); /* Градиент от серого к красному */
+}
+#saturationSlider::-webkit-slider-thumb {
+  background: #ff4d4d; /* Светло-красный */
+}
+#saturationSlider::-moz-range-thumb {
+  background: #ff4d4d;
+}
+
+/* Слайдер Контраст */
+#contrastSlider {
+  background: linear-gradient(to right, #cccccc, #333333); /* Градиент от светло-серого к темно-серому */
+}
+#contrastSlider::-webkit-slider-thumb {
+  background: #808080; /* Серый */
+}
+#contrastSlider::-moz-range-thumb {
+  background: #808080;
+}
+
+/* Слайдер Цветовой сдвиг */
+#hueShiftSlider {
+  background: linear-gradient(to right, #ff0000, #ffff00, #00ff00, #0000ff, #ff00ff, #ff0000); /* Радужный градиент */
+}
+#hueShiftSlider::-webkit-slider-thumb {
+  background: #ffffff; /* Белый */
+  border: 2px solid #000000; /* Черная рамка */
+}
+#hueShiftSlider::-moz-range-thumb {
+  background: #ffffff;
+  border: 2px solid #000000;
+}
+
+
+
+
 
 .tools {
     color: var(--button-text-color);
@@ -259,6 +352,7 @@ input[type="range"] {
 input[type="range"]:hover {
     opacity: 50;
 }
+
 .cursor-panel {
     position: absolute;
     top: 0;
@@ -268,9 +362,11 @@ input[type="range"]:hover {
     border-radius: 10px;
     z-index: 1000;
     display: none;
-    max-width: 80%; /* Ограничиваем ширину панели */
-    max-height: 80%; /* Ограничиваем высоту панели */
-    overflow-y: auto; 
+    max-width: 80%;
+    /* Ограничиваем ширину панели */
+    max-height: 80%;
+    /* Ограничиваем высоту панели */
+    overflow-y: auto;
 }
 
 .cursor-item {
@@ -316,9 +412,8 @@ input[type="range"]:hover {
     border-color: hsl(69, 100%, 52%);
     overflow-y: auto;
 }
- */
 
-.canvas-container {
+*/ .canvas-container {
     position: relative;
     /* display: flex; */
     justify-content: center;
@@ -445,8 +540,18 @@ input[type="range"]::-moz-range-thumb {
 /* new */
 .canv-container {
     position: relative;
-    width: 700px;
-    height: 500px;
+    width: 600px;
+    height: 400px;
+}
+
+.canv-container{
+border-radius: 20px;
+/* position: relative; */
+/* width: 600px; */
+}
+.sliders{
+/* position: relative; */
+width: 600px;
 }
 
 .canv-container canvas {
@@ -720,65 +825,72 @@ img:hover {
 
 /* Скрыть полосу прогресса */
 #pressureBar {
-  appearance: none;
-  -webkit-appearance: none; /* Для совместимости с Safari и Chrome */
-  width: 0; /* Скрыть полосу, установив ширину 0 */
-  height: 0; /* Скрыть полосу, установив высоту 0 */
+    appearance: none;
+    -webkit-appearance: none;
+    /* Для совместимости с Safari и Chrome */
+    width: 0;
+    /* Скрыть полосу, установив ширину 0 */
+    height: 0;
+    /* Скрыть полосу, установив высоту 0 */
 }
 
 /* Скрыть label по умолчанию */
 .pressure-bar-container label {
-  display: none;
+    display: none;
 }
 
 /* Показать label при наведении на контейнер */
 .pressure-bar-container:hover label {
-  display: inline-block;
+    display: inline-block;
 }
 
 /* показ сообщения */
 /* In your style.css file or within <style> tags */
 .message-popup {
-  display: none; 
-  position: absolute; 
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: rgba(0, 0, 0, 0.7);
-  color: white; /* Цвет кнопки закрытия */
-  padding: 10px 20px;
-  border-radius: 5px;
-  z-index: 1000; 
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    /* Цвет кнопки закрытия */
+    padding: 10px 20px;
+    border-radius: 5px;
+    z-index: 1000;
 }
 
 /* add  23 Sep 00:21*/
-        #zoomLevelDisplay {
-            color: red;
-            font-weight: bold;
-            font-size: 16px;
-            margin-top: 10px;
-        }
+#zoomLevelDisplay {
+    color: red;
+    font-weight: bold;
+    font-size: 16px;
+    margin-top: 10px;
+}
 
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.4);
-        }
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+}
 
-        .modal-content {
-            background-color: #4b0000;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-        }
-
+.modal-content {
+    background-color: #4b0000;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+}
+.filterCanvas {
+    z-index: -3 !important; 
+    background-color: rgba(0, 0, 255, 0.2); /* Make it semi-transparent blue for testing */
+}
 
 /* 
 #chat-container {
