@@ -114,9 +114,12 @@
                             <progress id="pressureBar" value="0" max="4000"></progress>
                             <span id="pressureValue" class="pressure-value"></span>
                         </div>
+                        <!-- <input type="number" id="resolutionWidth" value="2000">
+<input type="number" id="resolutionHeight" value="2000">
+<button onclick="updateResolutionSettings()">Применить</button> -->
                     </div>
-                    <label for="outlineSize" title="Размер обводки">🖼️</label>
-                    <span style="font-size: 1.5em;">&#8690;</span>
+                    <label for="outlineSize" title="Размер обводки">🖼️</label> <span
+                        style="font-size: 1.5em;">&#8690;</span>
                     <input type="range" id="outlineSize" min="0" max="20" value="0">
                     <span id="outlineSizeValue" style="color: red;">0</span>
                     <button id="toggleOutlineTypeBtn" title="Переключить тип обводки">🔄</button>
@@ -146,8 +149,7 @@
                         <div id="backgroundImageGallery" style="display: flex; flex-wrap: wrap; margin-top: 10px;">
                         </div>
                         <div id="backgroundPreview"
-                            style="display: none; position: absolute; z-index: 1000; border: 2px solid #000;">
-                        </div>
+                            style="display: none; position: absolute; z-index: 1000; border: 2px solid #000;"></div>
                     </div>
                     <!-- Canvas Settings Modal -->
                     <div id="canvasSettingsModal" class="modal">
@@ -161,35 +163,54 @@
                         </div>
                     </div>
                     <script>
+                        // Глобальные переменные для размеров
+                        let displayWidth = 600;
+                        let displayHeight = 400;
+                        let realWidth = displayWidth*2;
+
+                        let realHeight = displayWidth*2;
+                        let scale = displayWidth / realWidth;
+                    </script>
+                    <script>
 
                         const layerFilters = {};
+
+
 
                     </script>
                     <script>
                         // фильтры
-                        const filterSliders = [
-                            'lightnessSlider',
-                            'saturationSlider',
-                            'contrastSlider',
-                            'hueShiftSlider'
-                        ];
 
-                        filterSliders.forEach(sliderId => {
-                            document.getElementById(sliderId).addEventListener('input', updateFilters);
-                        });
+const filterSliders = [
+    'lightnessSlider',
+    'saturationSlider',
+    'contrastSlider',
+    'hueShiftSlider'
+];
 
-                        function updateFilters() {
-                            const brightness = lightnessSlider.value;
-                            const saturation = saturationSlider.value;
-                            const contrast = contrastSlider.value;
-                            const hueShift = hueShiftSlider.value;
+filterSliders.forEach(sliderId => {
+    document.getElementById(sliderId).addEventListener('input', updateFilters);
+});
 
-                            lightnessValue.textContent = brightness;
-                            saturationValue.textContent = saturation;
-                            contrastValue.textContent = contrast;
-                            hueShiftValue.textContent = hueShift;
-                            layers[currentLayer].style.filter = `brightness(${brightness}%) saturate(${saturation}%) contrast(${contrast}%) hue-rotate(${hueShift}deg)`;
-                        }
+function updateFilters() {
+    const brightness = lightnessSlider.value;
+    const saturation = saturationSlider.value;
+    const contrast = contrastSlider.value;
+    const hueShift = hueShiftSlider.value;
+
+    lightnessValue.textContent = brightness;
+    saturationValue.textContent = saturation;
+    contrastValue.textContent = contrast;
+    hueShiftValue.textContent = hueShift;
+
+    const filterString = `brightness(${brightness}%) saturate(${saturation}%) contrast(${contrast}%) hue-rotate(${hueShift}deg)`;
+    
+    // Сохраняем фильтр для текущего слоя
+    layerFilters[currentLayer] = filterString;
+    
+    // Применяем фильтр к текущему слою
+    layers[currentLayer].style.filter = filterString;
+}
                         // Функция для применения фильтров к слою
                         function applyFiltersToLayer(layerId) {
                             const brightness = lightnessSlider.value;
@@ -209,8 +230,7 @@
                         const elements = ['UploadB', 'fillModeBtn',
                             'brushSize', 'opacity', 'pressureBar', 'backgroundPicker',
                             'addLayerBtn', 'removeLayerBtn', 'eraserBtn', 'layerButtons',
-                            'zoomBtn', 'canvasContainer', 'drawOnExistingBtn', 'identifyLayerBtn', 'layerOpacitySlider', 'layerOpacityValue',
-                            'layerOpacityValue', 'moveLayerUp',
+                            'zoomBtn', 'canvasContainer', 'drawOnExistingBtn', 'identifyLayerBtn', 'layerOpacitySlider', 'layerOpacityValue', 'moveLayerUp',
                             'moveLayerDown'
                         ];
 
@@ -297,7 +317,6 @@
                     <script>
 
                         // document.dispatchEvent(layerCreationComplete);
-                        // Object.values(layers).forEach(addEventListenersToLayer);
                         drawOnExistingBtn.addEventListener('click', toggleDrawOnExisting);
 
                         // ИНИЦИАЛИЗАЦИЯ 
@@ -335,10 +354,13 @@
 
                             layerCount++;
                             layerColors[layerCount] = '#' + Math.floor(Math.random() * 16777215).toString(16);
+
                             const canvas = document.createElement('canvas');
                             canvas.id = `layer${layerCount}`;
-                            canvas.width = 600;
-                            canvas.height = 400;
+                            canvas.width = realWidth;
+                            canvas.height = realHeight;
+                            canvas.style.width = `${displayWidth}px`;
+                            canvas.style.height = `${displayHeight}px`;
                             canvas.style.position = 'absolute';
                             canvas.style.top = '0';
                             canvas.style.left = '0';
@@ -398,10 +420,32 @@
                             currentLayer = layerNum;
                             curCtx = contexts[currentLayer];
 
+// add
+ // Обновляем слайдеры фильтров для текущего слоя
+    // if (layerFilters[currentLayer]) {
+    //     const filters = layerFilters[currentLayer].match(/\d+/g);
+    //     if (filters && filters.length === 4) {
+    //         lightnessSlider.value = filters[0];
+    //         saturationSlider.value = filters[1];
+    //         contrastSlider.value = filters[2];
+    //         hueShiftSlider.value = filters[3];
+    //         updateFilters();
+    //     }
+    // } else {
+    //     // Если фильтров нет, устанавливаем значения по умолчанию
+    //     lightnessSlider.value = 100;
+    //     saturationSlider.value = 100;
+    //     contrastSlider.value = 100;
+    //     hueShiftSlider.value = 0;
+    //     updateFilters();
+    // }
+
+
+
+
                             const opacity = layerOpacities[layerNum] || 100;
                             layerOpacitySlider.value = opacity;
                             layerOpacityValue.textContent = opacity;
-
                             document.querySelectorAll('.layer-button').forEach(btn => {
                                 btn.classList.remove('active-layer');
                                 if (parseInt(btn.dataset.layer) === currentLayer) {
@@ -433,11 +477,9 @@
                             contexts[layerNum].fillRect(0, 0, layers[layerNum].width, layers[layerNum].height);
                         }
 
-                        // сохранение истории
+                        // сохранение истории saveState
                         function saveState() {
-                            if (!curCtx) {
-                                return;
-                            }
+                            if (!curCtx) return;
 
                             if (history[currentLayer].length >= MAX_HISTORY_STATES) {
                                 history[currentLayer].shift();
@@ -494,7 +536,6 @@
                                 }
                             }
                         }
-
                         function startDrawing(e) {
                             if (currentLayer === 100 || !curCtx || isEyedropperActive || isCtrlPressed) {
                                 return;
@@ -503,8 +544,8 @@
                             const rect = layers[currentLayer].getBoundingClientRect();
                             const clientX = e.touches ? e.touches[0].clientX : e.clientX;
                             const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-                            const x = Math.floor((clientX - rect.left) / zoomLevel);
-                            const y = Math.floor((clientY - rect.top) / zoomLevel);
+                            const x = Math.floor((clientX - rect.left) * (realWidth / displayWidth) / zoomLevel);
+                            const y = Math.floor((clientY - rect.top) * (realHeight / displayHeight) / zoomLevel);
 
                             points.length = 0;
                             symmetricPoints.length = 0;
@@ -522,15 +563,16 @@
                                 finger(e);
                                 return;
                             }
-                            const rect = layers[currentLayer].getBoundingClientRect();
+                            if (!isDrawing || !curCtx) return;
 
+                            const rect = layers[currentLayer].getBoundingClientRect();
                             const clientX = e.touches ? e.touches[0].clientX : e.clientX;
                             const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-                            const x = Math.floor((clientX - rect.left) / zoomLevel);
-                            const y = Math.floor((clientY - rect.top) / zoomLevel);
+                            const x = Math.floor((clientX - rect.left) * (realWidth / displayWidth) / zoomLevel);
+                            const y = Math.floor((clientY - rect.top) * (realHeight / displayHeight) / zoomLevel);
 
                             const pressure = e.pressure || 1;
-                            curCtx.lineWidth = brushSize.value * pressure;
+                            curCtx.lineWidth = brushSize.value * pressure * (realWidth / displayWidth);
                             curCtx.lineCap = 'round';
                             curCtx.lineJoin = 'round';
                             curCtx.globalAlpha = opacity.value / 100;
@@ -550,7 +592,7 @@
                             }
 
                             if (symmetry) {
-                                const centerX = layers[currentLayer].width / 2;
+                                const centerX = realWidth / 2;
                                 const symmetricLastX = centerX + (centerX - lastX);
                                 const symmetricX = centerX + (centerX - x);
 
@@ -573,6 +615,39 @@
                             pressureBar.nextElementSibling.textContent = Math.round(pressure * 100);
                             layerDrawnOn[currentLayer] = true;
                             updateLayerEyeIcon(currentLayer);
+                        }
+                        function changeResolution(newWidth, newHeight) {
+                            realWidth = newWidth;
+                            realHeight = newHeight;
+
+                            Object.values(layers).forEach(layer => {
+                                const tempCanvas = document.createElement('canvas');
+                                tempCanvas.width = newWidth;
+                                tempCanvas.height = newHeight;
+                                const tempCtx = tempCanvas.getContext('2d');
+                                tempCtx.drawImage(layer, 0, 0, layer.width, layer.height, 0, 0, newWidth, newHeight);
+
+                                layer.width = newWidth;
+                                layer.height = newHeight;
+                                layer.getContext('2d').drawImage(tempCanvas, 0, 0);
+                            });
+
+                            updateCanvasScale();
+                        }
+
+                        // Пример использования в настройках
+                        function updateResolutionSettings() {
+                            const newWidth = document.getElementById('resolutionWidth').value;
+                            const newHeight = document.getElementById('resolutionHeight').value;
+                            changeResolution(newWidth, newHeight);
+                        }
+
+                        function getCanvasCoordinates(clientX, clientY) {
+                            const rect = layers[currentLayer].getBoundingClientRect();
+                            return {
+                                x: (clientX - rect.left) / scale,
+                                y: (clientY - rect.top) / scale
+                            };
                         }
 
                         function stopDrawing() {
@@ -741,8 +816,6 @@
                             moveLayerInStack(direction);
                         }
 
-                        // moveLayerUpBtn.addEventListener('click', handleMoveLayerClick);
-                        // moveLayerDownBtn.addEventListener('click', handleMoveLayerClick);
 
                         moveLayerUp.addEventListener('click', () => {
                             moveLayerInStack(-1);
@@ -834,12 +907,8 @@
 
 
 
-
                         function updateZoom() {
-
-
                             Object.values(layers).forEach(layer => {
-
                                 layer.style.transformOrigin = '0 0';
 
                                 if (zoomLevel <= 1) {
@@ -861,8 +930,15 @@
                             });
 
                             canvasContainer.style.overflow = 'hidden';
-                            // иконка и зум в html
                             document.getElementById('zoomLevelDisplay').textContent = `🔎${(zoomLevel * 100).toFixed(0)}%`;
+
+                            // Обновляем обводку для всех слоев
+                            Object.keys(outlineLayers).forEach(layerNum => {
+                                const size = outlineSizes[layerNum];
+                                if (size > 0) {
+                                    applyOutline(layerNum, size);
+                                }
+                            });
                         }
 
                         //  инструмент палец
@@ -991,37 +1067,31 @@
 
                         // Функция для применения обводки к слою
                         function applyOutline(layerNum, size) {
-                            saveState(); // Сохраняем состояние перед изменением
+                            saveState();
 
-                            // Проверяем существование слоя и его контекста
                             if (!layers[layerNum] || !contexts[layerNum]) {
                                 return;
                             }
 
-                            // Получаем ID слоя обводки, если он уже существует
                             let outlineLayerId = outlineLayers[layerNum] ? outlineLayers[layerNum].id : null;
 
-                            // Если слой обводки не существует, создаем его
                             if (!outlineLayerId) {
                                 outlineLayerId = createOutlineLayer(layerNum);
                             }
 
-                            // Получаем контексты слоя обводки и исходного слоя
                             const outlineCtx = contexts[outlineLayerId];
                             const sourceCtx = contexts[layerNum];
                             const canvas = layers[layerNum];
 
-                            // Очищаем слой обводки
                             outlineCtx.clearRect(0, 0, canvas.width, canvas.height);
 
-                            // Если размер обводки больше 0, создаем и применяем обводку
-
                             if (size > 0) {
-                                const imageData = sourceCtx.getImageData(0, 0, canvas.width, canvas.height);
-                                const outlineImageData = outlineCtx.createImageData(canvas.width, canvas.height);
+                                const scaledSize = size * (realWidth / displayWidth); // Учитываем масштаб
+                                const imageData = sourceCtx.getImageData(0, 0, realWidth, realHeight);
+                                const outlineImageData = outlineCtx.createImageData(realWidth, realHeight);
 
                                 requestAnimationFrame(() => {
-                                    createOutline(imageData, outlineImageData, size, canvas.width, canvas.height, isInnerOutline);
+                                    createOutline(imageData, outlineImageData, scaledSize, realWidth, realHeight, isInnerOutline);
                                     outlineCtx.putImageData(outlineImageData, 0, 0);
                                     outlineSizes[layerNum] = size;
                                     updateLayerList();
@@ -1035,13 +1105,16 @@
                         }
 
 
+
                         // Функция для создания слоя обводки
                         function createOutlineLayer(layerNum) {
-                            // Создаем новый canvas для слоя обводки
                             const outlineCanvas = document.createElement('canvas');
-                            outlineCanvas.width = layers[layerNum].width;
-                            outlineCanvas.height = layers[layerNum].height;
+                            outlineCanvas.width = realWidth;
+                            outlineCanvas.height = realHeight;
+                            outlineCanvas.style.width = `${displayWidth}px`;
+                            outlineCanvas.style.height = `${displayHeight}px`;
                             const outlineCtx = outlineCanvas.getContext('2d', { willReadFrequently: true });
+
 
                             // Генерируем новый индекс для слоя обводки
                             const newLayerIndex = Math.max(...Object.keys(layers).map(Number)) + 1;
@@ -1079,7 +1152,7 @@
                                 for (let x = 0; x < width; x++) {
                                     const index = (y * width + x) * 4;
                                     if ((isInner && sourceData[index + 3] > 0) || (!isInner && sourceData[index + 3] === 0)) {
-                                        if (hasNeighborWithDifferentAlpha(sourceData, x, y, width, height, size, isInner)) {
+                                        if (hasNeighborWithDifferentAlpha(sourceData, x, y, width, height, Math.ceil(size), isInner)) {
                                             outlineData.set(outlineColor, index);
                                         }
                                     }
@@ -1087,27 +1160,24 @@
                             }
                         }
 
-function hasNeighborWithDifferentAlpha(sourceData, x, y, width, height, isInner) {
-    const targetAlpha = isInner ? 0 : 255;
-    const neighbors = [
-        {dx: 0, dy: -1}, // up
-        {dx: 0, dy: 1},  // down
-        {dx: -1, dy: 0}, // left
-        {dx: 1, dy: 0}   // right
-    ];
-    
-    for (const {dx, dy} of neighbors) {
-        const nx = x + dx;
-        const ny = y + dy;
-        if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
-            const neighborIndex = (ny * width + nx) * 4 + 3;
-            if (sourceData[neighborIndex] === targetAlpha) {
-                return true;
-            }
-        }
-    }
-    return false;
-}
+
+                        function hasNeighborWithDifferentAlpha(sourceData, x, y, width, height, size, isInner) {
+                            const targetAlpha = isInner ? 0 : 255;
+                            for (let dy = -size; dy <= size; dy++) {
+                                for (let dx = -size; dx <= size; dx++) {
+                                    const nx = x + dx;
+                                    const ny = y + dy;
+                                    if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+                                        const neighborIndex = (ny * width + nx) * 4 + 3;
+                                        if (sourceData[neighborIndex] === targetAlpha) {
+                                            return true;
+                                        }
+                                    }
+                                }
+                            }
+                            return false;
+                        }
+
 
                         // Функция для конвертации hex цвета в rgb массив
                         function hexToRgb(hex) {
@@ -1287,8 +1357,6 @@ function hasNeighborWithDifferentAlpha(sourceData, x, y, width, height, isInner)
 
                     </script>
                     </script>
-
-
                     <script src="script.js" defer></script>
                     <script src="cursors.js" defer></script>
                     <script type="module" src="constants.js" defer></script>

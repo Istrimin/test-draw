@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Outline Test</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="myCanvas" width="500" height="500"></canvas>
+    <br>
+    <input type="range" id="outlineSize" min="1" max="20" value="5">
+    <span id="sizeValue">5</span>
+    <br>
+    <button id="applyOutline">Apply Outline</button>
+    <input type="color" id="outlineColorPicker" value="#000000">
+
+    <script>
+        const canvas = document.getElementById('myCanvas');
+        const ctx = canvas.getContext('2d');
+        const outlineSizeSlider = document.getElementById('outlineSize');
+        const sizeValueSpan = document.getElementById('sizeValue');
+        const applyOutlineBtn = document.getElementById('applyOutline');
+        const outlineColorPicker = document.getElementById('outlineColorPicker');
+
+        // Draw a sample shape
+        ctx.fillStyle = 'red';
+        ctx.beginPath();
+        ctx.arc(250, 250, 100, 0, Math.PI * 2);
+        ctx.fill();
+
+        outlineSizeSlider.addEventListener('input', function() {
+            sizeValueSpan.textContent = this.value;
+        });
+
+        applyOutlineBtn.addEventListener('click', function() {
+            const size = parseInt(outlineSizeSlider.value);
+            applyOutline(size);
+        });
+
+        function applyOutline(size) {
+            const sourceImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const outlineImageData = ctx.createImageData(canvas.width, canvas.height);
+            
+            createOutline(sourceImageData, outlineImageData, size, canvas.width, canvas.height, false);
+            
+            ctx.putImageData(outlineImageData, 0, 0);
+        }
+
+        function createOutline(sourceImageData, outlineImageData, size, width, height, isInner) {
+            const sourceData = sourceImageData.data;
+            const outlineData = outlineImageData.data;
+            const outlineColor = hexToRgb(outlineColorPicker.value);
+            const targetAlpha = isInner ? 0 : 255;
+            const sizeInt = Math.ceil(size);
+            
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    const index = (y * width + x) * 4;
+                    if ((isInner && sourceData[index + 3] > 0) || (!isInner && sourceData[index + 3] === 0)) {
+                        if (hasNeighborWithDifferentAlpha(sourceData, x, y, width, height, sizeInt, targetAlpha)) {
+                            outlineData.set(outlineColor, index);
+                        }
+                    }
+                }
+            }
+        }
+
+        function hasNeighborWithDifferentAlpha(sourceData, x, y, width, height, size, targetAlpha) {
+            const startX = Math.max(0, x - size);
+            const endX = Math.min(width - 1, x + size);
+            const startY = Math.max(0, y - size);
+            const endY = Math.min(height - 1, y + size);
+
+            for (let ny = startY; ny <= endY; ny++) {
+                const rowOffset = ny * width * 4;
+                for (let nx = startX; nx <= endX; nx++) {
+                    if (sourceData[rowOffset + nx * 4 + 3] === targetAlpha) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        function hexToRgb(hex) {
+            hex = hex.replace('#', '');
+            const r = parseInt(hex.substring(0, 2), 16);
+            const g = parseInt(hex.substring(2, 4), 16);
+            const b = parseInt(hex.substring(4, 6), 16);
+            return [r, g, b, 255];
+        }
+    </script>
+</body>
+</html>
