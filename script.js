@@ -72,10 +72,10 @@
 // переключение симметрии
 
 // Exit functionality
-  const exitLink = document.getElementById('exitLink');
-  const doorSound = new Howl({
-    src: ['sounds/door-close.wav']
-  });
+  const exitLink = gel('exitLink');
+  // const doorSound = new Howl({
+  //   src: ['sounds/door-close.wav']
+  // });
   exitLink.addEventListener('click', () => {
     doorSound.play();
     doorSound.once('end', () => {

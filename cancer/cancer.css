@@ -260,39 +260,6 @@ body.no-drop {
 	cursor: not-allowed;
 }
 
-.slider input[type="range"] {
-	width: 80%;
-	-webkit-appearance: none;
-	appearance: none;
-	outline: none;
-	overflow: hidden;
-	touch-action: pan-y;
-	border-radius: 20px;
-}
-
-input[type="range"]::-webkit-slider-thumb {
-	-webkit-appearance: none;
-	appearance: none;
-	width: 20px;
-	height: 50px;
-	background: #00ff08;
-	cursor: pointer;
-	border-radius: 20px;
-
-	box-shadow: -100vw 0 0 100vw rgb(0, 93, 186);
-}
-
-input[type="range"]::-moz-range-thumb {
-	width: 20px;
-	height: 50px;
-	background: #4CAF50;
-	color: #00ff08;
-	cursor: progress;
-	border-radius: 50%;
-	box-shadow: -100vw 0 0 100vw dodgerblue;
-}
-/* 
-
 
 /* Стили для панели курсоров */
 #cursorPanel {
@@ -491,10 +458,10 @@ body {
 
 }
 
-.canvas-and-sliders {
+/* .canvas-and-sliders {
     width: 70%;
 
-}
+} */
 
 #chat-container {
     /* width: 28%;

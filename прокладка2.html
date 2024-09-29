@@ -255,16 +255,16 @@
     let symmetry = false;
 
     // Get DOM elements
-    const brushSizeInput = document.getElementById('brushSize');
-    const opacityInput = document.getElementById('opacity');
-    const pressureBar = document.getElementById('pressureBar');
-    const backgroundPicker = document.getElementById('backgroundPicker');
-    const canvasContainer = document.getElementById('canvasContainer');
-    const layerButtons = document.getElementById('layerButtons');
-    const addLayerBtn = document.getElementById('addLayerBtn');
-    const removeLayerBtn = document.getElementById('removeLayerBtn');
+    const brushSizeInput = $('brushSize');
+    const opacityInput = $('opacity');
+    const pressureBar = $('pressureBar');
+    const backgroundPicker = $('backgroundPicker');
+    const canvasContainer = $('canvasContainer');
+    const layerButtons = $('layerButtons');
+    const addLayerBtn = $('addLayerBtn');
+    const removeLayerBtn = $('removeLayerBtn');
 
-const eraserBtn = document.getElementById('eraserBtn');
+const eraserBtn = $('eraserBtn');
 eraserBtn.addEventListener('click', toggleEraser);
 
     // Initialize pressure-supported state
@@ -509,7 +509,7 @@ if (isErasing) {
 
     // Initialize the first layer
     createLayer();
-    setDrawingColor(document.getElementById('colorPicker').value);
+    setDrawingColor($('colorPicker').value);
     resizeCanvas();
 
     // Добавляем слушатели событий к существующим слоям

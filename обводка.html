@@ -20,12 +20,12 @@
     <input type="color" id="outlineColorPicker" value="#000000">
 
     <script>
-        const canvas = document.getElementById('myCanvas');
+        const canvas = $('myCanvas');
         const ctx = canvas.getContext('2d');
-        const outlineSizeSlider = document.getElementById('outlineSize');
-        const sizeValueSpan = document.getElementById('sizeValue');
-        const applyOutlineBtn = document.getElementById('applyOutline');
-        const outlineColorPicker = document.getElementById('outlineColorPicker');
+        const outlineSizeSlider = $('outlineSize');
+        const sizeValueSpan = $('sizeValue');
+        const applyOutlineBtn = $('applyOutline');
+        const outlineColorPicker = $('outlineColorPicker');
 
         // Draw a sample shape
         ctx.fillStyle = 'red';

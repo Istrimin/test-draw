@@ -126,6 +126,8 @@ img:hover {
     </class>
   </div>
   <script>
+    const $ = id => document.getElementById(id);
+
     vkBridge.send('VKWebAppInit');
 
     document.addEventListener('contextmenu', event => event.preventDefault());
@@ -137,7 +139,7 @@ img:hover {
         const minutes = now.getMinutes().toString().padStart(2, '0');
         const seconds = now.getSeconds().toString().padStart(2, '0');
         const timeString = `${hours}:${minutes}:${seconds}`;
-        document.getElementById('time').textContent = timeString;
+        $('time').textContent = timeString;
     }
 
     // Update the time every second
@@ -153,7 +155,7 @@ img:hover {
     }
 
     const randomImageUrl = getRandomImage(images);
-    document.getElementById('randomImage').src = randomImageUrl;
+    $('randomImage').src = randomImageUrl;
   </script>
 </body>
 

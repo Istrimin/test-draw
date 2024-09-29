@@ -78,21 +78,21 @@
         </div>
     </main>
     <script>
-const colorPicker = document.getElementById('colorPicker');
-const backgroundPicker = document.getElementById('backgroundPicker');
-const drawingCanvas = document.getElementById('drawingCanvas');
-const backgroundCanvas = document.getElementById('backgroundCanvas');
+const colorPicker = $('colorPicker');
+const backgroundPicker = $('backgroundPicker');
+const drawingCanvas = $('drawingCanvas');
+const backgroundCanvas = $('backgroundCanvas');
 const ctx = drawingCanvas.getContext('2d');
 const bgCtx = backgroundCanvas.getContext('2d');
-const symmetryButton = document.getElementById('symmetry');
-const brushSizeInput = document.getElementById('brushSize');
-const eyedropperBtn = document.getElementById('eyedropperBtn');
-const clearBtn = document.getElementById('clearBtn');
-const eraserBtn = document.getElementById('eraserBtn');
-const undoBtn = document.getElementById('undo');
-const redoBtn = document.getElementById('redo');
-const saveImageBtn = document.getElementById('saveImageBtn');
-const overlayCanvas = document.getElementById('overlayCanvas');
+const symmetryButton = $('symmetry');
+const brushSizeInput = $('brushSize');
+const eyedropperBtn = $('eyedropperBtn');
+const clearBtn = $('clearBtn');
+const eraserBtn = $('eraserBtn');
+const undoBtn = $('undo');
+const redoBtn = $('redo');
+const saveImageBtn = $('saveImageBtn');
+const overlayCanvas = $('overlayCanvas');
 const overlayCtx = overlayCanvas.getContext('2d');
 
 let isDrawing = false;

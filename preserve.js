@@ -308,7 +308,7 @@
 //         let isIdentifyingLayer = false;
 //         let wasDrawing = false;  // Moved `wasDrawing` to global scope
 
-//         const identifyLayerBtn = document.getElementById('identifyLayerBtn');
+//         const identifyLayerBtn = $('identifyLayerBtn');
 
 //         // Add a single click event listener to the canvas container
 
@@ -498,8 +498,8 @@
 
 // // ~Двигаем слой
 // // переход по слоям
-// const moveLayerUpBtn = document.getElementById('moveLayerUp');
-// const moveLayerDownBtn = document.getElementById('moveLayerDown');
+// const moveLayerUpBtn = $('moveLayerUp');
+// const moveLayerDownBtn = $('moveLayerDown');
 // moveLayerUpBtn.addEventListener('click', () => {
 //   moveLayerInStack(-1);
 // });
@@ -524,7 +524,7 @@
 //   }
 // }
 // // Получаем контейнер для кнопок слоёв
-// const layerButtonsContainer = document.getElementById('layerButtons');
+// const layerButtonsContainer = $('layerButtons');
 // // Делаем кнопки слоёв перетаскиваемыми
 // $(function () {
 //   $(layerButtonsContainer).sortable({
@@ -542,7 +542,7 @@
 //   // Обновляем z-index каждого слоя в соответствии с новым порядком кнопок
 //   layerButtons.forEach((button, index) => {
 //     const layerId = `layer${button.dataset.layer}`;
-//     const canvas = document.getElementById(layerId);
+//     const canvas = $(layerId);
 //     canvas.style.zIndex = index + 1; // z-index начинается с 1
 //   });
 // }

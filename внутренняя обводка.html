@@ -173,10 +173,10 @@
             'zoomBtn', 'canvasContainer', 'drawOnExistingBtn', 'identifyLayerBtn', 'layerOpacitySlider', 'layerOpacityValue',
         ];
 
-        const container = document.getElementById('canvasContainer');
+        const container = $('canvasContainer');
         const containerRect = container.getBoundingClientRect();
         const obj = Object.fromEntries(
-            elements.map(id => [id, document.getElementById(id)])
+            elements.map(id => [id, $(id)])
         );
         const layerPanel = document.querySelector('.layer-panel'),
             sidebar = document.querySelector(".sidebar"),
@@ -220,7 +220,7 @@
             isSmoothLineMode = false,
             isCtrlPressed = false;
 
-        const symmetryButton = document.getElementById('symmetry');
+        const symmetryButton = $('symmetry');
 
         symmetryButton.addEventListener('click', toggleSymmetry);
         // !
@@ -237,7 +237,7 @@
             isDrawOnExisting = !isDrawOnExisting;
             drawOnExistingBtn.classList.toggle('active', isDrawOnExisting);
         }
-        const spiderStrengthSlider = document.getElementById('spiderStrength');
+        const spiderStrengthSlider = $('spiderStrength');
 
         function toggleSpider() {
             isSpider = !isSpider;
@@ -552,7 +552,7 @@ function endDrawing() {
         canvasContainer.addEventListener('click', handleEyedropperClick);
         canvasContainer.addEventListener('touchstart', handleEyedropperClick);
 
-        const eyedropperBtn = document.getElementById('eyedropperBtn');
+        const eyedropperBtn = $('eyedropperBtn');
         let isEyedropperActive = false;
 
         eyedropperBtn.addEventListener('click', handleEyedropperActivation);
@@ -611,7 +611,7 @@ function endDrawing() {
             updateLayerButtonColor(currentLayer);
 
             // Обновляем color picker, если он существует
-            const colorPicker = document.getElementById('colorPicker');
+            const colorPicker = $('colorPicker');
 
             // Деактивируем пипетку
             isEyedropperActive = false;
@@ -776,8 +776,8 @@ function endDrawing() {
         //         }
 
         // двигаем слои кнопками
-        const moveLayerUpBtn = document.getElementById('moveLayerUp');
-        const moveLayerDownBtn = document.getElementById('moveLayerDown');
+        const moveLayerUpBtn = $('moveLayerUp');
+        const moveLayerDownBtn = $('moveLayerDown');
         moveLayerUpBtn.addEventListener('click', () => {
             moveLayerInStack(-1);
         });
@@ -798,7 +798,7 @@ function endDrawing() {
                 currentLayerButton.click();
             }
         }
-        const layerButtonsContainer = document.getElementById('layerButtons');
+        const layerButtonsContainer = $('layerButtons');
         // Zoom functions
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Control') {
@@ -880,7 +880,7 @@ function endDrawing() {
 
             canvasContainer.style.overflow = 'hidden';
             // иконка и зум в html
-            document.getElementById('zoomLevelDisplay').textContent = `🔎${(zoomLevel * 100).toFixed(0)}%`;
+            $('zoomLevelDisplay').textContent = `🔎${(zoomLevel * 100).toFixed(0)}%`;
         }
 
 
@@ -901,7 +901,7 @@ function endDrawing() {
         //  инструмент палец
         let isFinger = false;
 
-        const fingerBtn = document.getElementById('fingerBtn');
+        const fingerBtn = $('fingerBtn');
 
         fingerBtn.addEventListener('click', () => {
             isFinger = !isFinger;
@@ -997,8 +997,8 @@ function moveCanvasContent(layerId, direction, amount) {
 const outlineLayers = {};
 const outlineSizes = {};
 
-const outlineSizeInput = document.getElementById('outlineSize');
-const outlineSizeValue = document.getElementById('outlineSizeValue');
+const outlineSizeInput = $('outlineSize');
+const outlineSizeValue = $('outlineSizeValue');
 
 outlineSizeInput.max = "20";
 
@@ -1098,7 +1098,7 @@ function createOutline(sourceImageData, outlineImageData, size, width, height) {
 
 
 function updateLayerList() {
-    const layerButtonsContainer = document.getElementById('layerButtons');
+    const layerButtonsContainer = $('layerButtons');
     layerButtonsContainer.innerHTML = ''; // Очищаем текущий список слоев
 
     // Создаем массив из всех слоев (включая обычные и слои обводки)
@@ -1171,9 +1171,9 @@ function createLayerButton(layerId, container) {
             }
         }
         // сообщение
-        const messageButton = document.getElementById('message');
-        const messageContainer = document.getElementById('message-container');
-        const messageText = document.getElementById('message-text');
+        const messageButton = $('message');
+        const messageContainer = $('message-container');
+        const messageText = $('message-text');
 
         function showMessage(message) {
             messageText.textContent = message;

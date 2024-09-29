@@ -1,31 +1,17 @@
-let userId;
-let groupId;
-let accessToken;
+let userId, groupId, accessToken;
 
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        // Инициализация VK Bridge
         await vkBridge.send('VKWebAppInit');
+        groupId = new URLSearchParams(window.location.search).get('vk_group_id');
 
-        // Получение параметров запуска
-        const launchParams = new URLSearchParams(window.location.search);
-        groupId = launchParams.get('vk_group_id');
-        console.log('Group ID:', groupId);
-
-        // Получение токена доступа
-        const accessTokenData = await vkBridge.send('VKWebAppGetAuthToken', {
+        const { access_token } = await vkBridge.send('VKWebAppGetAuthToken', {
             app_id: 52166766,
             scope: 'friends,messages'
         });
-        accessToken = accessTokenData.access_token;
-        console.log('Access token received:', accessToken);
+        accessToken = access_token;
 
-        // Получение информации о пользователе
-        const user = await vkBridge.send('VKWebAppGetUserInfo');
-        userId = user.id;
-        console.log('User ID:', userId);
-
-        // Загрузка истории сообщений
+        userId = (await vkBridge.send('VKWebAppGetUserInfo')).id;
         await getNewMessages();
     } catch (error) {
         console.error('Error initializing:', error);
@@ -33,9 +19,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // Подписка на ошибки токена доступа
-vkBridge.subscribe((e) => {
-    if (e.detail.type === 'VKWebAppAccessTokenFailed') {
-        console.error('Access token error:', e.detail.data);
+vkBridge.subscribe(({ detail }) => {
+    if (detail.type === 'VKWebAppAccessTokenFailed') {
+        console.error('Access token error:', detail.data);
     }
 });
 
@@ -44,20 +30,16 @@ async function getNewMessages() {
         const response = await vkBridge.send('VKWebAppCallAPIMethod', {
             method: 'messages.getHistory',
             params: {
-                peer_id: -groupId, 
+                peer_id: -groupId,
                 count: 20,
                 access_token: accessToken,
                 v: '5.131'
             }
         });
-       
-        // Обработка полученных сообщений
-        if (response.response && response.response.items) {
-            const messages = response.response.items;
-            messages.forEach(message => {
-                addMessage(message.from_id < 0 ? 'Бот' : 'Вы', message.text);
-            });
-        }
+
+        response.response?.items?.forEach(message => {
+            addMessage(message.from_id < 0 ? 'Бот' : 'Вы', message.text);
+        });
     } catch (error) {
         console.error('Error getting messages:', error);
     }
@@ -65,47 +47,39 @@ async function getNewMessages() {
 
 async function sendMessage(text) {
     try {
-        const response = await vkBridge.send('VKWebAppCallAPIMethod', {
-            method: 'messages.send',
-            params: {
-                peer_id: -groupId, 
-                random_id: Math.floor(Math.random() * 1000000),
-                message: text,
-                access_token: accessToken,
-                v: '5.131'
-            }
-        });
-        console.log('Message sent:', response);
+        // Реализуйте отправку сообщения
     } catch (error) {
         console.error('Error sending message:', error);
     }
 }
 
-document.getElementById('chat-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const input = document.getElementById('chat-input');
+// Ensure the event listener for the chat form is set up correctly
+gel('chat-form').addEventListener('submit', async (e) => {
+    e.preventDefault(); // Prevent the default form submission
+    const input = gel('chat-input');
     const message = input.value.trim();
     if (message) {
-        addMessage('Вы', message);
-        await sendMessage(message);
-        input.value = '';
+        addMessage('Вы', message); // Add the message to the chat
+        await sendMessage(message); // Send the message (implement this function)
+        input.value = ''; // Clear the input field
     }
 });
 
-// Функция для добавления сообщения в чат (вам нужно реализовать эту функцию)
+// Функция для добавления сообщения в чат
+// Function to add a message to the chat
 function addMessage(sender, text) {
-    // Здесь должна быть логика добавления сообщения в интерфейс
-    console.log(`${sender}: ${text}`);
+    const chatMessages = gel('chat-messages'); // Use chat-messages to add messages
+    const messageElement = document.createElement('div');
+    messageElement.className = 'message'; // Add a class for styling
+    messageElement.innerHTML = `<strong>${sender}:</strong> ${text}`;
+    chatMessages.appendChild(messageElement);
+    chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll to the bottom
 }
 
-        document.getElementById('chat-input').addEventListener('focus', () => {
-            // Отключаем обработку горячих клавиш при фокусе на поле ввода
-            window.removeEventListener('keydown', handleKeyDown); 
-        });
+const toggleKeyDownHandler = (add) => {
+    const method = add ? 'addEventListener' : 'removeEventListener';
+    window[method]('keydown', handleKeyDown);
+};
 
-        document.getElementById('chat-input').addEventListener('blur', () => {
-            // Включаем обработку горячих клавиш при потере фокуса с поля ввода
-            window.addEventListener('keydown', handleKeyDown); 
-        });
-
-
+gel('chat-input').addEventListener('focus', () => toggleKeyDownHandler(false));
+gel('chat-input').addEventListener('blur', () => toggleKeyDownHandler(true));

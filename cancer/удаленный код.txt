@@ -29,6 +29,6 @@ add zoom
         //           layer.style.transform = `scale(${zoomLevel})`;
         //       });
         //       canvasContainer.style.overflow = 'auto';
-        //       document.getElementById('zoomLevelDisplay').textContent = `🔎${(zoomLevel * 100).toFixed(0)}%`;
+        //       $('zoomLevelDisplay').textContent = `🔎${(zoomLevel * 100).toFixed(0)}%`;
         //       }
       

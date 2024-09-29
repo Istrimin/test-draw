@@ -265,15 +265,15 @@ let symmetry = false;
 let isErasing = false;
 
 // Get DOM elements
-const brushSizeInput = document.getElementById('brushSize');
-const opacityInput = document.getElementById('opacity');
-const pressureBar = document.getElementById('pressureBar');
-const backgroundPicker = document.getElementById('backgroundPicker');
-const canvasContainer = document.getElementById('canvasContainer');
-const layerButtons = document.getElementById('layerButtons');
-const addLayerBtn = document.getElementById('addLayerBtn');
-const removeLayerBtn = document.getElementById('removeLayerBtn');
-const eraserBtn = document.getElementById('eraserBtn');
+const brushSizeInput = $('brushSize');
+const opacityInput = $('opacity');
+const pressureBar = $('pressureBar');
+const backgroundPicker = $('backgroundPicker');
+const canvasContainer = $('canvasContainer');
+const layerButtons = $('layerButtons');
+const addLayerBtn = $('addLayerBtn');
+const removeLayerBtn = $('removeLayerBtn');
+const eraserBtn = $('eraserBtn');
 
 // Initialize pressure-supported state
 const isPressureSupported = 'onpointermove' in window;
@@ -516,7 +516,7 @@ function redo() {
 
 // Initialize the first layer
 createLayer();
-setDrawingColor(document.getElementById('colorPicker').value);
+setDrawingColor($('colorPicker').value);
 
 // Добавляем слушатели событий к существующим слоям
 Object.values(layers).forEach(addEventListenersToLayer);
@@ -528,8 +528,8 @@ eraserBtn.addEventListener('click', () => {
 });
 
 // Добавляем обработчики для кнопок отмены и повтора
-document.getElementById('undoBtn').addEventListener('click', undo);
-document.getElementById('redoBtn').addEventListener('click', redo);
+$('undoBtn').addEventListener('click', undo);
+$('redoBtn').addEventListener('click', redo);
 
 
     </script>

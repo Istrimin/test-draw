@@ -354,7 +354,41 @@ input[type="range"]:hover {
     opacity: 50;
 }
 
-.cursor-panel {
+/* Стили для панели курсоров */
+#cursorPanel {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: transparent;
+	display: none;
+	z-index: 10;
+	padding: 10px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	overflow-y: auto;
+}
+
+.cursor-item {
+	display: inline-block;
+	margin: 5px;
+	cursor: pointer;
+	border-radius: 0px;
+}
+
+.cursor-preview {
+	width: 64px;
+	height: 64px;
+	border: 1px solid #00cc4100;
+	padding: 2px;
+	border-radius: 0px;
+}
+
+.cursor-item:hover .cursor-preview {
+	border-color: hsl(69, 100%, 52%);
+}
+
+/* .cursor-panel {
     position: absolute;
     top: 0;
     left: 0;
@@ -364,9 +398,7 @@ input[type="range"]:hover {
     z-index: 1000;
     display: none;
     max-width: 80%;
-    /* Ограничиваем ширину панели */
     max-height: 80%;
-    /* Ограничиваем высоту панели */
     overflow-y: auto;
 }
 
@@ -383,7 +415,6 @@ input[type="range"]:hover {
     overflow-y: auto;
 }
 
-/* Добавляем стили для заголовка панели */
 .cursor-panel h3 {
     color: white;
     margin-top: 0;
@@ -412,9 +443,9 @@ input[type="range"]:hover {
 .cursor-item:hover .cursor-preview {
     border-color: hsl(69, 100%, 52%);
     overflow-y: auto;
-}
+} */
 
-*/ .canvas-container {
+.canvas-container {
     position: relative;
     /* display: flex; */
     justify-content: center;

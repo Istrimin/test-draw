@@ -126,13 +126,13 @@
     </div>
 <script>
         // Get DOM elements
-        const brushSizeInput = document.getElementById('brushSize');
-        const opacityInput = document.getElementById('opacity');
-        const pressureBar = document.getElementById('pressureBar');
-        const backgroundPicker = document.getElementById('backgroundPicker');
-        const addLayerBtn = document.getElementById('addLayerBtn');
-        const removeLayerBtn = document.getElementById('removeLayerBtn');
-        const eraserBtn = document.getElementById('eraserBtn');
+        const brushSizeInput = $('brushSize');
+        const opacityInput = $('opacity');
+        const pressureBar = $('pressureBar');
+        const backgroundPicker = $('backgroundPicker');
+        const addLayerBtn = $('addLayerBtn');
+        const removeLayerBtn = $('removeLayerBtn');
+        const eraserBtn = $('eraserBtn');
         const isPressureSupported = 'onpointermove' in window;
         let layerCount = 0;
         const layers = {};
@@ -145,9 +145,9 @@
         let currentCtx;
         let isDrawing = false;
         let isErasing = false;
-        const layerButtons = document.getElementById('layerButtons');
-        const zoomBtn = document.getElementById('zoomBtn');
-        const canvasContainer = document.getElementById('canvasContainer');
+        const layerButtons = $('layerButtons');
+        const zoomBtn = $('zoomBtn');
+        const canvasContainer = $('canvasContainer');
         let zoomLevel =     5;
         const MAX_ZOOM = 100;
         const MIN_ZOOM = 0.1;
@@ -155,7 +155,7 @@
         Object.values(layers).forEach(addEventListenersToLayer);
         let isIdentifyingLayer = false;
         let wasDrawing = false;
-        const identifyLayerBtn = document.getElementById('identifyLayerBtn');
+        const identifyLayerBtn = $('identifyLayerBtn');
         const layerPanel = document.querySelector('.layer-panel');
         let isDraggingScroll = false;
         let startY;
@@ -428,8 +428,8 @@
                 });
              }
         // двигаем слои кнопками
-            const moveLayerUpBtn = document.getElementById('moveLayerUp');
-            const moveLayerDownBtn = document.getElementById('moveLayerDown');
+            const moveLayerUpBtn = $('moveLayerUp');
+            const moveLayerDownBtn = $('moveLayerDown');
             moveLayerUpBtn.addEventListener('click', () => {
                 moveLayerInStack(-1);
              });
@@ -450,7 +450,7 @@
                     currentLayerButton.click();
                 }
              }
-            const layerButtonsContainer = document.getElementById('layerButtons');
+            const layerButtonsContainer = $('layerButtons');
         // симуляция нажатия контрл для нормальной работы зума.
             function simulateCtrlPress() {
                 isCtrlPressed = true;
@@ -501,7 +501,7 @@
                     layer.style.transform = `scale(${zoomLevel})`;
                 });
                 canvasContainer.style.overflow = 'auto';
-                document.getElementById('zoomLevelDisplay').textContent = `: ${(zoomLevel * 100).toFixed(0)}%`;
+                $('zoomLevelDisplay').textContent = `: ${(zoomLevel * 100).toFixed(0)}%`;
              }
 
 
@@ -532,7 +532,7 @@
             layer.style.transform = `scale(${zoomLevel})`;
         });
         canvasContainer.style.overflow = 'auto';
-        document.getElementById('zoomLevelDisplay').textContent = `: ${(zoomLevel * 100).toFixed(0)}%`;
+        $('zoomLevelDisplay').textContent = `: ${(zoomLevel * 100).toFixed(0)}%`;
         }
 
 

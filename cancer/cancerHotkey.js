@@ -15,6 +15,6 @@ document.addEventListener('keydown', function(event) {
 
     if (action) {
         event.preventDefault();
-        typeof action === 'string' ? document.getElementById(action)?.click() : action();
+        typeof action === 'string' ? gel(action)?.click() : action();
     }
 });

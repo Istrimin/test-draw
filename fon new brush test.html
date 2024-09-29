@@ -148,10 +148,10 @@
             'zoomBtn', 'canvasContainer', 'drawOnExistingBtn', 'identifyLayerBtn', 'layerOpacitySlider', 'layerOpacityValue',
         ];
 
-        const container = document.getElementById('canvasContainer');
+        const container = $('canvasContainer');
         const containerRect = container.getBoundingClientRect();
         const obj = Object.fromEntries(
-            elements.map(id => [id, document.getElementById(id)])
+            elements.map(id => [id, $(id)])
         );
         const layerPanel = document.querySelector('.layer-panel'),
             sidebar = document.querySelector(".sidebar"),
@@ -207,7 +207,7 @@
 
 
 
-        const symmetryButton = document.getElementById('symmetry');
+        const symmetryButton = $('symmetry');
 
         symmetryButton.addEventListener('click', toggleSymmetry);
         // !
@@ -225,7 +225,7 @@
             drawOnExistingBtn.classList.toggle('active', isDrawOnExisting);
         }</script>
     <script>
-        const spiderStrengthSlider = document.getElementById('spiderStrength');
+        const spiderStrengthSlider = $('spiderStrength');
 
         function toggleSpider() {
             isSpider = !isSpider;
@@ -260,7 +260,7 @@ function drawSpider(startX, startY, endX, endY, isSymmetric = false) {
 }
 
 
-        document.getElementById('spider').addEventListener('click', toggleSpider);
+        $('spider').addEventListener('click', toggleSpider);
     </script>
     </script>
     <script>
@@ -669,7 +669,7 @@ function endDrawing() {
         canvasContainer.addEventListener('click', handleEyedropperClick);
         canvasContainer.addEventListener('touchstart', handleEyedropperClick);
 
-        const eyedropperBtn = document.getElementById('eyedropperBtn');
+        const eyedropperBtn = $('eyedropperBtn');
         let isEyedropperActive = false;
 
         eyedropperBtn.addEventListener('click', handleEyedropperActivation);
@@ -728,7 +728,7 @@ function endDrawing() {
             updateLayerButtonColor(currentLayer);
 
             // Обновляем color picker, если он существует
-            const colorPicker = document.getElementById('colorPicker');
+            const colorPicker = $('colorPicker');
 
             // Деактивируем пипетку
             isEyedropperActive = false;
@@ -893,8 +893,8 @@ function endDrawing() {
         //         }
 
         // двигаем слои кнопками
-        const moveLayerUpBtn = document.getElementById('moveLayerUp');
-        const moveLayerDownBtn = document.getElementById('moveLayerDown');
+        const moveLayerUpBtn = $('moveLayerUp');
+        const moveLayerDownBtn = $('moveLayerDown');
         moveLayerUpBtn.addEventListener('click', () => {
             moveLayerInStack(-1);
         });
@@ -915,7 +915,7 @@ function endDrawing() {
                 currentLayerButton.click();
             }
         }
-        const layerButtonsContainer = document.getElementById('layerButtons');
+        const layerButtonsContainer = $('layerButtons');
         // Zoom functions
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Control') {
@@ -997,7 +997,7 @@ function endDrawing() {
 
             canvasContainer.style.overflow = 'hidden';
             // иконка и зум в html
-            document.getElementById('zoomLevelDisplay').textContent = `🔎${(zoomLevel * 100).toFixed(0)}%`;
+            $('zoomLevelDisplay').textContent = `🔎${(zoomLevel * 100).toFixed(0)}%`;
         }
 
 

@@ -1,77 +1,60 @@
-// Курсоры
-    document.addEventListener('DOMContentLoaded', () => {
-    			const cursorPanel = document.getElementById('cursorPanel');
-    			const cursorList = document.getElementById('cursorList');
-    			const changeCursorBtn = document.getElementById('changeCursorBtn');
-                const canvas = document.getElementById('yourCanvasId'); 
-    function loadCursors() {
-        cursorList.innerHTML = '';
-        
-        for (let i = 1; i <= 80; i++) {
-            const cursorUrl = `cursorsNum/${i}.png`;
+		document.addEventListener('DOMContentLoaded', () => {
+			const cursorPanel = gel('cursorPanel');
+			const cursorList = gel('cursorList');
+			const changeCursorBtn = gel('changeCursorBtn');
 
-            // Создаем новый объект изображения
-            const image = new Image();
-            image.src = cursorUrl;
+			function loadCursors() {
+				cursorList.innerHTML = '';
+				for (let i = 1; i <= 80; i++) {
+					const cursorUrl = `../cursorsNum/${i}.png`;
 
-            // Обработчик события загрузки изображения
-            image.onload = () => {
-                // Получаем размеры изображения
-                let targetWidth = image.width;
-                let targetHeight = image.height;
+					const image = new Image();
+					image.src = cursorUrl;
+					image.onload = () => {
 
-                // Максимальный размер для курсора
-                const maxSize = 128;
-
-                // Проверяем, нужно ли изменять размер
-                if (targetWidth > maxSize || targetHeight > maxSize) {
-                    const aspectRatio = targetWidth / targetHeight;
-                    if (targetWidth > targetHeight) {
-                        targetWidth = maxSize;
-                        targetHeight = maxSize / aspectRatio;
-                    } else {
-                        targetHeight = maxSize;
-                        targetWidth = maxSize * aspectRatio;
-                    }
-                }
-
-                // Создаем канвас для изменения размера
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                canvas.width = targetWidth;
-                canvas.height = targetHeight;
-                ctx.drawImage(image, 0, 0, targetWidth, targetHeight);
-                const resizedCursorUrl = canvas.toDataURL();
-
-                // Создаем элемент изображения для курсора
-                const cursorImg = document.createElement('img');
-                cursorImg.src = resizedCursorUrl;
-                cursorImg.alt = `cursor${i}`;
-                cursorImg.style.maxWidth = `${maxSize}px`;
-
-                cursorImg.addEventListener('click', () => {
-                    canvasContainer.style.cursor = `url(${resizedCursorUrl}), auto`;
-                    cursorPanel.style.display = 'none';
-                });
-                // ! добавляю, чтобы работали клики еще и от планшета!
-                cursorImg.addEventListener('pointerup', () => {
-                    canvasContainer.style.cursor = `url(${resizedCursorUrl}), auto`;
-                    cursorPanel.style.display = 'none';
-                });
-
-                // Добавляем изображение курсора в список
-                cursorList.appendChild(cursorImg);
-            };
-        }
-    }
-
-    // Обработчик события клика на кнопку изменения курсора
-    changeCursorBtn.addEventListener('click', () => {
-        cursorPanel.style.display = cursorPanel.style.display === 'none' ? 'block' : 'none';
-    });
-
-    // Загружаем курсоры
-    loadCursors();
-    });
+						let targetWidth = image.width;
+						let targetHeight = image.height;
 
 
+						const maxSize = 128;
+
+						if (targetWidth > maxSize || targetHeight > maxSize) {
+							const aspectRatio = targetWidth / targetHeight;
+							if (targetWidth > targetHeight) {
+								targetWidth = maxSize;
+								targetHeight = maxSize / aspectRatio;
+							} else {
+								targetHeight = maxSize;
+								targetWidth = maxSize * aspectRatio;
+							}
+						}
+
+						const canvas = document.createElement('canvas');
+						const ctx = canvas.getContext('2d');
+						canvas.width = targetWidth;
+						canvas.height = targetHeight;
+						ctx.drawImage(image, 0, 0, targetWidth, targetHeight);
+						const resizedCursorUrl = canvas.toDataURL();
+
+
+						const cursorImg = document.createElement('img');
+						cursorImg.src = resizedCursorUrl;
+						cursorImg.alt = `cursor${i}`;
+						cursorImg.style.maxWidth = `${maxSize}px`;
+
+						cursorImg.addEventListener('click', () => {
+							drawingCanvas.style.cursor = `url(${resizedCursorUrl}), auto`;
+							cursorPanel.style.display = 'none';
+						});
+
+						cursorList.appendChild(cursorImg);
+					};
+				}
+			}
+
+			changeCursorBtn.addEventListener('click', () => {
+				cursorPanel.style.display = cursorPanel.style.display === 'none' ? 'block' : 'none';
+			});
+
+			loadCursors();
+		});

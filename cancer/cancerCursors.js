@@ -1,8 +1,8 @@
 // 
 		document.addEventListener('DOMContentLoaded', () => {
-			const cursorPanel = document.getElementById('cursorPanel');
-			const cursorList = document.getElementById('cursorList');
-			const changeCursorBtn = document.getElementById('changeCursorBtn');
+			const cursorPanel = gel('cursorPanel');
+			const cursorList = gel('cursorList');
+			const changeCursorBtn = gel('changeCursorBtn');
 
 			function loadCursors() {
 				cursorList.innerHTML = '';

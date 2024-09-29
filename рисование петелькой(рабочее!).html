@@ -19,9 +19,9 @@
     <button id="clear">Clear Canvas</button>
 
     <script>
-        const canvas = document.getElementById('drawingCanvas');
+        const canvas = $('drawingCanvas');
         const ctx = canvas.getContext('2d');
-        const clearBtn = document.getElementById('clear');
+        const clearBtn = $('clear');
 
         let isDrawing = false;
         let lastX = 0;

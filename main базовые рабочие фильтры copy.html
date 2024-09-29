@@ -164,7 +164,7 @@
 
                                 const layerFilters = {};
 
-                                const mergeDownBtn = document.getElementById('mergeDownBtn');
+                                const mergeDownBtn = $('mergeDownBtn');
 
                                 mergeDownBtn.addEventListener('click', mergeLayerDown);
 
@@ -245,14 +245,14 @@
                                     }
                                 }
                             </script>
-                            <script>const lightnessSlider = document.getElementById('lightnessSlider');
-                                const saturationSlider = document.getElementById('saturationSlider');
-                                const contrastSlider = document.getElementById('contrastSlider');
-                                const lightnessValue = document.getElementById('lightnessValue');
-                                const saturationValue = document.getElementById('saturationValue');
-                                const contrastValue = document.getElementById('contrastValue');
-                                const hueShiftSlider = document.getElementById('hueShiftSlider');
-                                const hueShiftValue = document.getElementById('hueShiftValue');
+                            <script>const lightnessSlider = $('lightnessSlider');
+                                const saturationSlider = $('saturationSlider');
+                                const contrastSlider = $('contrastSlider');
+                                const lightnessValue = $('lightnessValue');
+                                const saturationValue = $('saturationValue');
+                                const contrastValue = $('contrastValue');
+                                const hueShiftSlider = $('hueShiftSlider');
+                                const hueShiftValue = $('hueShiftValue');
 
                                 hueShiftSlider.addEventListener('input', updateFilters);
                                 lightnessSlider.addEventListener('input', updateFilters);
@@ -293,10 +293,10 @@
                                     'zoomBtn', 'canvasContainer', 'drawOnExistingBtn', 'identifyLayerBtn', 'layerOpacitySlider', 'layerOpacityValue',
                                 ];
 
-                                const container = document.getElementById('canvasContainer');
+                                const container = $('canvasContainer');
                                 const containerRect = container.getBoundingClientRect();
                                 const obj = Object.fromEntries(
-                                    elements.map(id => [id, document.getElementById(id)])
+                                    elements.map(id => [id, $(id)])
                                 );
                                 const layerPanel = document.querySelector('.layer-panel'),
                                     sidebar = document.querySelector(".sidebar"),
@@ -340,11 +340,11 @@
                                     isSmoothLineMode = false,
                                     isCtrlPressed = false;
 
-                                const symmetryButton = document.getElementById('symmetry');
+                                const symmetryButton = $('symmetry');
 
                                 symmetryButton.addEventListener('click', toggleSymmetry);
 
-                                const spiderButton = document.getElementById('spider');
+                                const spiderButton = $('spider');
                                 spiderButton.addEventListener('click', toggleSpider);
 
                                 // !
@@ -361,7 +361,7 @@
                                     isDrawOnExisting = !isDrawOnExisting;
                                     drawOnExistingBtn.classList.toggle('active', isDrawOnExisting);
                                 }
-                                const spiderStrengthSlider = document.getElementById('spiderStrength');
+                                const spiderStrengthSlider = $('spiderStrength');
 
 
                                 function toggleSpider() {
@@ -687,7 +687,7 @@
                                 canvasContainer.addEventListener('click', handleEyedropperClick);
                                 canvasContainer.addEventListener('touchstart', handleEyedropperClick);
 
-                                const eyedropperBtn = document.getElementById('eyedropperBtn');
+                                const eyedropperBtn = $('eyedropperBtn');
                                 let isEyedropperActive = false;
 
                                 eyedropperBtn.addEventListener('click', handleEyedropperActivation);
@@ -746,7 +746,7 @@
                                     updateLayerButtonColor(currentLayer);
 
                                     // Обновляем color picker, если он существует
-                                    const colorPicker = document.getElementById('colorPicker');
+                                    const colorPicker = $('colorPicker');
 
                                     // Деактивируем пипетку
                                     isEyedropperActive = false;
@@ -911,7 +911,7 @@
                                     }
 
                                 }
-                                const layerButtonsContainer = document.getElementById('layerButtons');
+                                const layerButtonsContainer = $('layerButtons');
                                 // Zoom functions
                                 document.addEventListener('keydown', (e) => {
                                     if (e.key === 'Control') {
@@ -993,7 +993,7 @@
 
                                     canvasContainer.style.overflow = 'hidden';
                                     // иконка и зум в html
-                                    document.getElementById('zoomLevelDisplay').textContent = `🔎${(zoomLevel * 100).toFixed(0)}%`;
+                                    $('zoomLevelDisplay').textContent = `🔎${(zoomLevel * 100).toFixed(0)}%`;
                                 }
 
 
@@ -1014,7 +1014,7 @@
                                 //  инструмент палец
                                 let isFinger = false;
 
-                                const fingerBtn = document.getElementById('fingerBtn');
+                                const fingerBtn = $('fingerBtn');
 
                                 fingerBtn.addEventListener('click', () => {
                                     isFinger = !isFinger;
@@ -1111,12 +1111,12 @@
                                 let isInnerOutline = false;
 
                                 // Получаем элемент DOM для выбора цвета обводки
-                                const outlineColorPicker = document.getElementById('outlineColorPicker');
+                                const outlineColorPicker = $('outlineColorPicker');
 
                                 // Получаем элементы DOM
-                                const toggleOutlineTypeBtn = document.getElementById('toggleOutlineTypeBtn');
-                                const outlineSizeInput = document.getElementById('outlineSize');
-                                const outlineSizeValue = document.getElementById('outlineSizeValue');
+                                const toggleOutlineTypeBtn = $('toggleOutlineTypeBtn');
+                                const outlineSizeInput = $('outlineSize');
+                                const outlineSizeValue = $('outlineSizeValue');
 
                                 // Устанавливаем максимальное значение для input размера обводки
                                 outlineSizeInput.max = "20";
@@ -1322,7 +1322,7 @@
 
                                 // Функция для обновления списка слоев в панели слоев
                                 function updateLayerList() {
-                                    const layerButtonsContainer = document.getElementById('layerButtons');
+                                    const layerButtonsContainer = $('layerButtons');
                                     layerButtonsContainer.innerHTML = ''; // Очищаем текущий список слоев
 
                                     // Получаем список всех слоев, кроме фонового
@@ -1397,9 +1397,9 @@
                                     }
                                 }
                                 // сообщение
-                                const messageButton = document.getElementById('message');
-                                const messageContainer = document.getElementById('message-container');
-                                const messageText = document.getElementById('message-text');
+                                const messageButton = $('message');
+                                const messageContainer = $('message-container');
+                                const messageText = $('message-text');
 
                                 function showMessage(message) {
                                     messageText.textContent = message;

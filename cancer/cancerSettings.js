@@ -1,177 +1,39 @@
-document.addEventListener('DOMContentLoaded', () => {
-  // Prevent default dragging for all elements
-  document.querySelectorAll('*').forEach(element => {
-    element.setAttribute('draggable', 'false'); 
-  });
+// Отключаем перетаскивание для всех элементов
+  	document.querySelectorAll('*').forEach(element => element.setAttribute('draggable', 'false'));
 
-  // Optional: Add visual feedback (cursor change) on drag attempt
-  document.addEventListener('dragstart', (event) => {
-    event.preventDefault(); // Prevent default drag behavior
-    event.dataTransfer.effectAllowed = 'none'; // Indicate dragging is not allowed
-    document.body.style.cursor = 'not-allowed'; // Change cursor to "not-allowed"
-  });
-
-  // Optional: Reset cursor when dragging stops
-  document.addEventListener('dragend', () => {
-    document.body.style.cursor = 'auto'; // Reset cursor to default
-  });
-
-  // !блокировка контекстного меню 
-  document.addEventListener('contextmenu', event => event.preventDefault());
-});
-
-// настройки планшета
-document.addEventListener('touchstart', function (e) {
-  if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT') {
-    e.preventDefault();
-  }
-}, { passive: false });
-
-// обработка мыши
-document.addEventListener('mousedown', function (e) {
-  if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT') {
-    e.preventDefault();
-  }
-}, { passive: false });
-
-// отключаем все стандарные настройки кнопок
-document.addEventListener('keydown', function(e) {
-  e.preventDefault(); 
-});
-
-// отключаем обры линии при выходе из канваса
-document.addEventListener('pointerleave', function(e) {
-  e.preventDefault();
-});
-document.addEventListener('mouseleave', function(e) {
-  e.preventDefault();
-});
-
-// добавляем класс для красивых иконок
-document.addEventListener('DOMContentLoaded', () => {
-  // Select all icon elements. 
-  // Modify this selector to accurately target your icons if needed.
-  const icons = document.querySelectorAll('a, button'); 
-  // Add the class to each icon
-  icons.forEach(icon => {
-    icon.classList.add('icon-hover');
-  });
-});
-
-document.addEventListener('touchmove', function(e) {
-  // Проверяем, происходит ли касание на слайдере
-  if (!e.target.closest('.slider')) {
-    e.preventDefault();
-  }
-}, {
-  passive: false,
-  capture: true
-});
+// Отключаем стандартные действия клавиатуры, но разрешаем для полей ввода
+	document.addEventListener('keydown', (e) => {
+	    if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+	        e.preventDefault();
+	    }
+	});
+	// Отключаем контекстное меню
+  	document.addEventListener('contextmenu', event => event.preventDefault());
+// Добавляем обработчики событий для предотвращения стандартных действий
+	['touchstart', 'mousedown', 'pointerleave', 'mouseleave', 'touchmove'].forEach(event => {
+		document.addEventListener(event, preventDefault, { passive: false });
+		});
+// Обработчик события начала перетаскивания
+	document.addEventListener('dragstart', (event) => {
+		event.preventDefault(); // Предотвращаем стандартное поведение перетаскивания
+		event.dataTransfer.effectAllowed = 'none'; // Указываем, что перетаскивание не разрешено
+		document.body.style.cursor = 'not-allowed'; // Меняем курсор на "нельзя"
+	});
+// Обработчик события окончания перетаскивания
+	document.addEventListener('dragend', () => {
+		document.body.style.cursor = 'auto'; // Сбрасываем курсор на стандартный
+	});
+// Отключаем стандартные действия клавиатуры
+  	document.addEventListener('keydown', (e) => e.preventDefault());
+	// Добавляем класс для иконок
+  	document.querySelectorAll('a, button').forEach(icon => icon.classList.add('icon-hover'));
 
 
-// копия
-// document.addEventListener('DOMContentLoaded', () => {
-//   // Prevent default dragging for all elements
-//     document.querySelectorAll('*').forEach(element => {
-//       element.setAttribute('draggable', 'false'); 
-//     });
-
-//   // Optional: Add visual feedback (cursor change) on drag attempt
-//     document.addEventListener('dragstart', (event) => {
-//       event.preventDefault(); // Prevent default drag behavior
-//       event.dataTransfer.effectAllowed = 'none'; // Indicate dragging is not allowed
-//       document.body.style.cursor = 'not-allowed'; // Change cursor to "not-allowed"
-//     });
-
-//   // Optional: Reset cursor when dragging stops
-//   document.addEventListener('dragend', () => {
-//   document.body.style.cursor = 'auto'; // Reset cursor to default
-//   });
-
-
-// // !блокировка контекстного меню
-
-//         document.addEventListener('contextmenu', event => event.preventDefault());
-
-//   });
-
-
-
-// // копия
-// document.addEventListener('DOMContentLoaded', () => {
-//   // отключаем перетаскивание
-//   // Prevent default dragging for all elements
-//   document.querySelectorAll('*').forEach(element => {
-//     element.setAttribute('draggable', 'false'); 
-//   });
-//   // Optional: Add visual feedback (cursor change) on drag attempt
-//   document.addEventListener('dragstart', (event) => {
-//     event.preventDefault(); // Prevent default drag behavior
-//     event.dataTransfer.effectAllowed = 'none'; // Indicate dragging is not allowed
-//     document.body.style.cursor = 'not-allowed'; // Change cursor to "not-allowed"
-//   });
-//   // Optional: Reset cursor when dragging stops
-//   document.addEventListener('dragend', () => {
-//     document.body.style.cursor = 'auto'; // Reset cursor to default
-//   });
-//   // !блокировка контекстного меню 
-//   // document.addEventListener('contextmenu', event => event.preventDefault());
-//   // добавляем ресайз для контейнера с сообщениями
-//   // $(function () {
-//   //     $("#message-container").resizable();
-//   // });
-// });
-
-// // настройки планшета
-// document.addEventListener('touchstart', function (e) {
-//     if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT') {
-//         e.preventDefault();
-//     }
-// }, { passive: false });
-
-// // обработка мыши
-// document.addEventListener('mousedown', function (e) {
-//     if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT') {
-//         e.preventDefault();
-//     }
-// }, { passive: false });
-
-// // отключаем все стандарные настройки кнопок
-// document.addEventListener('keydown', function(e) {
-//   e.preventDefault(); 
-// });
-
-// // отключаем обры линии при выходе из канваса
-// document.addEventListener('pointerleave', function(e) {
-//     e.preventDefault();
-// });
-// document.addEventListener('mouseleave', function(e) {
-//     e.preventDefault();
-// });
-
-// // блокируем контекстное меню
-// document.addEventListener('contextmenu', event => event.preventDefault());
-
-// // добавляем класс для красивых иконок
-// document.addEventListener('DOMContentLoaded', () => {
-//   // Select all icon elements. 
-//   // Modify this selector to accurately target your icons if needed.
-//   const icons = document.querySelectorAll('a, button'); 
-//   // Add the class to each icon
-//   icons.forEach(icon => {
-//     icon.classList.add('icon-hover');
-//   });
-// });
-
-// document.addEventListener('touchmove', function(e) {
-//     // Проверяем, происходит ли касание на слайдере
-//     if (!e.target.closest('.slider')) {
-//         e.preventDefault();
-//     }
-// }, {
-//     passive: false,
-//     capture: true
-// });
-
-
+// Функция для предотвращения стандартных действий для определенных событий
+	const preventDefault = (e) => {
+	    // Проверяем, является ли целевой элемент кнопкой или полем ввода
+	    if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT') {
+	        e.preventDefault();
+	    }
+	};
 

@@ -1,7 +1,7 @@
 
-
+const rect = drawingCanvas.getBoundingClientRect();
 function pickColor(e) {
-  const rect = drawingCanvas.getBoundingClientRect();
+  
   const x = e.clientX - rect.left;
   const y = e.clientY - rect.top;
   const pixelData = ctx.getImageData(x, y, 1, 1).data;
@@ -15,9 +15,9 @@ function pickColor(e) {
 function rgbToHex(rgb) {
   rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
   function hex(x) {
-    return ("0" + parseInt(x).toString(16)).slice(-2);
+    return (`0${parseInt(x).toString(16)}`).slice(-2);
   }
-  return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
+  return `#${hex(rgb[1])}${hex(rgb[2])}${hex(rgb[3])}`;
   }
 
 		eyedropperBtn.addEventListener('click', toggleEyedropper);

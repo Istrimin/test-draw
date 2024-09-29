@@ -1,14 +1,18 @@
 // JavaScript for background settings modal
-const backgroundSettingsBtn = document.getElementById('backgroundSettingsBtn');
-const backgroundSettingsModal = document.getElementById('backgroundSettingsModal');
-const closeModal = document.getElementById('closeModal');
-const backgroundColorPicker = document.getElementById('backgroundColorPicker');
-const backgroundImageInput = document.getElementById('backgroundImageInput');
-const setBackgroundImageBtn = document.getElementById('setBackgroundImageBtn');
-const imageGallery = document.getElementById('backgroundImageGallery');
+// const backgroundSettingsBtn = gel('backgroundSettingsBtn'),
+//   backgroundSettingsModal = gel('backgroundSettingsModal'),
+//   closeModal = gel('closeModal'),
+//   backgroundColorPicker = gel('backgroundColorPicker'),
+//   backgroundImageInput = gel('backgroundImageInput'),
+//   setBackgroundImageBtn = gel('setBackgroundImageBtn');
+
+
+
+
+  const imageGallery = gel('backgroundImageGallery');
 
 const initialImages = ['cancer.jpg', 'logo.jpg', 'cancer3.jpg'];
-let backgroundGalleryImages = [...initialImages];
+const backgroundGalleryImages = [...initialImages];
 
 function loadBackgroundImages() {
     imageGallery.innerHTML = '';
@@ -20,12 +24,12 @@ function loadBackgroundImages() {
         img.style.margin = '5px';
         img.style.cursor = 'pointer';
 
-        img.onclick = function() {
+        img.onclick = () => {
             document.body.style.backgroundImage = `url(${img.src})`;
             backgroundSettingsModal.style.display = "none";
         };
 
-        img.onmouseover = function() {
+        img.onmouseover = () => {
             document.body.style.backgroundImage = `url(${img.src})`;
         };
 
@@ -33,12 +37,12 @@ function loadBackgroundImages() {
     });
 }
 
-backgroundSettingsBtn.onclick = function() {
+backgroundSettingsBtn.onclick = () => {
     loadBackgroundImages();
     backgroundSettingsModal.style.display = "block";
 }
 
-closeModal.onclick = function() {
+closeModal.onclick = () => {
     backgroundSettingsModal.style.display = "none";
 }
 
@@ -48,10 +52,9 @@ backgroundColorPicker.addEventListener('input', function() {
 
 backgroundImageInput.addEventListener('change', function() {
     const files = this.files;
-    for (let i = 0; i < files.length; i++) {
-        const file = files[i];
+    for (const file of files) {
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = (e) => {
             backgroundGalleryImages.push(e.target.result);
             loadBackgroundImages();
         }
@@ -59,25 +62,8 @@ backgroundImageInput.addEventListener('change', function() {
     }
 });
 
-// JavaScript for canvas settings modal
-const elements = [
-  'canvasSettingsBtn',
-  'canvasSettingsModal',
-  'closeCanvasModal',
-  'canvasColorPicker',
-  'canvasImageInput',
-  'setCanvasImageBtn',
-  'canvasImageGallery'
-];
-
-const obj = Object.fromEntries(
-  elements.map(id => [id, document.getElementById(id)])
-);
-
-const canvasPreview = document.getElementById('canvasPreview');
-
 const initialCanvasImages = ['canvas1.jpg'];
-let canvasGalleryImages = [...initialCanvasImages];
+const canvasGalleryImages = [...initialCanvasImages];
 
 function loadCanvasImages() {
     canvasImageGallery.innerHTML = '';
@@ -89,11 +75,11 @@ function loadCanvasImages() {
         img.style.margin = '5px';
         img.style.cursor = 'pointer';
 
-        img.onclick = function() {
+        img.onclick = () => {
             setCanvasImage(img.src);
         };
 
-        img.onmouseover = function() {
+        img.onmouseover = () => {
             updateCanvasPreview(img.src);
         };
 
@@ -101,7 +87,7 @@ function loadCanvasImages() {
     });
     // Добавляем кнопку для установки прозрачного фона
     const transparentBtn = document.createElement('button');
-    transparentBtn.onclick = function() {
+    transparentBtn.onclick = () => {
         setCanvasTransparent();
     };
 
@@ -117,7 +103,7 @@ function setCanvasImage(src) {
     const canvas = layers[back];
     const ctx = canvas.getContext('2d');
     const img = new Image();
-    img.onload = function() {
+    img.onload = () => {
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         canvasSettingsModal.style.display = "none";
     }
@@ -127,7 +113,7 @@ function setCanvasImage(src) {
 function updateCanvasPreview(src) {
     const previewCtx = contexts[back]; 
     const img = new Image();
-    img.onload = function() {
+    img.onload = () => {
         previewCtx.clearRect(0, 0, layers[back].width, layers[back].height);
         previewCtx.drawImage(img, 0, 0, layers[back].width, layers[back].height);
     }
@@ -142,12 +128,12 @@ function updateCanvasPreview(src) {
         canvasSettingsModal.style.display = "none";
     }
 
-canvasSettingsBtn.onclick = function() {
+canvasSettingsBtn.onclick = () => {
     loadCanvasImages();
     canvasSettingsModal.style.display = "block";
 }
 
-closeCanvasModal.onclick = function() {
+closeCanvasModal.onclick = () => {
     canvasSettingsModal.style.display = "none";
 }
 
@@ -161,10 +147,9 @@ canvasColorPicker.addEventListener('input', function() {
 
 canvasImageInput.addEventListener('change', function() {
     const files = this.files;
-    for (let i = 0; i < files.length; i++) {
-        const file = files[i];
+    for (const file of files) {
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = (e) => {
             canvasGalleryImages.push(e.target.result);
             loadCanvasImages();
         }
@@ -173,7 +158,7 @@ canvasImageInput.addEventListener('change', function() {
 });
 
 
-window.onclick = function(event) {
+window.onclick = (event) => {
     if (event.target === backgroundSettingsModal) {
         backgroundSettingsModal.style.display = "none";
     }
