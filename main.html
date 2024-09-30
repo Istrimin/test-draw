@@ -18,9 +18,8 @@
         <div class="sidebar">
             <a href="index.html" target="_self" title="Выйти из команты" id="exitLink">🚪</a>
             <button id="message" title="Сообщение">✉️</button>
-            <div id="message-container" class="message-popup">
-                <p id="message-text"></p>
-            </div>
+
+
             <button id="floodFillBtn" title="Заливка">🌊</button>
             <button id="mergeDownBtn" title="Слить co слоем ниже">🔽</button>
             <button id="backgroundSettingsBtn" title="Настройки фона">🖼️</button>
@@ -54,6 +53,10 @@
                 <button id="moveLayerDown" title="Слой вниз">▼</button>
             </div>
             <div class="canvas-container">
+            <div id="message-container" class="message-popup">
+                <p id="message-text"></p>
+            </div>
+
                 <div class="color-picker-and-word">
                     <div class="color-picker-group">
                         <input type="color" id="colorPicker" value="#000000" title="Цвет заливки (C)">
@@ -175,12 +178,6 @@
 
                         let scale = displayWidth / realWidth;
                         const layerFilters = {};
-                    </script>
-                    <script>
-
-
-
-
                     </script>
                     <script>
                         // фильтры
@@ -969,59 +966,7 @@ function getPixelColor2(x, y) {
                         }
                         const MAX_HISTORY_STATES = 1000;
 
-// // перемещение изображения по координатам
-//                         function moveCanvasContent(layerId, direction, amount) {
-//                             const canvas = layers[layerId];
-//                             const ctx = contexts[layerId];
-
-//                             // Сохраняем текущее состояние канваса
-//                             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
-//                             // Очищаем канвас
-//                             ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-//                             // Вычисляем смещение
-//                             let offsetX = 0, offsetY = 0;
-//                             switch (direction) {
-//                                 case 'left':
-//                                     offsetX = -amount;
-//                                     break;
-//                                 case 'right':
-//                                     offsetX = amount;
-//                                     break;
-//                                 case 'up':
-//                                     offsetY = -amount;
-//                                     break;
-//                                 case 'down':
-//                                     offsetY = amount;
-//                                     break;
-//                             }
-
-//                             // Рисуем содержимое канваса со смещением
-//                             ctx.putImageData(imageData, offsetX, offsetY);
-
-//                             // Если часть изображения вышла за пределы канваса, рисуем ее с другой стороны
-//                             if (offsetX > 0) {
-//                                 ctx.putImageData(imageData, offsetX - canvas.width, 0, canvas.width - offsetX, 0, offsetX, canvas.height);
-//                             } else if (offsetX < 0) {
-//                                 ctx.putImageData(imageData, canvas.width + offsetX, 0, 0, 0, -offsetX, canvas.height);
-//                             }
-
-//                             if (offsetY > 0) {
-//                                 ctx.putImageData(imageData, 0, offsetY - canvas.height, 0, canvas.height - offsetY, canvas.width, offsetY);
-//                             } else if (offsetY < 0) {
-//                                 ctx.putImageData(imageData, 0, canvas.height + offsetY, 0, 0, canvas.width, -offsetY);
-//                             }
-
-//                             // Обновляем состояние слоя
-//                             layerDrawnOn[layerId] = true;
-//                             updateLayerEyeIcon(layerId);
-//                         }
-
-
-
-
-                        // Обводка
+// Обводка
                         const outlineLayers = {};
                         const outlineSizes = {};
                         let isInnerOutline = false;
@@ -1586,37 +1531,134 @@ canvasContainer.addEventListener('click', (e) => {
                             }
                         }
 // сообщение
-                        const messageButton = gel('message');
-                        const messageContainer = gel('message-container');
-                        const messageText = gel('message-text');
+                        // const messageButton = gel('message');
+                        // const messageContainer = gel('message-container');
+                        // const messageText = gel('message-text');
 
-                        function showMessage(message) {
-                            messageText.textContent = message;
-                            messageContainer.style.display = 'block';
-                        }
+                        // function showMessage(message) {
+                        //     messageText.textContent = message;
+                        //     messageContainer.style.display = 'block';
+                        // }
 
-                        messageButton.addEventListener('click', () => {
-                            showMessage("Привет! Это тестовое сообщение."); // Show a test message
-                        });
+                        // messageButton.addEventListener('click', () => {
+                        //     showMessage("Привет! Это тестовое сообщение."); // Show a test message
+                        // });
 
-                        if (!messageContainer.querySelector('.close-button')) {
-                            const closeButton = document.createElement('span');
-                            closeButton.textContent = '×';
-                            closeButton.classList.add('close-button');
-                            messageContainer.appendChild(closeButton);
+                        // if (!messageContainer.querySelector('.close-button')) {
+                        //     const closeButton = document.createElement('span');
+                        //     closeButton.textContent = '×';
+                        //     closeButton.classList.add('close-button');
+                        //     messageContainer.appendChild(closeButton);
 
-                            closeButton.addEventListener('click', () => {
-                                messageContainer.style.display = 'none';
-                            });
-                        }
+                        //     closeButton.addEventListener('click', () => {
+                        //         messageContainer.style.display = 'none';
+                        //     });
+                        // }
 
-                        window.addEventListener('click', (event) => {
-                            if (event.target === messageContainer) {
-                                messageContainer.style.display = 'none';
-                            }
-                        });
+                        // window.addEventListener('click', (event) => {
+                        //     if (event.target === messageContainer) {
+                        //         messageContainer.style.display = 'none';
+                        //     }
+                        // });
 
                     </script>
+<script>
+    // const messageButton = gel('message');
+    // const messageContainer = gel('message-container');
+    // const messageText = gel('message-text');
+    // function showMessage(message) {
+    //     messageText.innerHTML = `<pre>${message}</pre>`; // Используем <pre> для сохранения форматирования
+    //     messageContainer.style.display = 'block';
+    // }
+
+    // messageButton.addEventListener('click', () => {
+    //     fetch('message.txt')
+    //         .then(response => {
+    //             if (!response.ok) {
+    //                 throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
+    //             }
+    //             return response.text();
+    //         })
+    //         .then(data => {
+    //             showMessage(data); // Показать сообщение из файла
+    //         })
+    //         .catch(error => {
+    //             console.error('There was a problem with the fetch operation:', error);
+    //             showMessage(`Ошибка загрузки сообщения: ${error.message}`); // Показать сообщение об ошибке
+    //         });
+    // });
+
+    // if (!messageContainer.querySelector('.close-button')) {
+    //     const closeButton = document.createElement('span');
+    //     closeButton.textContent = '×';
+    //     closeButton.classList.add('close-button');
+    //     messageContainer.appendChild(closeButton);
+
+    //     closeButton.addEventListener('click', () => {
+    //         messageContainer.style.display = 'none';
+    //     });
+    // }
+
+    // window.addEventListener('click', (event) => {
+    //     if (event.target === messageContainer) {
+    //         messageContainer.style.display = 'none';
+    //     }
+    // });
+$(document).ready(function() {
+    const messageButton = $('#message');
+    const messageContainer = $('#message-container');
+    const messageText = $('#message-text');
+
+    function showMessage(message) {
+        messageText.html(`<pre>${message}</pre>`); // Используем <pre> для сохранения форматирования
+        messageContainer.show();
+    }
+
+    messageButton.on('click', function() {
+        if (messageContainer.is(':visible')) {
+            messageContainer.hide(); // Скрыть контейнер, если он уже открыт
+        } else {
+            fetch('message.txt')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    showMessage(data); // Показать сообщение из файла
+                })
+                .catch(error => {
+                    showMessage(`Ошибка загрузки сообщения: ${error.message}`); // Показать сообщение об ошибке
+                });
+        }
+    });
+
+    if (!messageContainer.find('.close-button').length) {
+        const closeButton = $('<span class="close-button">×</span>');
+        messageContainer.append(closeButton);
+
+        closeButton.on('click', function() {
+            messageContainer.hide();
+        });
+    }
+
+    $(window).on('click', function(event) {
+        if ($(event.target).is(messageContainer)) {
+            messageContainer.hide();
+        }
+    });
+});
+// создание слоев
+    document.addEventListener('DOMContentLoaded', () => {
+                    for (let i = 1; i < 100; i++) {
+                        createLayer();
+                        setCurrentLayer(50);
+                        const layerButtonsContainer = document.querySelector('.layer-panel');
+                        layerButtonsContainer.scrollTop = (layerButtonsContainer.scrollHeight / 120) * 50;
+                    }
+                });
+</script>
                     </script>
                     <script src="script.js" defer></script>
                     <script src="cursors.js" defer></script>
@@ -1628,8 +1670,7 @@ canvasContainer.addEventListener('click', (e) => {
                     <script type="module" src="hotkey.js" defer></script>
                     <script type="module" src="settingsPanel.js" defer></script>
                     <script type="module" src="tools.js" defer></script>
-                    <script>
-                    </script>
+
 </body>
 
 </html>

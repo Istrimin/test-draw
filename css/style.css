@@ -106,6 +106,7 @@ canvas {
     --button-color: rgb(25, 25, 25);
     --button-text-color: rgb(211, 116, 255);
     --button-active-color: rgb(9, 95, 0);
+    --font-size: 30px;
 }
 
 
@@ -487,26 +488,41 @@ input[type="range"]:hover {
 
 
 
-
+#message-container {
+    max-height: 90%;
+    max-width: 50%;
+    overflow-y: auto;
+    padding: 10px;
+    font-size: 200%;
+    word-wrap: break-word;
+}
 
 #message-container p {
     color: #80ff8f;
-    width: 100%;
-    text-align: center;
+    /* width: 100%; */
+    /* text-align: center; */
+    word-wrap: break-word;
 }
-
-#message {
-    font-size: 20px;
+.message-popup {
+    display: none;
+    position: absolute;
+    position:relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* центрирование*/
+    background-color: rgba(0, 0, 0, 0.7);
+    color: rgb(255, 0, 0);  /* Цвет кнопки закрытия */
+    padding: 10px 20px;
+    border-radius: 5px;
+    z-index: 1000;
 }
-
-
 
 
 .time {
     background-color: transparent;
     color: #ffffff;
     font-family: monospace;
-    font-size: 10px;
+    font-size: 20px;
     margin: 0;
     padding: 0;
 }
@@ -885,21 +901,7 @@ img:hover {
     display: inline-block;
 }
 
-/* показ сообщения */
-/* In your style.css file or within <style> tags */
-.message-popup {
-    display: none;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: rgba(0, 0, 0, 0.7);
-    color: white;
-    /* Цвет кнопки закрытия */
-    padding: 10px 20px;
-    border-radius: 5px;
-    z-index: 1000;
-}
+
 
 /* add  23 Sep 00:21*/
 #zoomLevelDisplay {

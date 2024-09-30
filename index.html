@@ -2,22 +2,17 @@
 <html lang="en">
 
 <head>
-
-  <head>
-  </head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Настоящий Художник</title>
   <link rel="stylesheet" href="css/index.css">
   <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
-  <!-- <script type="module" src="settings.js" defer"></script> -->
   <style>
     .image-row {
       background-color: transparent;
       display: flex;
       flex-direction: row;
       gap: 30px;
-      /*  Установите желаемый отступ */
     }
 
     .no-underline {
@@ -40,75 +35,46 @@
       opacity: 1;
     }
 
+    #randomImage {
+      box-shadow: 0px 0px 100px rgb(0, 0, 0), inset 0px 0px 150px rgb(0, 0, 0);
+    }
 
-#randomImage{
-  box-shadow:
-    0px 0px 100px rgb(0, 0, 0),
-    inset 0px 0px 150px rgb(0, 0, 0);
-}
-.randomImage{
-  box-shadow:
-    0px 0px 100px rgb(0, 0, 0),
-    inset 0px 0px 150px rgb(0, 0, 0);
-}
+    #randomImage:hover {
+      border-radius: 100px;
+      box-shadow: 0px 0px 100px rgba(0, 0, 0, 0.664), inset 0px 0px 150px rgba(0, 0, 0, 0.632);
+    }
 
+    img {
+      background-color: transparent;
+      border-radius: 100px;
+      transition: transform 0.3s ease;
+    }
 
-#randomImage:hover{
-  border-radius: 100px;
-  box-shadow:
-    0px 0px 100px rgba(0, 0, 0, 0.664),
-    inset 0px 0px 150px rgba(0, 0, 0, 0.632);
-}
+    img:hover {
+      transform: scale(1.01);
+    }
 
+    .image-container img:hover {
+      transform: scale(1.2);
+      box-shadow: 0px 0px 100px rgba(0, 110, 255, 0.5), inset 0px 0px 100px rgba(0, 110, 255, 0.228);
+    }
 
-img{
-  background-color: transparent;
-  
-  /* transform: scale(1.1); */
-  border-radius: 100px;
-
-  /* box-shadow:  */
-    /* 0px 0px 100px rgba(255, 255, 255, 0.78),
-    inset 0px 0px 150px rgba(209, 209, 209, 0.78); */
-    /* 0px 0px 100px rgb(0, 0, 0),
-    inset 0px 0px 150px rgb(0, 0, 0); */
-}
-
-
-img:hover {
-  transform: scale(1.01);
-  /* box-shadow:  */
-    /* 0px 0px 100px rgba(255, 255, 255, 0.78),
-    inset 0px 0px 150px rgba(209, 209, 209, 0.78); */
-
-  border-radius: 100px;
-}
-
-
-.image-container img { 
-  transform: scale(1.1);
-
-  border-radius: 100px;
-} 
-.image-container img:hover { 
-  border-radius: 100px;
-  transform: scale(1.1);
-  box-shadow: 
-    0px 0px 100px rgba(0, 110, 255, 0.5), 
-    inset 0px 0px 100px rgba(0, 110, 255, 0.228); 
-} 
+    /* Glowing effect */
+    .glow {
+      text-shadow: 0 0 5px rgba(0, 110, 255, 0.8), 0 0 10px rgba(0, 110, 255, 0.6), 0 0 15px rgba(0, 110, 255, 0.4);
+      transition: text-shadow 0.3s ease;
+    }
   </style>
 </head>
 
 <body>
   <div class="header-container">
     <div id="time" class="time"></div>
-<div class="column-container"> 
-  <img src="" id="randomImage" width="200" alt="Рисуйка">
-</div>
-
-    <h2>Привет художник!</h2>
-    <class class="image-row">
+    <div class="column-container">
+      <img src="" id="randomImage" width="200" alt="Рисуйка">
+    </div>
+    <h2 id="greeting">Привет художник!</h2>
+    <div class="image-row">
       <a href="main.html" target="_self" title="Я уже бабочка" class="no-underline">
         <div class="image-container">
           <img src="images/index/Бабочка Большая.png" alt="Я уже бабочка" style="width: 6em;" class="default-image">
@@ -117,45 +83,44 @@ img:hover {
       </a>
       <div class="image-container">
         <a href="./cancer/cancer.html" target="_self" title="Я только начал" class="no-underline">
-          <img src="images/index/caterpillar.png" alt="Я только начал" style="width: 6em; height:6em"
-            class="default-image">
-          <img src="images/index/caterpillarHover.png" alt="Я только начал" style="width: 6em; height:6em;"
-            class="hover-image" />
+          <img id="caterpillarImage" src="images/index/caterpillar.png" alt="Я только начал" style="width: 6em; height:6em" class="default-image">
+        </a>
       </div>
-      </a>
-    </class>
+    </div>
   </div>
   <script>
-    const $ = id => document.getElementById(id);
-
+    const gel = id => document.getElementById(id);
     vkBridge.send('VKWebAppInit');
-
     document.addEventListener('contextmenu', event => event.preventDefault());
-
-    // JavaScript code to update the time
-    function updateTime() {
-        const now = new Date();
-        const hours = now.getHours().toString().padStart(2, '0');
-        const minutes = now.getMinutes().toString().padStart(2, '0');
-        const seconds = now.getSeconds().toString().padStart(2, '0');
-        const timeString = `${hours}:${minutes}:${seconds}`;
-        $('time').textContent = timeString;
-    }
-
-    // Update the time every second
-    setInterval(updateTime, 1000); 
-
-
-
+    setInterval(() => {
+      const now = new Date();
+      gel('time').textContent = now.toTimeString().split(' ')[0].slice(0, 8);
+    }, 1000);
     const images = Array.from({ length: 3 }, (_, i) => `images/dream/dream${i + 1}.png`);
+    gel('randomImage').src = images[Math.floor(Math.random() * images.length)];
 
-    function getRandomImage(images) {
-      const randomIndex = Math.floor(Math.random() * images.length);
-      return images[randomIndex];
-    }
+    // Caterpillar hover effect
+    const caterpillarImage = gel('caterpillarImage');
+    const hoverImageSrc = 'images/index/caterpillarHover.png';
 
-    const randomImageUrl = getRandomImage(images);
-    $('randomImage').src = randomImageUrl;
+    caterpillarImage.addEventListener('mouseenter', () => {
+      caterpillarImage.src = hoverImageSrc;
+    });
+
+    caterpillarImage.addEventListener('mouseleave', () => {
+      caterpillarImage.src = 'images/index/caterpillar.png';
+    });
+
+    // Glowing effect on greeting text
+    const greeting = gel('greeting');
+
+    greeting.addEventListener('mouseenter', () => {
+      greeting.classList.add('glow');
+    });
+
+    greeting.addEventListener('mouseleave', () => {
+      greeting.classList.remove('glow');
+    });
   </script>
 </body>
 
