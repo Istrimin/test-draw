@@ -1,76 +1,496 @@
 
-// горячие клавиши
-const buttonMap = {
-  KeyA: 'eyedropperBtn',
-  KeyB: 'backgroundPicker',
-  KeyE: 'eraserBtn',
-  KeyS: 'saveImageBtn',
-  KeyR: 'clear',
-  KeyF: 'fillModeBtn',
-  KeyU: 'UploadButton',
+// фильтры
 
-  KeyT: 'drawOnExistingBtn',
-};
+                        const filterSliders = [
+                            'lightnessSlider',
+                            'saturationSlider',
+                            'contrastSlider',
+                            'hueShiftSlider'
+                        ];
 
-const functionMap = {
-  KeyZ: undo, 
-  KeyX: redo, 
-  KeyQ: toggleSymmetry,
-  KeyV: toggleSpider,
-  KeyW: togglePreviousLayer, 
-};
+                        filterSliders.forEach(sliderId => {
+                            gel(sliderId).addEventListener('input', updateFilters);
+                        });
 
-document.addEventListener('keydown', (event) => {
-  const keyCode = event.code;
+                        function updateFilters() {
+                            const brightness = lightnessSlider.value;
+                            const saturation = saturationSlider.value;
+                            const contrast = contrastSlider.value;
+                            const hueShift = hueShiftSlider.value;
 
-  if (buttonMap[keyCode]) { 
-    gel(buttonMap[keyCode]).click();
-  } else if (functionMap[keyCode]) {
-    functionMap[keyCode]();
+                            lightnessValue.textContent = brightness;
+                            saturationValue.textContent = saturation;
+                            contrastValue.textContent = contrast;
+                            hueShiftValue.textContent = hueShift;
+
+                            const filterString = `brightness(${brightness}%) saturate(${saturation}%) contrast(${contrast}%) hue-rotate(${hueShift}deg)`;
+
+                            // Сохраняем фильтр для текущего слоя
+                            layerFilters[currentLayer] = filterString;
+
+                            // Применяем фильтр к текущему слою
+                            layers[currentLayer].style.filter = filterString;
+                        }
+                        // Функция для применения фильтров к слою
+                        function applyFiltersToLayer(layerId) {
+                            const brightness = lightnessSlider.value;
+                            const saturation = saturationSlider.value;
+                            const contrast = contrastSlider.value;
+                            const hueShift = hueShiftSlider.value;
+
+                            layers[layerId].style.filter = `brightness(${brightness}%) saturate(${saturation}%) contrast(${contrast}%) hue-rotate(${hueShift}deg)`;
+                        }
+
+    
+// панель настроек settings panel
+    const imageGallery = document.getElementById('backgroundImageGallery');
+    const backgroundGalleryImages = ['cancer.jpg', 'logo.jpg', 'cancer3.jpg'];
+    const canvasGalleryImages = ['canvas1.jpg'];
+
+    function loadImages(gallery, images, onClick, onMouseOver) {
+        gallery.innerHTML = '';
+        images.forEach(imageSrc => {
+            const img = document.createElement('img');
+            img.src = imageSrc.startsWith('data:') ? imageSrc : `images/${imageSrc}`;
+            img.style.cssText = 'width: 100px; height: 100px; margin: 5px; cursor: pointer;';
+            img.onclick = onClick(img.src);
+            img.onmouseover = onMouseOver(img.src);
+            gallery.appendChild(img);
+        });
+        }
+
+    function setImage(element, src, modal) {
+        element.style.backgroundImage = `url(${src})`;
+        if (modal) modal.style.display = "none";
+        }
+
+    function loadBackgroundImages() {
+        loadImages(imageGallery, backgroundGalleryImages, 
+            src => () => setImage(document.body, src, backgroundSettingsModal),
+            src => () => setImage(document.body, src));
+        }
+
+    function loadCanvasImages() {
+            loadImages(canvasImageGallery, canvasGalleryImages, 
+                src => () => setCanvasImage(src), 
+                src => () => updateCanvasPreview(src));
+
+            const transparentBtn = document.createElement('button');
+            transparentBtn.onclick = setCanvasTransparent;
+            transparentBtn.style.cssText = 'width: 100px; height: 100px; margin: 5px; cursor: pointer;';
+            canvasImageGallery.appendChild(transparentBtn);
+        }
+    function loadImageAndDraw(src, canvas, clear = false) {
+        const img = new Image();
+        img.onload = () => {
+            const ctx = canvas.getContext('2d');
+            if (clear) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            if (canvas === layers[back]) {
+                canvasSettingsModal.style.display = "none";
+            }
+        };
+        img.src = src;
+        }
+
+    function setCanvasImage(src) {
+        loadImageAndDraw(src, layers[back]);
+        }
+
+    function updateCanvasPreview(src) {
+        loadImageAndDraw(src, layers[back], true);
+        }
+
+    function setCanvasTransparent() {
+        layers[back].getContext('2d').clearRect(0, 0, layers[back].width, layers[back].height);
+        canvasSettingsModal.style.display = "none";
+        }
+
+    function handleFileInput(input, galleryImages, loadFunction) {
+        Array.from(input.files).forEach(file => {
+            const reader = new FileReader();
+            reader.onload = e => {
+                galleryImages.push(e.target.result);
+                loadFunction();
+            };
+            reader.readAsDataURL(file);
+        });
+        }
+
+    backgroundSettingsBtn.onclick = () => {
+        loadBackgroundImages();
+        backgroundSettingsModal.style.display = "block";
+        };
+
+    canvasSettingsBtn.onclick = () => {
+        loadCanvasImages();
+        canvasSettingsModal.style.display = "block";
+        };
+
+    closeModal.onclick = () => backgroundSettingsModal.style.display = "none";
+    closeCanvasModal.onclick = () => canvasSettingsModal.style.display = "none";
+    // выбор цеета для бэка
+    backgroundColorPicker.addEventListener('input', function() {
+        document.body.style.backgroundColor = this.value;
+        });
+
+    canvasColorPicker.addEventListener('input', function() {
+        const ctx = layers[back].getContext('2d');
+        ctx.fillStyle = this.value;
+        ctx.fillRect(0, 0, layers[back].width, layers[back].height);
+        updateCanvasPreview(layers[back].toDataURL());
+        });
+
+    function setupFileInput(inputElement, galleryImages, loadFunction) {
+        inputElement.addEventListener('change', function() {
+            handleFileInput(this, galleryImages, loadFunction);
+        });
+        }
+
+    setupFileInput(backgroundImageInput, backgroundGalleryImages, loadBackgroundImages);
+    setupFileInput(canvasImageInput, canvasGalleryImages, loadCanvasImages);
+    // применение выбранного изображения
+    [backgroundImageInput, canvasImageInput].forEach((input, index) => {
+        handleFileInput(input, index === 0 ? backgroundGalleryImages : canvasGalleryImages, index === 0 ? loadBackgroundImages : loadCanvasImages);
+        });
+
+    // Initialize
+    loadBackgroundImages();
+    loadCanvasImages();
+
+
+// // заливка
+//     const FillBtn = gel('FillBtn');
+//     let isFloodFillActive = false;
+//     // Add event listener for canvasContainer
+//     canvasContainer.addEventListener('click', (e) => {
+//         if (isFloodFillActive) {
+//             floodFill(e);
+//         }
+//     });
+//     FillBtn.addEventListener('click', () => {
+//         isFloodFillActive = !isFloodFillActive;
+//         FillBtn.classList.toggle('active', isFloodFillActive);
+//     });
+// function floodFill(e) {
+//     // Проверяем, активна ли функция заливки и существует ли текущий контекст
+//     if (!isFloodFillActive || !curCtx) return;
+
+//     const rect = layers[currentLayer].getBoundingClientRect();
+//     // Вычисляем начальные координаты с учетом масштабирования
+//     const startX = Math.floor((e.clientX - rect.left) / zoomLevel);
+//     const startY = Math.floor((e.clientY - rect.top) / zoomLevel);
+
+//     // Создаем временный канвас для работы
+//     const tempCanvas = document.createElement('canvas');
+//     const tempCtx = tempCanvas.getContext('2d');
+//     tempCanvas.width = realWidth;
+//     tempCanvas.height = realHeight;
+
+//     // Копируем содержимое всех слоев на временный канвас, кроме слоев 0, 1 и текущего
+//     Object.entries(layers).forEach(([index, layer]) => {
+//         if (index !== '0' && index !== '1' && parseInt(index) !== currentLayer) {
+//             tempCtx.drawImage(layer, 0, 0);
+//         }
+//     });
+
+//     const imageData = tempCtx.getImageData(0, 0, realWidth, realHeight);
+//     const data = imageData.data;
+//     const targetColor = getPixelColor(startX, startY, data, realWidth);
+    
+//     // Получаем цвет заливки для текущего слоя
+//     const fillColor = layerColors[currentLayer] ? hexToRgba(layerColors[currentLayer]) : [0, 0, 0, 255];
+//     const tolerance = 30; // Допустимое отклонение цвета
+
+//     // Проверяем, не совпадает ли целевой цвет с цветом заливки
+//     if (colorMatch(targetColor, fillColor, tolerance)) return;
+
+//     const stack = [[startX, startY]];
+//     const visited = new Uint8Array(realWidth * realHeight);
+
+//     // Алгоритм заливки
+//     while (stack.length) {
+//         const [x, y] = stack.pop();
+//         const index = y * realWidth + x;
+//         if (visited[index]) continue;
+//         visited[index] = 1;
+
+//         const pixelIndex = index * 4;
+//         const currentColor = data.slice(pixelIndex, pixelIndex + 4);
+
+//         // Заливаем, если цвет совпадает с целевым или это сплошной цвет
+//         if (colorMatch(currentColor, targetColor, tolerance) || isSolidColor(currentColor, tolerance)) {
+//             setPixelColor(data, x, y, realWidth, fillColor);
+//             // Проверяем соседние пиксели
+//             if (x > 0 && !isContourPixel(x - 1, y, data, realWidth, realHeight, targetColor, tolerance)) stack.push([x - 1, y]);
+//             if (x < realWidth - 1 && !isContourPixel(x + 1, y, data, realWidth, realHeight, targetColor, tolerance)) stack.push([x + 1, y]);
+//             if (y > 0 && !isContourPixel(x, y - 1, data, realWidth, realHeight, targetColor, tolerance)) stack.push([x, y - 1]);
+//             if (y < realHeight - 1 && !isContourPixel(x, y + 1, data, realWidth, realHeight, targetColor, tolerance)) stack.push([x, y + 1]);
+//         }
+//     }
+
+//     // Применяем изменения к текущему контексту
+//     curCtx.putImageData(imageData, 0, 0);
+//     saveState();
+//     layerDrawnOn[currentLayer] = true;
+//     updateLayerEyeIcon(currentLayer);
+// }
+
+// // Проверяет, является ли цвет сплошным (близким к белому)
+// function isSolidColor(color, tolerance) {
+//     return color[0] >= 255 - tolerance && color[1] >= 255 - tolerance && color[2] >= 255 - tolerance;
+// }
+
+// // Проверяет, является ли пиксель частью контура
+// function isContourPixel(x, y, data, width, height, targetColor, tolerance) {
+//     const currentColor = getPixelColor(x, y, data, width);
+//     return !colorMatch(currentColor, targetColor, tolerance);
+// }
+
+// // Устанавливает цвет пикселя
+// function setPixelColor(data, x, y, width, color) {
+//     const index = (y * width + x) * 4;
+//     data[index] = color[0];
+//     data[index + 1] = color[1];
+//     data[index + 2] = color[2];
+//     data[index + 3] = color[3];
+// }
+
+// // Преобразует HEX-цвет в RGBA
+// function hexToRgba(hex) {
+//     const r = parseInt(hex.slice(1, 3), 16);
+//     const g = parseInt(hex.slice(3, 5), 16);
+//     const b = parseInt(hex.slice(5, 7), 16);
+//     return [r, g, b, 255];
+// }
+
+// // Проверяет, совпадают ли цвета с учетом допуска
+// function colorMatch(a, b, tolerance) {
+//     return Math.abs(a[0] - b[0]) <= tolerance &&
+//            Math.abs(a[1] - b[1]) <= tolerance &&
+//            Math.abs(a[2] - b[2]) <= tolerance &&
+//            (a.length < 4 || b.length < 4 || Math.abs(a[3] - b[3]) <= tolerance);
+// }
+
+// // Получает цвет пикселя по координатам
+// function getPixelColor(x, y, data, width) {
+//     x = Math.floor(x);
+//     y = Math.floor(y);
+//     if (x < 0 || x >= width || y < 0 || y >= data.length / 4 / width) {
+//         return [0, 0, 0, 0]; // Возвращаем прозрачный цвет для пикселей вне границ
+//     }
+//     const index = (y * width + x) * 4;
+//     return [data[index], data[index + 1], data[index + 2], data[index + 3]];
+// }
+
+
+
+
+
+// Функция сохранения текущего состояния
+        function saveCurrentState() {
+            const currentState = curCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height);
+            history[currentLayer].push(currentState);
+        }
+
+// закомментированное
+    // try {
+    //   isPressureSupported = !!window.PointerEvent && 'pressure' in PointerEvent.prototype;
+    // } catch (e) { }
+    //             const isPressureSupported = 'onpointermove' in window;
+// *toggle eraser
+        eraserBtn.addEventListener('click', toggleEraser);
+        function toggleEraser() {
+            isErasing = !isErasing;
+            eraserBtn.classList.toggle('active', isErasing);
+        }
+
+
+
+// Layer switching
+  document.querySelectorAll('.layer-button').forEach(button => {
+    button.addEventListener('click', function () {
+      document.querySelector('.active-layer').classList.remove('active-layer');
+      this.classList.add('active-layer');
+      currentLayer = parseInt(this.dataset.layer);
+      curCtx = window[`ctx${currentLayer}`];
+      isDrawing = false;
+      });
+    });
+
+// загрузка изображения
+  function importImage(event) {
+    saveState();
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      uploadedImage = new Image();
+      uploadedImage.onload = () => {
+        const canvas = layers[currentLayer];
+        const ctx = contexts[currentLayer];
+       
+        // Рассчитываем новые размеры, сохраняя пропорции
+        let newWidth;
+        let newHeight;
+        const ratio = uploadedImage.width / uploadedImage.height;
+       
+        if (ratio > canvas.width / canvas.height) {
+          // Изображение шире, чем канвас
+          newWidth = canvas.width;
+          newHeight = newWidth / ratio;
+        } else {
+          // Изображение выше, чем канвас или равно по пропорциям
+          newHeight = canvas.height;
+          newWidth = newHeight * ratio;
+        }
+       
+        // Очищаем текущий слой
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+       
+        // Рисуем изображение по центру канваса
+        function calculateCenteredX(canvasWidth, newWidth) {
+            return (canvasWidth - newWidth) / 2;
+        }
+        // Usage
+        const x = calculateCenteredX(canvas.width, newWidth);
+        ctx.drawImage(uploadedImage, x, y, newWidth, newHeight);
+       
+        // Обновляем состояние слоя
+        layerDrawnOn[currentLayer] = true;
+        updateLayerEyeIcon(currentLayer);
+
+        // Применяем текущие фильтры к слою
+        applyFiltersToLayer(currentLayer);
+      };
+      uploadedImage.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
   }
-// });
-  // Check for Ctrl + Arrow keys first for canvas movement
-  if (event.ctrlKey && (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key))) {
-    const moveAmount = 1; // Количество пикселей для перемещения
-    switch(event.key) {
-        case 'ArrowLeft':
-            moveCanvasContent(currentLayer, 'left', moveAmount);
-            break;
-        case 'ArrowRight':
-            moveCanvasContent(currentLayer, 'right', moveAmount);
-            break;
-        case 'ArrowUp':
-            moveCanvasContent(currentLayer, 'up', moveAmount);
-            break;
-        case 'ArrowDown':
-            moveCanvasContent(currentLayer, 'down', moveAmount);
-            break;
+
+
+// Exit functionality
+  const exitLink = gel('exitLink');
+  // const doorSound = new Howl({
+  //   src: ['sounds/door-close.wav']
+  // });
+  exitLink.addEventListener('click', () => {
+    doorSound.play();
+    doorSound.once('end', () => {
+      window.location.href = 'index.html';
+    });
+  });
+// установка цвета кисти
+  function setDrawingColor(color) {
+    if (!curCtx) {
+      return;
     }
-  // } else if (elementMap[keyCode]) { 
-  //   const element = elementMap[keyCode];
-
-  //   if (typeof element === 'string') {
-  //     gel(element).click();
-  //   } else if (typeof element === 'function') {
-  //     element();
-  //   } 
-  } else if (event.altKey && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) { // Move layer in stack with Alt + Up/Down
-
-    moveLayerInStack(event.key === 'ArrowUp' ? -1 : 1);
-  } else if (event.key === 'ArrowUp' || event.key === 'ArrowDown') { 
-
-    moveLayerFocus(event.key === 'ArrowUp' ? -1 : 1);
+    layerColors[currentLayer] = color;
+    curCtx.strokeStyle = color;
+    updateLayerButtonColor(currentLayer);
   }
-});
+// Функция отмены
+    function undo() {
+      if (history[currentLayer] && history[currentLayer].length > 0) {
+        if (history[currentLayer].length === 1) {
+          // Если это последнее состояние, сохраняем текущее состояние перед очисткой
+          const currentState = curCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height);
+          redoHistory[currentLayer].push(currentState);
+          // Очищаем холст
+          curCtx.clearRect(0, 0, layers[currentLayer].width, layers[currentLayer].height);
+        } else {
+          // Сохраняем текущее состояние в redoHistory
+          const currentState = curCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height);
+          redoHistory[currentLayer].push(currentState);
+          // Возвращаемся к предыдущему состоянию
+          const previousState = history[currentLayer].pop();
+          curCtx.putImageData(previousState, 0, 0);
+        }
+      }
+    }
+// Функция повтора
+    function redo() {
+      if (!(redoHistory[currentLayer] && redoHistory[currentLayer].length > 0)) {
+        return;
+      }
+      const nextState = redoHistory[currentLayer].pop();
+    saveCurrentState();
+      curCtx.putImageData(nextState, 0, 0);
+    }
+
+// горячие клавиши hotkey
+    const buttonMap = {
+      KeyA: 'eyedropperBtn',
+      KeyB: 'backgroundPicker',
+      KeyE: 'eraserBtn',
+      KeyS: 'saveImageBtn',
+      KeyR: 'clear',
+      KeyF: 'FillBtn',
+      KeyU: 'UploadButton',
+
+      KeyT: 'drawOnExistingBtn',
+    };
+
+    const functionMap = {
+      KeyZ: undo, 
+      KeyX: redo, 
+      KeyQ: toggleSymmetry,
+      KeyV: toggleSpider,
+      KeyW: togglePreviousLayer, 
+    };
+
+    document.addEventListener('keydown', (event) => {
+      const keyCode = event.code;
+
+      if (buttonMap[keyCode]) { 
+        gel(buttonMap[keyCode]).click();
+      } else if (functionMap[keyCode]) {
+        functionMap[keyCode]();
+      }
+    // });
+      // Check for Ctrl + Arrow keys first for canvas movement
+      if (event.ctrlKey && (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key))) {
+        const moveAmount = 1; // Количество пикселей для перемещения
+        switch(event.key) {
+            case 'ArrowLeft':
+                moveCanvasContent(currentLayer, 'left', moveAmount);
+                break;
+            case 'ArrowRight':
+                moveCanvasContent(currentLayer, 'right', moveAmount);
+                break;
+            case 'ArrowUp':
+                moveCanvasContent(currentLayer, 'up', moveAmount);
+                break;
+            case 'ArrowDown':
+                moveCanvasContent(currentLayer, 'down', moveAmount);
+                break;
+        }
+      // } else if (elementMap[keyCode]) { 
+      //   const element = elementMap[keyCode];
+
+      //   if (typeof element === 'string') {
+      //     gel(element).click();
+      //   } else if (typeof element === 'function') {
+      //     element();
+      //   } 
+      } else if (event.altKey && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) { // Move layer in stack with Alt + Up/Down
+
+        moveLayerInStack(event.key === 'ArrowUp' ? -1 : 1);
+      } else if (event.key === 'ArrowUp' || event.key === 'ArrowDown') { 
+
+        moveLayerFocus(event.key === 'ArrowUp' ? -1 : 1);
+      }
+    });
 
 
-function moveLayerFocus(direction) {
-  const lB = document.querySelectorAll('.layer-button');
-  const currentLayerIndex = Array.from(lB).findIndex(button => button.classList.contains('active-layer'));
+    function moveLayerFocus(direction) {
+      const lB = document.querySelectorAll('.layer-button');
+      const currentLayerIndex = Array.from(lB).findIndex(button => button.classList.contains('active-layer'));
 
-  const newIndex = (currentLayerIndex + direction + lB.length) % lB.length; // Wrap around
-  lB[newIndex].click();
-}
+      const newIndex = (currentLayerIndex + direction + lB.length) % lB.length; // Wrap around
+      lB[newIndex].click();
+    }
 
 // buttons
     const imageInput = gel('imageInput');
@@ -379,91 +799,91 @@ function moveLayerFocus(direction) {
         ctx.putImageData(imageData, 0, 0);
     }
 // добавляем слой под текущим
-document.addEventListener('keydown', (e) => {
-    if (e.key !== 'Tab') {
-        return;
-    }
-    e.preventDefault();
-    createLayer(currentLayer, true);
-    updateZoom();
-});
-
-function createLayer(referenceLayer, isBelow) {
-    const layerButtons = Array.from(document.querySelectorAll('.layer-button'));
-    const currentIndex = layerButtons.findIndex(btn => parseInt(btn.dataset.layer) === referenceLayer);
-    layerCount++;
-    const newLayerNum = layerCount;
-    const canvas = document.createElement('canvas');
-    canvas.id = `layer${newLayerNum}`;
-    canvas.width = realWidth;
-    canvas.height = realHeight;
-    canvas.style.width = `${displayWidth}px`;
-    canvas.style.height = `${displayHeight}px`;
-    canvas.style.position = 'absolute';
-    canvas.style.top = '0';
-    canvas.style.left = '0';
-
-    // Устанавливаем z-index на основе текущего слоя
-    const currentZIndex = parseInt(layers[referenceLayer].style.zIndex);
-    canvas.style.zIndex = isBelow ? currentZIndex : currentZIndex + 1;
-
-    if (currentIndex === -1) {
-        canvasContainer.appendChild(canvas);
-    } else {
-        const targetIndex = isBelow ? currentIndex : currentIndex + 1;
-        canvasContainer.insertBefore(canvas, layers[targetIndex]);
-    }
-
-    layers[newLayerNum] = canvas;
-    contexts[newLayerNum] = canvas.getContext('2d', { willReadFrequently: true });
-    layerColors[newLayerNum] = `#${Math.floor(Math.random() * 16_777_215).toString(16)}`;
-
-    const button = document.createElement('button');
-    button.textContent = " ❤ ";
-    button.classList.add('layer-button');
-    button.dataset.layer = newLayerNum;
-
-    const eyeIcon = document.createElement('span');
-    eyeIcon.textContent = "👁️";
-    eyeIcon.style.display = 'inline';
-    eyeIcon.classList.add('eye-icon');
-    button.appendChild(eyeIcon);
-
-    if (currentIndex === -1) {
-        document.querySelector('.layer-buttons').appendChild(button);
-    } else {
-        layerButtons[currentIndex].parentNode.insertBefore(button, layerButtons[currentIndex].nextSibling);
-    }
-
-    button.addEventListener('click', function () {
-        setCurrentLayer(parseInt(this.dataset.layer));
+    document.addEventListener('keydown', (e) => {
+        if (e.key !== 'Tab') {
+            return;
+        }
+        e.preventDefault();
+        createLayer(currentLayer, true);
+        updateZoom();
     });
 
-    addEventListenersToLayer(canvas);
-    history[newLayerNum] = [];
-    redoHistory[newLayerNum] = [];
-    setCurrentLayer(newLayerNum);
-    initializeLayer(newLayerNum);
-    updateLayerButtonColor(newLayerNum);
-    updateLayerOrder();
-    layerDrawnOn[newLayerNum] = true;
-    updateLayerEyeIcon(newLayerNum);
-    updateZoom();
-    
-    outlineLayers[newLayerNum] = null;
-    outlineSizes[newLayerNum] = 0;
-    updateLayerList();
-}
+    function createLayer(referenceLayer, isBelow) {
+        const layerButtons = Array.from(document.querySelectorAll('.layer-button'));
+        const currentIndex = layerButtons.findIndex(btn => parseInt(btn.dataset.layer) === referenceLayer);
+        layerCount++;
+        const newLayerNum = layerCount;
+        const canvas = document.createElement('canvas');
+        canvas.id = `layer${newLayerNum}`;
+        canvas.width = realWidth;
+        canvas.height = realHeight;
+        canvas.style.width = `${displayWidth}px`;
+        canvas.style.height = `${displayHeight}px`;
+        canvas.style.position = 'absolute';
+        canvas.style.top = '0';
+        canvas.style.left = '0';
+
+        // Устанавливаем z-index на основе текущего слоя
+        const currentZIndex = parseInt(layers[referenceLayer].style.zIndex);
+        canvas.style.zIndex = isBelow ? currentZIndex : currentZIndex + 1;
+
+        if (currentIndex === -1) {
+            canvasContainer.appendChild(canvas);
+        } else {
+            const targetIndex = isBelow ? currentIndex : currentIndex + 1;
+            canvasContainer.insertBefore(canvas, layers[targetIndex]);
+        }
+
+        layers[newLayerNum] = canvas;
+        contexts[newLayerNum] = canvas.getContext('2d', { willReadFrequently: true });
+        layerColors[newLayerNum] = `#${Math.floor(Math.random() * 16_777_215).toString(16)}`;
+
+        const button = document.createElement('button');
+        button.textContent = " ❤ ";
+        button.classList.add('layer-button');
+        button.dataset.layer = newLayerNum;
+
+        const eyeIcon = document.createElement('span');
+        eyeIcon.textContent = "👁️";
+        eyeIcon.style.display = 'inline';
+        eyeIcon.classList.add('eye-icon');
+        button.appendChild(eyeIcon);
+
+        if (currentIndex === -1) {
+            document.querySelector('.layer-buttons').appendChild(button);
+        } else {
+            layerButtons[currentIndex].parentNode.insertBefore(button, layerButtons[currentIndex].nextSibling);
+        }
+
+        button.addEventListener('click', function () {
+            setCurrentLayer(parseInt(this.dataset.layer));
+        });
+
+        addEventListenersToLayer(canvas);
+        history[newLayerNum] = [];
+        redoHistory[newLayerNum] = [];
+        setCurrentLayer(newLayerNum);
+        initializeLayer(newLayerNum);
+        updateLayerButtonColor(newLayerNum);
+        updateLayerOrder();
+        layerDrawnOn[newLayerNum] = true;
+        updateLayerEyeIcon(newLayerNum);
+        updateZoom();
+        
+        outlineLayers[newLayerNum] = null;
+        outlineSizes[newLayerNum] = 0;
+        updateLayerList();
+    }
 
 // добавляем слой над текущим
-document.addEventListener('keydown', (e) => {
-    if (e.code !== 'Backquote') {
-        return;
-    }
-    e.preventDefault();
-    createLayer(currentLayer, false);
-    updateZoom();
-});
+    document.addEventListener('keydown', (e) => {
+        if (e.code !== 'Backquote') {
+            return;
+        }
+        e.preventDefault();
+        createLayer(currentLayer, false);
+        updateZoom();
+    });
 // *рисование под нарисованным
     // export function drawOn(startX, startY, endX, endY, ctx) {
     //     const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -715,6 +1135,8 @@ document.addEventListener('keydown', (e) => {
     //     }
     // `;
     // document.head.appendChild(style);
+
+
 // Удаление всего
     const deleteAllBtn = gel('deleteAllBtn');
     deleteAllBtn.addEventListener('click', () => {
@@ -751,25 +1173,25 @@ document.addEventListener('keydown', (e) => {
             }
                 
 // применение цвета для слоя и кисти colorPickers
-const colorPickers = document.querySelectorAll('input[type="color"]');
-colorPickers.forEach((picker, index) => {
-    picker.addEventListener('input', (event) => {
-        if (picker.id === 'outlineColorPicker') {
-            // Обработка изменения цвета обводки
-            applyOutline(currentLayer, parseInt(outlineSizeInput.value));
-        } else if (picker.id === 'backgroundPicker') {
-            setCurBackground(currentLayer);
-        } else {
-            setDrawingColor(event.target.value);
-        }
-    });
+    const colorPickers = document.querySelectorAll('input[type="color"]');
+    colorPickers.forEach((picker, index) => {
+        picker.addEventListener('input', (event) => {
+            if (picker.id === 'outlineColorPicker') {
+                // Обработка изменения цвета обводки
+                applyOutline(currentLayer, parseInt(outlineSizeInput.value));
+            } else if (picker.id === 'backgroundPicker') {
+                setCurBackground(currentLayer);
+            } else {
+                setDrawingColor(event.target.value);
+            }
+        });
 
-    document.addEventListener('keydown', (e) => {
-        if (e.key === (index + 1).toString()) {
-            setDrawingColor(picker.value);
-        }
+        document.addEventListener('keydown', (e) => {
+            if (e.key === (index + 1).toString()) {
+                setDrawingColor(picker.value);
+            }
+        });
     });
-});
 // Очистка канваса
     const clearBtn = gel('clear');
     clearBtn.addEventListener('click', clearCanvas);
@@ -779,7 +1201,6 @@ colorPickers.forEach((picker, index) => {
         curCtx.clearRect(0, 0, layers[currentLayer].width, layers[currentLayer].height);
         saveState();
     }
-// fix fill 
     // Flood Fill Functionality
             // const floodFillBtn = gel('floodFillBtn');
             // let isFloodFillActive = false; // Флаг для отслеживания состояния заливки
@@ -832,90 +1253,7 @@ colorPickers.forEach((picker, index) => {
             //     saveState();
             // }
 
-// 1
-            // Modify the event listener for floodFill 
-            // drawingCanvas.addEventListener('click', (e) => { // Use drawingCanvas here
-            //   if (isFillMode) {
-            //     floodFill(e);
-            //   }
-            // });
-    // // Flood Fill Functionality
-    // fillModeBtn.addEventListener('click', toggleFillMode);
-    // function toggleFillMode() {
-    //   isFillMode = !isFillMode;
-    //   // Optionally add visual indication of fill mode being active or inactive
-    //   fillModeBtn.classList.toggle('active', isFillMode);
-    // }
-// 2
-    // function floodFill(e) {
-    //   const startX = e.offsetX;
-    //   const startY = e.offsetY;
-    //   const imageData = ctx1.getImageData(0, 0, layer1.width, layer1.height);
-    //   const data = imageData.data;
-    //   const width = imageData.width;
-    //   const height = imageData.height;
-    //   const targetColor = getPixelColor(data, startX, startY, width);
-    //   const fillColor = hexToRgba(colorPicker.value);
-    //   const tolerance = 30;
-    //   if (colorMatch(targetColor, fillColor, tolerance)) return;
-    //   const stack = [[startX, startY]];
-    //   const visited = new Uint8Array(width * height);
-    //   while (stack.length) {
-    //     const [x, y] = stack.pop();
-    //     const index = y * width + x;
-    //     if (visited[index]) continue;
-    //     visited[index] = 1;
-    //     const pixelIndex = index * 4;
-    //     const currentColor = data.slice(pixelIndex, pixelIndex + 4);
-    //     if (colorMatch(currentColor, targetColor, tolerance) || isContourPixel(x, y, data, width, height, targetColor, tolerance)) {
-    //       setPixelColor(data, x, y, width, fillColor);
-    //       if (x > 0) stack.push([x - 1, y]);
-    //       if (x < width - 1) stack.push([x + 1, y]);
-    //       if (y > 0) stack.push([x, y - 1]);
-    //       if (y < height - 1) stack.push([x, y + 1]);
-    //     }
-    //   }
-    //   // Оптимизированный дополнительный проход
-    //   for (let y = 0; y < height; y++) {
-    //     for (let x = 0; x < width; x++) {
-    //       const index = (y * width + x) * 4;
-    //       if (!colorMatch(data.slice(index, index + 4), fillColor, 0) && shouldFillPixel(x, y, data, width, height, fillColor)) {
-    //         setPixelColor(data, x, y, width, fillColor);
-    //       }
-    //     }
-    //   }
-    //   ctx1.putImageData(imageData, 0, 0);
-    //   saveState();
-    // }
-    // function getPixelColor(data, x, y, width) {
-    //   const index = (y * width + x) * 4;
-    //   return data.slice(index, index + 4);
-    // }
-    // function setPixelColor(data, x, y, width, color) {
-    //   const index = (y * width + x) * 4;
-    //   data.set(color, index);
-    // }
-    // function isContourPixel(x, y, data, width, height, targetColor, tolerance) {
-    //   const directions = [[-1, 0], [1, 0], [0, -1], [0, 1], [-1, -1], [-1, 1], [1, -1], [1, 1]];
-    //   const currentColor = getPixelColor(data, x, y, width);
-    //   if (colorMatch(currentColor, targetColor, tolerance)) return false;
-    //   return directions.some(([dx, dy]) => {
-    //     const nx = x + dx;
-    //     const ny = y + dy;
-    //     if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
-    //       const neighborColor = getPixelColor(data, nx, ny, width);
-    //       return colorMatch(neighborColor, targetColor, tolerance);
-    //     }
-    //     return false;
-    //   });
-    // }
-    
-    // // Modify the event listener for floodFill
-    // layer1.addEventListener('click', (e) => {
-    //   if (isFillMode) {
-    //     floodFill(e);
-    //   }
-    // });
+
 // ..функция сшивания(копия)
         // function ntc(e, narrowFactor = 0.9) {
         //             if (!isDrawing || !curCtx || !isFinger) return;
@@ -978,6 +1316,7 @@ colorPickers.forEach((picker, index) => {
     // Это инструмент, позволяющий рисвовать контур и затем сразу заливать его вторым цветом.
     // fix 
 // function getPixelColorFromAllLayers(x, y) {
+
     //     // Start from the top layer and go down
     //     for (let i = layerCount; i >= 1; i--) {
     //         if (layers[i] && contexts[i]) {
