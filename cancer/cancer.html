@@ -71,6 +71,8 @@
             <button id="smoothDrawingBtn" title="Паутинка">🌀</button>
             <button id="tabletModeBtn" title="Планшет/давление (T)">📱</button>
             <button id="overlayBtn" title="Трафарет (D)">👻</button>
+            <button id="loadImageBtn" title="Загрузить изображение">📂</button>
+            <button id="bgImageBtn" title="Фон">🌄</button>
         </div>
     </div>
 
@@ -111,6 +113,8 @@
             box-shadow: -100vw 0 0 100vw dodgerblue;
         }
     </style>
+    <input type="file" id="imageInput" accept="image/*" style="display:none">
+    <input type="file" id="bgImageInput" accept="image/*" style="display:none">
     <script>
 const gel = id => document.getElementById(id);
 
@@ -175,6 +179,7 @@ let isEyedropperActive = false;
 let isErasing = false;
 let symmetryBtn = true;
 let overlayActive = false;
+let tabletModeActive = false;
 let isSmoothDrawing = false;
 
 let lastX = 0;
@@ -666,7 +671,61 @@ window.addEventListener('resize', resizeCanvases);
 resizeCanvases();
 initializeCursor();
 
+// === Load image to canvas ===
+const imageInput = gel('imageInput');
+const bgImageInput = gel('bgImageInput');
+const loadImageBtn = gel('loadImageBtn');
+const bgImageBtn = gel('bgImageBtn');
 
+loadImageBtn.addEventListener('click', () => imageInput.click());
+bgImageBtn.addEventListener('click', () => bgImageInput.click());
+
+imageInput.addEventListener('change', function() {
+    if (this.files && this.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                saveState();
+                const w = drawingCanvas.width / devicePixelRatio;
+                const h = drawingCanvas.height / devicePixelRatio;
+                ctx.clearRect(0, 0, w, h);
+                ctx.drawImage(img, 0, 0, w, h);
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(this.files[0]);
+    }
+    this.value = '';
+});
+
+bgImageInput.addEventListener('change', function() {
+    if (this.files && this.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const dataUrl = e.target.result;
+            backgroundCanvas.style.backgroundImage = 'url(' + dataUrl + ')';
+            try { localStorage.setItem('cancerBackground', dataUrl); }
+            catch(err) { console.warn('localStorage set failed:', err); }
+        };
+        reader.readAsDataURL(this.files[0]);
+    }
+    this.value = '';
+});
+
+(function restoreSavedBackground() {
+    const saved = localStorage.getItem('cancerBackground');
+    if (saved) {
+        const img = new Image();
+        img.onload = function() {
+            backgroundCanvas.style.backgroundImage = 'url(' + saved + ')';
+        };
+        img.onerror = function() {
+            localStorage.removeItem('cancerBackground');
+        };
+        img.src = saved;
+    }
+})();
 
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('a, button').forEach(icon => icon.classList.add('icon-hover'));
@@ -749,6 +808,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     </script>
+
 </body>
 
 </html>

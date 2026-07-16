@@ -23,6 +23,8 @@
             <button id="removeLayerBtn" title="Удалить слой (D)">➖</button>
             <button id="mergeDownBtn" title="Слить co слоем ниже">🔽</button>
             <button id="backgroundSettingsBtn" title="Настройки фона">🖼️</button>
+            <input type="file" id="customBgInput" accept="image/*" style="display: none;">
+            <button id="customBgBtn" title="Установить свой фон">🌟</button>
             <button id="canvasSettingsBtn" title="Настройки канваса">🖌️</button>
             <button id="fullscreenBtn" title="Полноэкранный режим">🔲</button>
             <button id="spider" title="Паутинка">🕷️</button>
@@ -31,6 +33,8 @@
             <button id="drawOnExistingBtn" title="Рисовать на существующем">➡️</button>
             <input type="file" id="imageInput" accept="image/*" style="display: none;">
             <button id="UploadB" title="Загрузить изображение (U)">🌺</button>
+            <input type="file" id="loadReplaceInput" accept="image/*" style="display: none;">
+            <button id="loadReplaceBtn" title="Заменить всё изображение">📥</button>
             <button id="saveImageBtn" title="Сохранить изображение">🎬</button>
             <button id="eraserBtn">🧽</button>
             <button id="changeCursorBtn" title="Сменить курсор">🎨</button>
@@ -150,6 +154,7 @@
                         </div>
                         <div id="backgroundPreview"
                             style="display: none; position: absolute; z-index: 1000; border: 2px solid #000;"></div>
+                        <button id="resetCustomBgBtn" style="margin-top:10px;font-size:medium;">Сбросить кастомный фон</button>
                     </div>
                     <!-- Canvas Settings Modal -->
                     <div id="canvasSettingsModal" class="modal">
@@ -188,7 +193,10 @@
                             'closeModal',
                             'backgroundColorPicker',
                             'backgroundImageInput',
-                            'setBackgroundImageBtn'
+                            'setBackgroundImageBtn',
+                            'customBgBtn', 'customBgInput',
+                            'loadReplaceBtn', 'loadReplaceInput',
+                            'resetCustomBgBtn'
                         ];
                         // консранта!
                         const obj = Object.fromEntries(
@@ -299,6 +307,12 @@
                             img.onload = function () {
                                 contexts[layerIndex].drawImage(img, 0, 0, layers[layerIndex].width, layers[layerIndex].height);
                             }
+                            img.onerror = function () {
+                                if (imageUrl !== 'images/canvas1.jpg') {
+                                    localStorage.removeItem('customBackground');
+                                    setLayerBackground(layerIndex, 'images/canvas1.jpg');
+                                }
+                            }
                             img.src = imageUrl;
                         }
                         // создание слоев
@@ -313,7 +327,16 @@
                                 canvasContainer.appendChild(canvas);
                                 layers[0] = canvas;
                                 contexts[0] = canvas.getContext('2d', { willReadFrequently: true });
-                                setLayerBackground(back, 'images/canvas1.jpg');
+                                try {
+                                    const savedBg = localStorage.getItem('customBackground');
+                                    if (savedBg) {
+                                        setLayerBackground(back, savedBg);
+                                    } else {
+                                        setLayerBackground(back, 'images/canvas1.jpg');
+                                    }
+                                } catch (e) {
+                                    setLayerBackground(back, 'images/canvas1.jpg');
+                                }
                             }
 
                             layerCount++;

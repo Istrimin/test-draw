@@ -1365,3 +1365,104 @@
     //         eyedropperBtn.classList.remove('active');
     //     }
     // }
+
+// ===== Load & Replace Image (полная замена) =====
+const loadReplaceBtn = gel('loadReplaceBtn');
+const loadReplaceInput = gel('loadReplaceInput');
+let replaceBackup = null;
+
+loadReplaceBtn.addEventListener('click', () => {
+    if (replaceBackup) {
+        cancelReplace();
+        return;
+    }
+    loadReplaceInput.click();
+});
+
+loadReplaceInput.addEventListener('change', function (e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+        const img = new Image();
+        img.onload = () => {
+            replaceBackup = {};
+            Object.keys(layers).forEach(layerId => {
+                if (layerId === back.toString()) return;
+                saveState();
+                const ctx = contexts[layerId];
+                replaceBackup[layerId] = ctx.getImageData(0, 0, layers[layerId].width, layers[layerId].height);
+            });
+            Object.keys(layers).forEach(layerId => {
+                if (layerId === back.toString()) return;
+                contexts[layerId].clearRect(0, 0, layers[layerId].width, layers[layerId].height);
+            });
+            const canvas = layers[currentLayer];
+            const ctx = contexts[currentLayer];
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            layerDrawnOn[currentLayer] = true;
+            updateLayerEyeIcon(currentLayer);
+            loadReplaceBtn.textContent = '↩️';
+            loadReplaceBtn.title = 'Отменить замену';
+        };
+        img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+    this.value = '';
+});
+
+function cancelReplace() {
+    if (!replaceBackup) return;
+    Object.keys(replaceBackup).forEach(layerId => {
+        const ctx = contexts[layerId];
+        ctx.clearRect(0, 0, layers[layerId].width, layers[layerId].height);
+        ctx.putImageData(replaceBackup[layerId], 0, 0);
+    });
+    replaceBackup = null;
+    loadReplaceBtn.textContent = '📥';
+    loadReplaceBtn.title = 'Заменить всё изображение';
+}
+
+// ===== Custom Background (свой фон с сохранением) =====
+const customBgBtn = gel('customBgBtn');
+const customBgInput = gel('customBgInput');
+
+customBgBtn.addEventListener('click', () => {
+    customBgInput.click();
+});
+
+customBgInput.addEventListener('change', function (e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+        const dataUrl = ev.target.result;
+        try {
+            localStorage.setItem('customBackground', dataUrl);
+        } catch (e) {
+            showMessage('Не удалось сохранить фон (слишком большое изображение)');
+        }
+        const img = new Image();
+        img.onload = () => {
+            const ctx = contexts[back];
+            ctx.clearRect(0, 0, layers[back].width, layers[back].height);
+            ctx.drawImage(img, 0, 0, layers[back].width, layers[back].height);
+            showMessage('Кастомный фон установлен');
+        };
+        img.src = dataUrl;
+    };
+    reader.readAsDataURL(file);
+    this.value = '';
+});
+
+// Reset custom background
+const resetCustomBgBtn = gel('resetCustomBgBtn');
+if (resetCustomBgBtn) {
+    resetCustomBgBtn.addEventListener('click', () => {
+        try {
+            localStorage.removeItem('customBackground');
+        } catch (e) {}
+        setLayerBackground(back, 'images/canvas1.jpg');
+        showMessage('Кастомный фон сброшен');
+    });
+}
