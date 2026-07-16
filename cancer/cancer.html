@@ -434,17 +434,17 @@ const cursorFiles = [
     '46.png','47.png','48.png','49.png','50.png','51.png','52.png','53.png'
 ];
 
-// SVG cursors
+// SVG cursors with individual hotspots (hx, hy in 32x32 space)
 const svgCursors = [
-    { name: 'Карандаш', svg: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><circle cx="16" cy="16" r="2" fill="black"/><line x1="16" y1="16" x2="28" y2="4" stroke="black" stroke-width="1.5"/></svg>' },
-    { name: 'Кисть', svg: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><circle cx="16" cy="16" r="4" fill="black" opacity="0.5"/><circle cx="16" cy="16" r="2" fill="black"/></svg>' },
-    { name: 'Кисть 2', svg: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><circle cx="16" cy="16" r="6" fill="black" opacity="0.3"/><circle cx="16" cy="16" r="3" fill="black" opacity="0.6"/><circle cx="16" cy="16" r="1" fill="black"/></svg>' },
-    { name: 'Маркер', svg: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><rect x="8" y="8" width="16" height="16" rx="3" fill="black" opacity="0.4"/><rect x="12" y="12" width="8" height="8" rx="2" fill="black"/></svg>' },
-    { name: 'Ластик', svg: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><rect x="6" y="6" width="20" height="20" rx="4" fill="white" stroke="black" stroke-width="1.5"/></svg>' },
-    { name: 'Крест', svg: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><line x1="16" y1="0" x2="16" y2="32" stroke="black" stroke-width="1"/><line x1="0" y1="16" x2="32" y2="16" stroke="black" stroke-width="1"/><circle cx="16" cy="16" r="1" fill="red"/></svg>' },
-    { name: 'Точка', svg: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><circle cx="16" cy="16" r="3" fill="black"/></svg>' },
-    { name: 'Цель', svg: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><circle cx="16" cy="16" r="8" fill="none" stroke="black" stroke-width="1"/><circle cx="16" cy="16" r="2" fill="black"/><line x1="16" y1="4" x2="16" y2="10" stroke="black" stroke-width="1"/><line x1="16" y1="22" x2="16" y2="28" stroke="black" stroke-width="1"/><line x1="4" y1="16" x2="10" y2="16" stroke="black" stroke-width="1"/><line x1="22" y1="16" x2="28" y2="16" stroke="black" stroke-width="1"/></svg>' },
-    { name: 'Стрелка', svg: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><polygon points="2,2 2,30 10,22 16,30 18,28 12,20 22,20" fill="black"/></svg>' },
+    { name: 'Карандаш', hx: 28, hy: 4, svg: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><circle cx="16" cy="16" r="2" fill="black"/><line x1="16" y1="16" x2="28" y2="4" stroke="black" stroke-width="1.5"/></svg>' },
+    { name: 'Кисть', hx: 16, hy: 16, svg: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><circle cx="16" cy="16" r="4" fill="black" opacity="0.5"/><circle cx="16" cy="16" r="2" fill="black"/></svg>' },
+    { name: 'Кисть 2', hx: 16, hy: 16, svg: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><circle cx="16" cy="16" r="6" fill="black" opacity="0.3"/><circle cx="16" cy="16" r="3" fill="black" opacity="0.6"/><circle cx="16" cy="16" r="1" fill="black"/></svg>' },
+    { name: 'Маркер', hx: 16, hy: 16, svg: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><rect x="8" y="8" width="16" height="16" rx="3" fill="black" opacity="0.4"/><rect x="12" y="12" width="8" height="8" rx="2" fill="black"/></svg>' },
+    { name: 'Ластик', hx: 16, hy: 16, svg: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><rect x="6" y="6" width="20" height="20" rx="4" fill="white" stroke="black" stroke-width="1.5"/></svg>' },
+    { name: 'Крест', hx: 16, hy: 16, svg: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><line x1="16" y1="0" x2="16" y2="32" stroke="black" stroke-width="1"/><line x1="0" y1="16" x2="32" y2="16" stroke="black" stroke-width="1"/><circle cx="16" cy="16" r="1" fill="red"/></svg>' },
+    { name: 'Точка', hx: 16, hy: 16, svg: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><circle cx="16" cy="16" r="3" fill="black"/></svg>' },
+    { name: 'Цель', hx: 16, hy: 16, svg: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><circle cx="16" cy="16" r="8" fill="none" stroke="black" stroke-width="1"/><circle cx="16" cy="16" r="2" fill="black"/><line x1="16" y1="4" x2="16" y2="10" stroke="black" stroke-width="1"/><line x1="16" y1="22" x2="16" y2="28" stroke="black" stroke-width="1"/><line x1="4" y1="16" x2="10" y2="16" stroke="black" stroke-width="1"/><line x1="22" y1="16" x2="28" y2="16" stroke="black" stroke-width="1"/></svg>' },
+    { name: 'Стрелка', hx: 2, hy: 2, svg: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><polygon points="2,2 2,30 10,22 16,30 18,28 12,20 22,20" fill="black"/></svg>' },
 ];
 
 function applyCursor(cursorUrl) {
@@ -470,13 +470,14 @@ function setPngCursor(src) {
     img.src = src;
 }
 
-function setSvgCursor(svgString) {
+function setSvgCursor(svgString, hx, hy) {
     const s = cursorSize;
     const sizedSvg = svgString.replace('width="32"', 'width="' + s + '"').replace('height="32"', 'height="' + s + '"');
     const encoded = encodeURIComponent(sizedSvg);
-    const hotspot = Math.floor(s / 2);
-    // SVG cursors: hotspot at center (where the tip/dot is drawn)
-    applyCursor('url("data:image/svg+xml,' + encoded + '") ' + hotspot + ' ' + hotspot + ', auto');
+    // Scale hotspot proportionally to cursor size
+    const scaledHx = Math.round(hx / 32 * s);
+    const scaledHy = Math.round(hy / 32 * s);
+    applyCursor('url("data:image/svg+xml,' + encoded + '") ' + scaledHx + ' ' + scaledHy + ', auto');
 }
 
 function buildPngTab() {
@@ -540,7 +541,7 @@ function toggleCursorPanel() {
         // Size slider
         const sizeDiv = document.createElement('div');
         sizeDiv.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:8px;color:white;font-size:13px;';
-        sizeDiv.innerHTML = 'Размер: <input type="range" id="cursorSizeSlider" min="16" max="128" value="' + cursorSize + '" style="width:100px;height:4px;"> <span id="cursorSizeLabel">' + cursorSize + '</span>';
+        sizeDiv.innerHTML = 'Размер: <input type="range" id="cursorSizeSlider" min="16" max="128" value="' + cursorSize + '" style="width:100px;height:4px;box-shadow:none;"> <span id="cursorSizeLabel">' + cursorSize + '</span>';
         cursorList.appendChild(sizeDiv);
         
         // Grid container
@@ -575,7 +576,7 @@ function toggleCursorPanel() {
                 svgCursors.forEach(c => {
                     const item = document.createElement('div');
                     item.className = 'cursor-item';
-                    item.title = c.name;
+                    item.title = c.name + ' (hotspot: ' + c.hx + ',' + c.hy + ')';
                     const preview = document.createElement('img');
                     preview.src = 'data:image/svg+xml,' + encodeURIComponent(c.svg);
                     preview.className = 'cursor-preview';
@@ -584,7 +585,7 @@ function toggleCursorPanel() {
                     preview.style.borderRadius = '4px';
                     item.appendChild(preview);
                     item.addEventListener('click', () => {
-                        setSvgCursor(c.svg);
+                        setSvgCursor(c.svg, c.hx, c.hy);
                         cursorPanel.style.display = 'none';
                     });
                     grid.appendChild(item);
