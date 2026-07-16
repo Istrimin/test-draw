@@ -218,6 +218,9 @@ function resizeCanvases() {
     overlayCanvas.style.width = w + 'px';
     overlayCanvas.style.height = h + 'px';
     
+    // Prevent scale accumulation on repeated resizes
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    bgCtx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.scale(devicePixelRatio, devicePixelRatio);
     bgCtx.scale(devicePixelRatio, devicePixelRatio);
     
@@ -343,23 +346,28 @@ function clearCanvas() {
 }
 
 function saveImage() {
-    const tempCanvas = document.createElement('canvas');
-    tempCanvas.width = drawingCanvas.width;
-    tempCanvas.height = drawingCanvas.height;
-    const tempCtx = tempCanvas.getContext('2d');
+    try {
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = drawingCanvas.width;
+        tempCanvas.height = drawingCanvas.height;
+        const tempCtx = tempCanvas.getContext('2d');
 
-    tempCtx.drawImage(drawingCanvas, 0, 0);
+        tempCtx.drawImage(drawingCanvas, 0, 0);
 
-    if (overlayActive) {
-        tempCtx.globalAlpha = parseFloat(overlayCanvas.style.opacity);
-        tempCtx.drawImage(overlayCanvas, 0, 0);
-        tempCtx.globalAlpha = 1.0;
+        if (overlayActive) {
+            tempCtx.globalAlpha = parseFloat(overlayCanvas.style.opacity) || 1;
+            tempCtx.drawImage(overlayCanvas, 0, 0);
+            tempCtx.globalAlpha = 1.0;
+        }
+
+        const link = document.createElement('a');
+        link.download = 'my-drawing.png';
+        link.href = tempCanvas.toDataURL('image/png');
+        link.click();
+    } catch (err) {
+        console.error('saveImage() failed:', err);
+        alert('Не удалось сохранить изображение. Откройте Console в DevTools и посмотрите ошибку.');
     }
-
-    const link = document.createElement('a');
-    link.download = 'my-drawing.png';
-    link.href = tempCanvas.toDataURL('image/png');
-    link.click();
 }
 
 window.createOverlayLayer = function() {
