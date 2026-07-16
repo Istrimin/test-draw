@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Настоящий Художник</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+</head>
+
+<body>
+    <div class="base-container">
+        <div class="sidebar">
+            <a href="index.html" target="_self" title="Выйти из команты" id="exitLink">🚪</a>
+            <button id="message" title="Сообщение">✉️</button>
+            <button id="FillBtn" title="Заливка">🌊</button>
+            <button id="fillModeBtn" title="Заливка">🎨</button>
+            <button id="addLayerBtn" title="Добавить слой (N)">➕</button>
+            <button id="removeLayerBtn" title="Удалить слой (D)">➖</button>
+            <button id="mergeDownBtn" title="Слить co слоем ниже">🔽</button>
+            <button id="backgroundSettingsBtn" title="Настройки фона">🖼️</button>
+            <button id="canvasSettingsBtn" title="Настройки канваса">🖌️</button>
+            <button id="fullscreenBtn" title="Полноэкранный режим">🔲</button>
+            <button id="spider" title="Паутинка">🕷️</button>
+            <button id="fingerBtn" title="Сужение к центру">🎯</button>
+            <button id="identifyLayerBtn" title="Определить слой">🔍</button>
+            <button id="drawOnExistingBtn" title="Рисовать на существующем">➡️</button>
+            <input type="file" id="imageInput" accept="image/*" style="display: none;">
+            <button id="UploadB" title="Загрузить изображение (U)">🌺</button>
+            <button id="saveImageBtn" title="Сохранить изображение">🎬</button>
+            <button id="eraserBtn">🧽</button>
+            <button id="changeCursorBtn" title="Сменить курсор">🎨</button>
+            <button id="undoBtn" title="Отменить (Z)">⟲</button>
+            <button id="redoBtn" title="Повторить (X)">⟳</button>
+            <button id="clear" title="Очистить">💀</button>
+            <button id="eyedropperBtn" title="Пипетка (A)">💧</button>
+            <button id="deleteAllBtn" title="Удалить все">🗑️</button>
+            <button id="mergeLayers" title="Объединить слои">🔗</button>
+            <button id="settings" title="Настройки">⚙️</button>
+        </div>
+        <div id="colorPreview"></div>
+        <div class="canvas-and-sliders">
+            <div class="layer-panel-wrapper">
+                <button id="moveLayerUp" title="Слой вверх">▲</button>
+                <div class="layer-panel">
+                    <div id="layerButtons"></div>
+                </div>
+                <button id="moveLayerDown" title="Слой вниз">▼</button>
+            </div>
+            <div class="canvas-container">
+                <div id="message-container" class="message-popup">
+                    <p id="message-text"></p>
+                </div>
+                <div class="color-picker-and-word">
+                    <div class="color-picker-group">
+                        <input type="color" id="colorPicker" value="#000000" title="Цвет заливки (C)">
+                        <input type="color" id="colorPicker2" value="#ffffff" title="булый">
+                        <input type="color" id="colorPicker3" value="#ff0000" title="Цвет кисти 3">
+                        <input type="color" id="colorPicker4" value="#ffa500" title="Цвет кисти 4">
+                        <input type="color" id="colorPicker5" value="#ffff00" title="Цвет кисти 5">
+                        <input type="color" id="colorPicker6" value="#008000" title="Цвет кисти 6">
+                        <input type="color" id="colorPicker7" value="#00ffff" title="Цвет кисти 7">
+                        <input type="color" id="colorPicker8" value="#0000ff" title="Цвет кисти 8">
+                        <input type="color" id="colorPicker9" value="#800080" title="Цвет кисти 9">
+                        <input type="color" id="backgroundPicker" value="#ffffff" title="Цвет фона (B)">
+                        <div class="color-picker-group-two">
+                        </div>
+                        <button id="symmetry" title="Симметрия (S)">🦋</button>
+                    </div>
+                    <div class="word-navigation">
+                        <button id="previousWord" title="Предыдущее слово">&lt;</button>
+                        <p id="Quizz"></p>
+                        <button id="nextWord" title="Следующее слово">&gt;</button>
+                    </div>
+                    <div class="header-container">
+                        <div class="time-wrapper">
+                            <span id="time" class="time"></span>
+                            <span id="startTime" class="time"></span>
+                            <span id="elapsedTime" class="time"></span>
+                            <button id="zoomBtn" title="Лупа"></button>
+                            <div id="zoomLevelDisplay" title="Уровень зума"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="canv-container" id="canvasContainer">
+                    <div id="cursorPanel" class="cursor-panel" style="display: none;">
+                        <h3>Выберите курсор</h3>
+                        <div id="cursorList"></div>
+                    </div>
+                </div>
+                <div class="sliders">
+                    <label for="spiderStrength" title="Сила паука" style="display: none;">🕸️</label>
+                    <input type="range" id="spiderStrength" min="50" max="10000" value="1000" title="Сила паука"
+                        style="display: none;">
+                </div>
+                <div class="sliders">
+                    <label for="opacity" title="Прозрачность">👻</label>
+                    <input type="range" id="opacity" min="1" max="100" value="100">
+                    <span id="opacityValue" style="color: red;">100</span>
+                    <label for="layerOpacitySlider" title="Прозрачность слоя">👓</label>
+                    <input type="range" id="layerOpacitySlider" min="0" max="100" value="100">
+                    <span id="layerOpacityValue" style="color: red;">100</span>
+                </div>
+                <div class="sliders">
+                    <label for="brushSize" title="Размер кисти">🖌️</label>
+                    <input type="range" id="brushSize" min="1" max="300" value="3">
+                    <span id="brushSizeValue" style="color: red;">3</span>
+                    <div class="sliders">
+                        <div class="pressure-bar-container">
+                            <label for="pressureBar" title="Нажим">🎯</label>
+                            <progress id="pressureBar" value="0" max="4000"></progress>
+                            <span id="pressureValue" class="pressure-value"></span>
+                        </div>
+                        <!-- <input type="number" id="resolutionHeight" value="2000">
+<button onclick="updateResolutionSettings()">Применить</button> -->
+                    </div>
+                    <label for="outlineSize" title="Размер обводки">🖼️</label> <span
+                        style="font-size: 1.5em;">&#8690;</span>
+                    <input type="range" id="outlineSize" min="0" max="20" value="0">
+                    <span id="outlineSizeValue" style="color: red;">0</span>
+                    <button id="toggleOutlineTypeBtn" title="Переключить тип обводки">🔄</button>
+                    <input type="color" id="outlineColorPicker" value="#000000" title="Цвет обводки">
+                    <button id="applyOutlineBtn" title="Применить обводку">✅</button>
+                </div>
+                <div class="filter-sliders">
+                    <label for="lightnessSlider" title="Светлость">🌑</label>
+                    <input type="range" id="lightnessSlider" min="0" max="100" value="100">
+                    <span id="lightnessValue" style="color: red;">100</span>
+                    <label for="saturationSlider" title="Цветность">🎨</label>
+                    <input type="range" id="saturationSlider" min="0" max="200" value="100">
+                    <span id="saturationValue" style="color: red;">200</span>
+                    <label for="contrastSlider" title="Контраст">🔆</label>
+                    <input type="range" id="contrastSlider" min="0" max="280" value="100">
+                    <span id="contrastValue" style="color: red;">200</span>
+                    <label for="hueShiftSlider" title="Цветовой сдвиг">🌈</label>
+                    <input type="range" id="hueShiftSlider" min="0" max="360" value="0">
+                    <span id="hueShiftValue" style="color: red;">0</span>
+                </div>
+                <div id="backgroundSettingsModal" class="modal">
+                    <div class="modal-content">
+                        <span id="closeModal" style="float:right;cursor:pointer;">&times;</span>
+                        <input type="color" id="backgroundColorPicker" value="#ffffff">
+                        <br><br>
+                        <input type="file" id="backgroundImageInput" accept="image/*" multiple>
+                        <div id="backgroundImageGallery" style="display: flex; flex-wrap: wrap; margin-top: 10px;">
+                        </div>
+                        <div id="backgroundPreview"
+                            style="display: none; position: absolute; z-index: 1000; border: 2px solid #000;"></div>
+                    </div>
+                    <!-- Canvas Settings Modal -->
+                    <div id="canvasSettingsModal" class="modal">
+                        <div class="modal-content">
+                            <span id="closeCanvasModal" style="float:right;cursor:pointer;">&times;</span>
+                            <input type="color" id="canvasColorPicker" value="#000000">
+                            <br><br>
+                            <input type="file" id="canvasImageInput" accept="image/*">
+                            <div id="canvasImageGallery" style="display: flex; flex-wrap: wrap; margin-top: 10px;">
+                            </div>
+                        </div>
+                    </div>
+                    <script>
+                        const gel = id => document.getElementById(id);
+                        gel('canvasContainer').style.width = '100%';
+                        // Глобальные переменные для размеров
+                        let displayWidth = 600;
+                        let displayHeight = 400;
+                        let realWidth = displayWidth;
+                        let realHeight = displayWidth;
+
+                        let scale = displayWidth / realWidth;
+                        const layerFilters = {};
+
+                        const symmetricPoints = []; // для паука
+                        const back = 0 // константа для z индекса канваса
+                        const elements = [
+                            'UploadB', 'fillModeBtn',
+                            'brushSize', 'opacity', 'pressureBar', 'backgroundPicker',
+                            'addLayerBtn', 'removeLayerBtn', 'eraserBtn', 'layerButtons',
+                            'zoomBtn', 'canvasContainer', 'drawOnExistingBtn', 'identifyLayerBtn',
+                            'layerOpacitySlider', 'layerOpacityValue', 'moveLayerUp',
+                            'moveLayerDown',
+                            'backgroundSettingsBtn',
+                            'backgroundSettingsModal',
+                            'closeModal',
+                            'backgroundColorPicker',
+                            'backgroundImageInput',
+                            'setBackgroundImageBtn'
+                        ];
+                        // консранта!
+                        const obj = Object.fromEntries(
+                            elements.map(id => [id, gel(id)])
+                        );
+                        const container = obj.canvasContainer;
+                        const containerRect = container.getBoundingClientRect();
+                        const layerPanel = document.querySelector('.layer-panel'),
+                            sidebar = document.querySelector(".sidebar"),
+                            points = [],
+                            layerOpacities = {},
+                            // layers = [],
+                            contexts = {},
+                            // layerColors = [],
+                            history = {},
+                            // redoHistory = [];
+                            layers = {},
+                            layerColors = {},
+                            redoHistory = {};
+                        // layerOpacities = [],
+                        // layers = [],
+                        // contexts = [],
+                        // layerColors = [],
+                        // redoHistory = [];
+
+                        const MAX_ZOOM = 100, MIN_ZOOM = 1, ZOOM_STEP = 0.02;
+
+                        let layerCount = 0,
+                            symmetry = true,
+                            currentLayer = 1,
+                            previousLayer = 1,
+
+                            isSpider = false,
+
+                            curCtx,
+                            isDrawing = false,
+                            isErasing = false,
+                            isDrawOnExisting = false,
+                            zoomLevel = 1, // 1000% = 10
+                            isIdentifyingLayer = false,
+                            wasDrawing = false,
+                            isDraggingScroll = false,
+                            startY,
+                            // currentCursor = 'auto',
+                            isZoomActive = false,
+                            offsetX = 0,
+                            offsetY = 0,
+                            lastX = null,
+                            lastY = null,
+                            uploadedImage = null,
+                            clearedCanvasState = null,
+                            isFillMode = false,
+                            zoomOriginX = 0,
+                            zoomOriginY = 0,
+                            isSmoothLineMode = false,
+                            isCtrlPressed = false;
+
+                        const symmetryButton = gel('symmetry');
+
+                        symmetryButton.addEventListener('click', toggleSymmetry);
+
+                        const spiderButton = gel('spider');
+                        spiderButton.addEventListener('click', toggleSpider);
+
+                        // !
+                        function toggleSymmetry() {
+                            symmetry = !symmetry;
+                            if (symmetry) {
+                                symmetryButton.classList.add('active');
+                            } else {
+                                symmetryButton.classList.remove('active');
+                            }
+                        }
+
+                        function toggleDrawOnExisting() {
+                            isDrawOnExisting = !isDrawOnExisting;
+                            drawOnExistingBtn.classList.toggle('active', isDrawOnExisting);
+                        }
+                        const spiderStrengthSlider = gel('spiderStrength');
+
+
+                        function toggleSpider() {
+                            isSpider = !isSpider;
+                            spider.classList.toggle('active', isSpider);
+                            // Show or hide the slider based on the spider tool state
+                            spiderStrengthSlider.style.display = isSpider ? 'block' : 'none';
+                        }
+
+
+                    </script>
+                    <script>
+фва="adfasdf"
+                        drawOnExistingBtn.addEventListener('click', toggleDrawOnExisting);
+
+                        // ИНИЦИАЛИЗАЦИЯ 
+                        document.addEventListener('DOMContentLoaded', function () {
+
+                            initializeApp();
+                        });
+
+                        function initializeApp() {
+                            createLayer();
+                        }
+
+                        // установка бэкграунда
+                        function setLayerBackground(layerIndex, imageUrl) {
+                            const img = new Image();
+                            img.onload = function () {
+                                contexts[layerIndex].drawImage(img, 0, 0, layers[layerIndex].width, layers[layerIndex].height);
+                            }
+                            img.src = imageUrl;
+                        }
+                        // создание слоев
+                        function createLayer() {
+
+                            updateZoom();
+                            if (!layers[back]) {
+                                const canvas = document.createElement('canvas');
+                                canvas.width = 600;
+                                canvas.height = 400;
+                                canvas.style.position = 'absolute';
+                                canvasContainer.appendChild(canvas);
+                                layers[0] = canvas;
+                                contexts[0] = canvas.getContext('2d', { willReadFrequently: true });
+                                setLayerBackground(back, 'images/canvas1.jpg');
+                            }
+
+                            layerCount++;
+                            layerColors[layerCount] = '#' + Math.floor(Math.random() * 16777215).toString(16);
+
+                            const canvas = document.createElement('canvas');
+                            canvas.id = `layer${layerCount}`;
+                            canvas.width = realWidth;
+                            canvas.height = realHeight;
+                            canvas.style.width = `${displayWidth}px`;
+                            canvas.style.height = `${displayHeight}px`;
+                            canvas.style.position = 'absolute';
+                            canvas.style.top = '0';
+                            canvas.style.left = '0';
+                            canvas.style.zIndex = layerCount;
+                            canvasContainer.appendChild(canvas);
+                            layers[layerCount] = canvas;
+                            contexts[layerCount] = canvas.getContext('2d', { willReadFrequently: true });
+                            const button = document.createElement('button');
+                            button.textContent = " ❤ ";
+                            button.classList.add('layer-button');
+                            button.dataset.layer = layerCount;
+
+
+                            // Add eye icon
+                            const eyeIcon = document.createElement('span');
+                            eyeIcon.textContent = "👁️";
+                            eyeIcon.style.display = 'none';
+                            eyeIcon.classList.add('eye-icon');
+                            button.appendChild(eyeIcon);
+
+
+                            layerButtons.appendChild(button);
+                            button.addEventListener('click', function () {
+                                setCurrentLayer(parseInt(this.dataset.layer));
+                            });
+                            addEventListenersToLayer(canvas);
+                            setCurrentLayer(layerCount);
+                            initializeLayer(layerCount);
+                            history[layerCount] = [];
+                            redoHistory[layerCount] = [];
+                            updateLayerButtonColor(layerCount);
+                            updateLayerOrder();
+                            // createHistorySlider(layerCount);
+                            layerDrawnOn[layerCount] = false; // Initialize as not drawn on
+
+                        }
+
+
+// рисование
+                        function startDrawing(e) {
+                            if (currentLayer === 100 || !curCtx || isEyedropperActive || isCtrlPressed) {
+                                return;
+                            }
+                            isDrawing = true;
+                            const rect = layers[currentLayer].getBoundingClientRect();
+                            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                            const x = Math.floor((clientX - rect.left) * (realWidth / displayWidth) / zoomLevel);
+                            const y = Math.floor((clientY - rect.top) * (realHeight / displayHeight) / zoomLevel);
+
+                            points.length = 0;
+                            symmetricPoints.length = 0;
+                            points.push({ x, y });
+
+                            [lastX, lastY] = [x, y];
+                            saveState();
+                        }
+
+                        function draw(e) {
+                            if (!isDrawing || !curCtx) {
+                                return;
+                            }
+                            if (isFinger) {
+                                finger(e);
+                                return;
+                            }
+                            if (!isDrawing || !curCtx) return;
+
+                            const rect = layers[currentLayer].getBoundingClientRect();
+                            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                            const x = Math.floor((clientX - rect.left) * (realWidth / displayWidth) / zoomLevel);
+                            const y = Math.floor((clientY - rect.top) * (realHeight / displayHeight) / zoomLevel);
+
+                            const pressure = e.pressure || 1;
+                            curCtx.lineWidth = brushSize.value * pressure * (realWidth / displayWidth);
+                            curCtx.lineCap = 'round';
+                            curCtx.lineJoin = 'round';
+                            curCtx.globalAlpha = opacity.value / 100;
+                            curCtx.globalCompositeOperation = isErasing ? 'destination-out' : 'source-over';
+
+                            if (isSpider) {
+                                drawSpider(lastX, lastY, x, y, false);
+                            } else {
+                                if (isDrawOnExisting) {
+                                    tools.drawOn(lastX, lastY, x, y, curCtx);
+                                } else {
+                                    curCtx.beginPath();
+                                    curCtx.moveTo(lastX, lastY);
+                                    curCtx.lineTo(x, y);
+                                    curCtx.stroke();
+                                }
+                            }
+
+                            if (symmetry) {
+                                const centerX = realWidth / 2;
+                                const symmetricLastX = centerX + (centerX - lastX);
+                                const symmetricX = centerX + (centerX - x);
+
+                                if (isSpider) {
+                                    drawSpider(symmetricLastX, lastY, symmetricX, y, true);
+                                } else {
+                                    if (isDrawOnExisting) {
+                                        tools.drawOn(symmetricLastX, lastY, symmetricX, y, curCtx);
+                                    } else {
+                                        curCtx.beginPath();
+                                        curCtx.moveTo(symmetricLastX, lastY);
+                                        curCtx.lineTo(symmetricX, y);
+                                        curCtx.stroke();
+                                    }
+                                }
+                            }
+
+                            [lastX, lastY] = [x, y];
+                            pressureBar.value = pressure * 10000;
+                            pressureBar.nextElementSibling.textContent = Math.round(pressure * 100);
+                            layerDrawnOn[currentLayer] = true;
+                            updateLayerEyeIcon(currentLayer);
+                        }
+
+                        function stopDrawing() {
+                            if (isDrawing) {
+                                isDrawing = false;
+                                saveState();
+                                points.length = 0;
+                                symmetricPoints.length = 0;
+                            }
+                            lastX = null;
+                            lastY = null;
+                        }
+
+                        function endDrawing() {
+                            if (isDrawing) {
+                                isDrawing = false;
+                                lastX = null;
+                                lastY = null;
+                            }
+                        }
+
+// заливка
+    const FillBtn = gel('FillBtn');
+    let isFloodFillActive = false;
+    // Add event listener for canvasContainer
+    canvasContainer.addEventListener('click', (e) => {
+        if (isFloodFillActive) {
+            floodFill(e);
+        }
+    });
+    FillBtn.addEventListener('click', () => {
+        isFloodFillActive = !isFloodFillActive;
+        FillBtn.classList.toggle('active', isFloodFillActive);
+    });
+    // function floodFill(e) {
+    //     // Проверяем, активна ли функция заливки и существует ли текущий контекст
+    //     if (!isFloodFillActive || !curCtx) return;
+
+    //     const rect = layers[currentLayer].getBoundingClientRect();
+    //     // Вычисляем начальные координаты с учетом масштабирования
+    //     const startX = Math.floor((e.clientX - rect.left) / zoomLevel);
+    //     const startY = Math.floor((e.clientY - rect.top) / zoomLevel);
+
+    //     // Создаем временный канвас для работы
+    //     const tempCanvas = document.createElement('canvas');
+    //     const tempCtx = tempCanvas.getContext('2d');
+    //     tempCanvas.width = realWidth;
+    //     tempCanvas.height = realHeight;
+
+    //     // Копируем содержимое всех слоев на временный канвас, кроме слоев 0, 1 и текущего
+    //     Object.entries(layers).forEach(([index, layer]) => {
+    //         if (index !== '0' && index !== '1' && parseInt(index) !== currentLayer) {
+    //             tempCtx.drawImage(layer, 0, 0);
+    //         }
+    //     });
+
+    //     const imageData = tempCtx.getImageData(0, 0, realWidth, realHeight);
+    //     const data = imageData.data;
+    //     const targetColor = getPixelColor(startX, startY, data, realWidth);
+        
+    //     // Получаем цвет заливки для текущего слоя
+    //     const fillColor = layerColors[currentLayer] ? hexToRgba(layerColors[currentLayer]) : [0, 0, 0, 255];
+    //     const tolerance = 30; // Допустимое отклонение цвета
+
+    //     // Проверяем, не совпадает ли целевой цвет с цветом заливки
+    //     if (colorMatch(targetColor, fillColor, tolerance)) return;
+
+    //     const stack = [[startX, startY]];
+    //     const visited = new Uint8Array(realWidth * realHeight);
+
+    //     // Алгоритм заливки
+    //     while (stack.length) {
+    //         const [x, y] = stack.pop();
+    //         const index = y * realWidth + x;
+    //         if (visited[index]) continue;
+    //         visited[index] = 1;
+
+    //         const pixelIndex = index * 4;
+    //         const currentColor = data.slice(pixelIndex, pixelIndex + 4);
+
+    //         // Заливаем, если цвет совпадает с целевым или это сплошной цвет
+    //         if (colorMatch(currentColor, targetColor, tolerance) || isSolidColor(currentColor, tolerance)) {
+    //             setPixelColor(data, x, y, realWidth, fillColor);
+    //             // Проверяем соседние пиксели
+    //             if (x > 0 && !isContourPixel(x - 1, y, data, realWidth, realHeight, targetColor, tolerance)) stack.push([x - 1, y]);
+    //             if (x < realWidth - 1 && !isContourPixel(x + 1, y, data, realWidth, realHeight, targetColor, tolerance)) stack.push([x + 1, y]);
+    //             if (y > 0 && !isContourPixel(x, y - 1, data, realWidth, realHeight, targetColor, tolerance)) stack.push([x, y - 1]);
+    //             if (y < realHeight - 1 && !isContourPixel(x, y + 1, data, realWidth, realHeight, targetColor, tolerance)) stack.push([x, y + 1]);
+    //         }
+    //     }
+
+    //     // Применяем изменения к текущему контексту
+    //     curCtx.putImageData(imageData, 0, 0);
+    //     saveState();
+    //     layerDrawnOn[currentLayer] = true;
+    //     updateLayerEyeIcon(currentLayer);
+    // }
+
+function floodFill(e) {
+    if (!isFloodFillActive || !curCtx) return;
+ 
+    const rect = layers[currentLayer].getBoundingClientRect();
+    const startX = Math.floor((e.clientX - rect.left) * (realWidth / displayWidth) / zoomLevel);
+    const startY = Math.floor((e.clientY - rect.top) * (realHeight / displayHeight) / zoomLevel);
+
+    const tempCanvas = document.createElement('canvas');
+    const tempCtx = tempCanvas.getContext('2d');
+    tempCanvas.width = realWidth;
+    tempCanvas.height = realHeight;
+
+        // Копируем содержимое всех слоев на временный канвас, кроме слоев 0, 1 и текущего
+        Object.entries(layers).forEach(([index, layer]) => {
+            if (index !== '0' && index !== '1' && parseInt(index) !== currentLayer) {
+                tempCtx.drawImage(layer, 0, 0);
+            }
+        });
+        adf="asdf"
+        var a = 23;
+
+        Object.entries(layers).forEach(([index, layer]) => {
+            if(index == 1) { return;}  });
+            if (index != 1) { // Пропускаем слой 1
+                tempCtx.drawImage(layer, 0, 0);
+            }
+
+    // // Копируем содержимое всех слоев на временный канвас
+    // Object.entries(layers).forEach(([index, layer]) => {
+    //     tempCtx.drawImage(layer, 0, 0);
+    // });
+
+    const imageData = tempCtx.getImageData(0, 0, realWidth, realHeight);
+    const data = imageData.data;
+    const targetColor = getPixelColor(startX, startY, data, realWidth);
+    
+    const fillColor = hexToRgba(layerColors[currentLayer] || '#000000');
+    const tolerance = 30;
+
+    if (colorMatch(targetColor, fillColor, tolerance)) return;
+
+    const fillLayer = (x, y) => {
+        const stack = [[x, y]];
+        const visited = new Uint8Array(realWidth * realHeight);
+
+        while (stack.length) {
+            const [x, y] = stack.pop();
+            const index = y * realWidth + x;
+            if (visited[index]) continue;
+            visited[index] = 1;
+
+            const pixelIndex = index * 4;
+            const currentColor = data.slice(pixelIndex, pixelIndex + 4);
+
+            if (colorMatch(currentColor, targetColor, tolerance) || isSolidColor(currentColor, tolerance)) {
+                setPixelColor(data, x, y, realWidth, fillColor);
+                if (x > 0) stack.push([x - 1, y]);
+                if (x < realWidth - 1) stack.push([x + 1, y]);
+                if (y > 0) stack.push([x, y - 1]);
+                if (y < realHeight - 1) stack.push([x, y + 1]);
+            }
+        }
+    };
+
+    fillLayer(startX, startY);
+
+    if (symmetry) {
+        const centerX = realWidth / 2;
+        const symmetricStartX = Math.floor(centerX + (centerX - startX));
+        fillLayer(symmetricStartX, startY);
+    }
+
+    curCtx.putImageData(imageData, 0, 0);
+    saveState();
+    layerDrawnOn[currentLayer] = true;
+    updateLayerEyeIcon(currentLayer);
+}
+
+    // Проверяет, является ли цвет сплошным (близким к белому)
+    function isSolidColor(color, tolerance) {
+        return color[0] >= 255 - tolerance && color[1] >= 255 - tolerance && color[2] >= 255 - tolerance;
+    }
+
+    // Проверяет, является ли пиксель частью контура
+    function isContourPixel(x, y, data, width, height, targetColor, tolerance) {
+        const currentColor = getPixelColor(x, y, data, width);
+        return !colorMatch(currentColor, targetColor, tolerance);
+    }
+     
+
+    // Устанавливает цвет пикселя
+    function setPixelColor(data, x, y, width, color) {
+        const index = (y * width + x) * 4;
+        data[index] = color[0];
+        data[index + 1] = color[1];
+        data[index + 2] = color[2];
+        data[index + 3] = color[3];
+    }
+    // Преобразует HEX-цвет в RGBA
+    function hexToRgba(hex) {
+        const r = parseInt(hex.slice(1, 3), 16);
+        const g = parseInt(hex.slice(3, 5), 16);
+        const b = parseInt(hex.slice(5, 7), 16);
+        return [r, g, b, 255];
+    }
+
+    // Проверяет, совпадают ли цвета с учетом допуска
+    function colorMatch(a, b, tolerance) {
+        return Math.abs(a[0] - b[0]) <= tolerance &&
+               Math.abs(a[1] - b[1]) <= tolerance &&
+               Math.abs(a[2] - b[2]) <= tolerance &&
+               (a.length < 4 || b.length < 4 || Math.abs(a[3] - b[3]) <= tolerance);
+    }
+
+    // Получает цвет пикселя по координатам
+    function getPixelColor(x, y, data, width) {
+        x = Math.floor(x);
+        y = Math.floor(y);
+        if (x < 0 || x >= width || y < 0 || y >= data.length / 4 / width) {
+            return [0, 0, 0, 0]; // Возвращаем прозрачный цвет для пикселей вне границ
+        }
+        const index = (y * width + x) * 4;
+        return [data[index], data[index + 1], data[index + 2], data[index + 3]];
+    }
+
+
+// пипетка 
+                        canvasContainer.addEventListener('click', handleEyedropperClick);
+                        canvasContainer.addEventListener('touchstart', handleEyedropperClick);
+
+                        const eyedropperBtn = gel('eyedropperBtn');
+                        let isEyedropperActive = false;
+
+                        eyedropperBtn.addEventListener('click', handleEyedropperActivation);
+                        eyedropperBtn.addEventListener('touchstart', handleEyedropperActivation);
+
+                        function handleEyedropperActivation(e) {
+                            e.preventDefault();
+
+                            isEyedropperActive = !isEyedropperActive;
+                            document.body.style.cursor = isEyedropperActive ? 'url(cursors/pipette.png), auto' : 'auto';
+                            eyedropperBtn.classList.toggle('active');
+
+                            if (isEyedropperActive) {
+                                isDrawing = false;
+                            }
+                        }
+                        function handleEyedropperClick(e) {
+                            if (!isEyedropperActive) return;
+
+                            e.preventDefault();
+
+                            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+                            const rect = canvasContainer.getBoundingClientRect();
+                            const x = Math.floor((clientX - rect.left) * (realWidth / displayWidth) / zoomLevel);
+                            const y = Math.floor((clientY - rect.top) * (realHeight / displayHeight) / zoomLevel);
+
+                            const color = getPixelColor2(x, y);
+
+                            curCtx.strokeStyle = color;
+                            layerColors[currentLayer] = color;
+                            updateLayerButtonColor(currentLayer);
+
+                            isEyedropperActive = false;
+                            document.body.style.cursor = 'auto';
+                            eyedropperBtn.classList.remove('active');
+                        }
+
+                        function getPixelColor2(x, y) {
+                            // Ensure x and y are integers
+                            x = Math.floor(x);
+                            y = Math.floor(y);
+
+                            const tempCanvas = document.createElement('canvas');
+                            const tempCtx = tempCanvas.getContext('2d', { willReadFrequently: true });
+                            tempCanvas.width = realWidth;
+                            tempCanvas.height = realHeight;
+
+                            const sortedLayers = Object.entries(layers)
+                                .filter(([id]) => id !== back.toString())
+                                .sort((a, b) => parseInt(a[1].style.zIndex) - parseInt(b[1].style.zIndex));
+
+                            tempCtx.drawImage(layers[back], 0, 0, realWidth, realHeight);
+                            sortedLayers.forEach(([, layer]) => {
+                                tempCtx.drawImage(layer, 0, 0, realWidth, realHeight);
+                            });
+
+                            // Check if x and y are within the canvas bounds
+                            if (x < 0 || x >= realWidth || y < 0 || y >= realHeight) {
+                                console.warn(`Coordinates (${x}, ${y}) are out of bounds`);
+                                return 'rgba(0, 0, 0, 0)'; // Return transparent color for out-of-bounds pixels
+                            }
+
+                            const pixelData = tempCtx.getImageData(x, y, 1, 1).data;
+                            return `rgb(${pixelData[0]}, ${pixelData[1]}, ${pixelData[2]})`;
+                        }
+
+// остальное
+                        // установка текущего слоя
+                        function setCurrentLayer(layerNum) {
+                            if (layerNum === back) {
+                                return;
+                            }
+
+                            if (currentLayer !== layerNum) {
+                                previousLayer = currentLayer;
+                            }
+
+                            currentLayer = layerNum;
+                            curCtx = contexts[currentLayer];
+
+
+                            const opacity = layerOpacities[layerNum] || 100;
+                            layerOpacitySlider.value = opacity;
+                            layerOpacityValue.textContent = opacity;
+                            document.querySelectorAll('.layer-button').forEach(btn => {
+                                btn.classList.remove('active-layer');
+                                if (parseInt(btn.dataset.layer) === currentLayer) {
+                                    btn.classList.add('active-layer');
+                                }
+                            });
+
+                            // if (!isErasing) {
+                            //     updateLayerButtonColor(layerNum);
+                            // }
+
+                            if (layerColors[layerNum]) {
+                                curCtx.strokeStyle = layerColors[layerNum];
+                            }
+                            updateLayerEyeIcon(layerNum);
+                            // Добавьте эти строки в конец функции:
+                            const outlineSize = outlineSizes[layerNum] || 0;
+                            outlineSizeInput.value = outlineSize;
+                            outlineSizeValue.textContent = outlineSize;
+                        }
+                        // обновление цвета слоев
+                        function updateLayerButtonColor(layerNum) {
+                            const button = document.querySelector(`.layer-button[data-layer="${layerNum}"]`);
+                            if (button && layerColors[layerNum]) {
+                                button.style.backgroundColor = layerColors[layerNum];
+                            }
+                        }
+                        // инициализация слоя(нужно так же при создании нового слоя)
+                        function initializeLayer(layerNum) {
+
+                            contexts[layerNum].fillStyle = 'rgba(0,0,0,0)';
+                            contexts[layerNum].fillRect(0, 0, layers[layerNum].width, layers[layerNum].height);
+                        }
+
+// паук
+                        function drawSpider(startX, startY, endX, endY, isSymmetric = false) {
+                            curCtx.beginPath();
+                            curCtx.moveTo(startX, startY);
+                            curCtx.quadraticCurveTo(startX, startY, endX, endY);
+                            curCtx.stroke();
+
+                            const targetPoints = isSymmetric ? symmetricPoints : points;
+                            targetPoints.push({ x: endX, y: endY });
+
+                            var power = spiderStrengthSlider.value;
+
+                            for (let i = 0; i < targetPoints.length; i++) {
+                                const dx = targetPoints[i].x - endX;
+                                const dy = targetPoints[i].y - endY;
+                                const dd = dx * dx + dy * dy;
+                                if (dd < power) {
+                                    var mul = 0.1
+                                    curCtx.beginPath();
+                                    curCtx.moveTo(endX + (dx * mul), endY + (dy * mul));
+                                    curCtx.lineTo(targetPoints[i].x - (dx * mul), targetPoints[i].y - (dy * mul));
+                                    curCtx.stroke();
+                                }
+                            }
+                        }
+// saveState сохранение истории 
+                        function saveState() {
+                            if (!curCtx) return;
+
+                            if (history[currentLayer].length >= MAX_HISTORY_STATES) {
+                                history[currentLayer].shift();
+                            }
+
+                            history[currentLayer].push(curCtx.getImageData(0, 0, layers[currentLayer].width, layers[currentLayer].height));
+
+                            // Сохраняем состояние слоя обводки, если он существует
+                            if (outlineLayers[currentLayer]) {
+                                const outlineLayerId = outlineLayers[currentLayer].id;
+                                if (!history[outlineLayerId]) {
+                                    history[outlineLayerId] = [];
+                                }
+                                if (history[outlineLayerId].length >= MAX_HISTORY_STATES) {
+                                    history[outlineLayerId].shift();
+                                }
+                                history[outlineLayerId].push(contexts[outlineLayerId].getImageData(0, 0, layers[outlineLayerId].width, layers[outlineLayerId].height));
+                            }
+
+                            redoHistory[currentLayer] = [];
+
+                            // Очищаем redo историю для слоя обводки
+                            if (outlineLayers[currentLayer]) {
+                                redoHistory[outlineLayers[currentLayer].id] = [];
+                            }
+                        }
+
+
+
+
+                        function changeResolution(newWidth, newHeight) {
+                            realWidth = newWidth;
+                            realHeight = newHeight;
+
+                            Object.values(layers).forEach(layer => {
+                                const tempCanvas = document.createElement('canvas');
+                                tempCanvas.width = newWidth;
+                                tempCanvas.height = newHeight;
+                                const tempCtx = tempCanvas.getContext('2d');
+                                tempCtx.drawImage(layer, 0, 0, layer.width, layer.height, 0, 0, newWidth, newHeight);
+
+                                layer.width = newWidth;
+                                layer.height = newHeight;
+                                layer.getContext('2d').drawImage(tempCanvas, 0, 0);
+                            });
+
+                            updateCanvasScale();
+                        }
+
+                        // Пример использования в настройках
+                        function updateResolutionSettings() {
+                            const newWidth = gel('resolutionWidth').value;
+                            const newHeight = gel('resolutionHeight').value;
+                            changeResolution(newWidth, newHeight);
+                        }
+
+                        function getCanvasCoordinates(clientX, clientY) {
+                            const rect = layers[currentLayer].getBoundingClientRect();
+                            return {
+                                x: (clientX - rect.left) / scale,
+                                y: (clientY - rect.top) / scale
+                            };
+                        }
+
+
+                        function addEventListenersToLayer(layer) {
+                            // Это мешало нажатиям
+                            // layer.addEventListener("touchstart", startDrawing);
+                            // layer.addEventListener("touchmove", draw);
+                            layer.addEventListener('pointerdown', startDrawing);
+                            layer.addEventListener('pointermove', draw);
+                            layer.addEventListener('pointerup', endDrawing);
+                        }
+                    </script>
+                    <script>
+
+
+
+                        // переключатель слоев
+                        function togglePreviousLayer() {
+                            [currentLayer, previousLayer] = [previousLayer, currentLayer];
+                            const layerButton = document.querySelector(`.layer-button[data-layer="${currentLayer}"]`);
+                            if (layerButton) {
+                                layerButton.click();
+                            }
+                        }
+                        const handlePointer = (e) => {
+                            if (e.type === "pointerenter" || e.type === "pointerdown") {
+                                e.preventDefault();
+                                isDraggingScroll = true;
+                                startY = e.clientY;
+                            } else if (isDraggingScroll) {
+                                const deltaY = e.clientY - startY;
+                                (e.target === sidebar ? sidebar : layerPanel).scrollTop += deltaY;
+                                startY = e.clientY;
+                            }
+                        };
+
+                        const events = ["pointerenter", "pointerdown", "pointermove"];
+
+                        [layerPanel, sidebar].forEach(element => {
+                            events.forEach(event => element.addEventListener(event, handlePointer));
+                        });
+
+                        function updateLayerOrder() {
+                            const layerButtons = Array.from(document.querySelectorAll('.layer-button'));
+                            const baseZIndex = 110;
+
+                            layerButtons.forEach((button, index) => {
+                                const layerId = parseInt(button.dataset.layer);
+                                if (layers[layerId]) {
+                                    const zIndex = layerId === back ? -100 : baseZIndex + layerButtons.length - index;
+                                    layers[layerId].style.zIndex = zIndex;
+
+                                    if (outlineLayers[layerId]) {
+                                        layers[outlineLayers[layerId].id].style.zIndex = zIndex + 1;
+                                    }
+                                }
+                            });
+                        }
+
+
+                        function handleMoveLayerClick(event) {
+                            const direction = event.target === moveLayerUp ? -1 : 1;
+                            moveLayerInStack(direction);
+                        }
+
+
+                        moveLayerUp.addEventListener('click', () => {
+                            moveLayerInStack(-1);
+                        });
+                        moveLayerDown.addEventListener('click', () => {
+                            moveLayerInStack(1);
+                        });
+                        function moveLayerInStack(direction) {
+                            const curLB = document.querySelector(`.layer-button[data-layer="${currentLayer}"]`);
+                            const targetLayerButton = direction === -1
+                                ? curLB.previousElementSibling
+                                : curLB.nextElementSibling;
+
+                            if (targetLayerButton) {
+                                // Перемещаем кнопку слоя в DOM
+                                if (direction === -1) {
+                                    curLB.parentNode.insertBefore(curLB, targetLayerButton);
+                                } else {
+                                    curLB.parentNode.insertBefore(targetLayerButton, curLB);
+                                }
+
+                                // Обновляем порядок слоев
+                                updateLayerOrder();
+
+                                // Перемещаем слой обводки вместе с основным слоем
+                                if (outlineLayers[currentLayer]) {
+                                    const outlineLayerId = outlineLayers[currentLayer].id;
+                                    const outlineLayer = layers[outlineLayerId];
+                                    const mainLayer = layers[currentLayer];
+                                    outlineLayer.style.zIndex = parseInt(mainLayer.style.zIndex) + 1;
+                                }
+
+                                // Активируем перемещенный слой
+                                curLB.click();
+                            }
+
+                        }
+                        const layerButtonsContainer = gel('layerButtons');
+                        // Zoom functions
+                        document.addEventListener('keydown', (e) => {
+                            if (e.key === 'Control') {
+                                isCtrlPressed = true;
+                            }
+                            // fix
+                            lastX = null;
+                            lastY = null;
+                        });
+
+                        document.addEventListener('keyup', (e) => {
+                            if (e.key === 'Control') {
+                                isCtrlPressed = false;
+                                // fix сбррос
+                                lastX = null;
+                                lastY = null;
+                            }
+                        });
+
+
+
+                        canvasContainer.addEventListener('mousemove', (e) => {
+                            e.preventDefault();
+                            if (isEyedropperActive || !isCtrlPressed || isDrawing || isFinger) return;
+
+
+
+                            const rect = canvasContainer.getBoundingClientRect();
+                            const mouseX = e.clientX - rect.left;
+                            const mouseY = e.clientY - rect.top;
+
+                            if (lastX !== undefined) {
+                                const deltaX = e.movementX;
+                                const oldZoom = zoomLevel;
+                                zoomLevel = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoomLevel + deltaX * ZOOM_STEP));
+
+                                if (oldZoom !== zoomLevel) {
+                                    zoomOriginX = (mouseX - offsetX) / oldZoom;
+                                    zoomOriginY = (mouseY - offsetY) / oldZoom;
+
+                                    offsetX = mouseX - zoomOriginX * zoomLevel;
+                                    offsetY = mouseY - zoomOriginY * zoomLevel;
+
+                                    updateZoom();
+                                }
+                            }
+
+                            lastX = mouseX;
+                            lastY = mouseY;
+                        });
+
+
+
+                        function updateZoom() {
+                            Object.values(layers).forEach(layer => {
+                                layer.style.transformOrigin = '0 0';
+
+                                if (zoomLevel <= 1) {
+                                    offsetX = 0;
+                                    offsetY = 0;
+                                    layer.style.transform = `scale(${zoomLevel})`;
+                                    layer.style.left = '0';
+                                    layer.style.top = '0';
+                                } else {
+                                    layer.style.transform = `scale(${zoomLevel})`;
+
+                                    const layerRect = layer.getBoundingClientRect();
+                                    offsetX = Math.min(Math.max(offsetX, containerRect.width - layerRect.width), 0);
+                                    offsetY = Math.min(Math.max(offsetY, containerRect.height - layerRect.height), 0);
+
+                                    layer.style.left = `${offsetX}px`;
+                                    layer.style.top = `${offsetY}px`;
+                                }
+                            });
+
+                            canvasContainer.style.overflow = 'hidden';
+                            gel('zoomLevelDisplay').textContent = `🔎${(zoomLevel * 100).toFixed(0)}%`;
+
+                            // Обновляем обводку для всех слоев
+                            Object.keys(outlineLayers).forEach(layerNum => {
+                                const size = outlineSizes[layerNum];
+                                if (size > 0) {
+                                    applyOutline(layerNum, size);
+                                }
+                            });
+                        }
+
+                        //  инструмент палец
+                        let isFinger = false;
+
+                        const fingerBtn = gel('fingerBtn');
+
+                        fingerBtn.addEventListener('click', () => {
+                            isFinger = !isFinger;
+                            fingerBtn.classList.toggle('active', isFinger);
+                        });
+                        function finger(e) {
+
+                            if (!isDrawing || !curCtx || !isFinger) return;
+
+                            const rect = layers[currentLayer].getBoundingClientRect();
+                            const x = Math.floor((e.clientX - rect.left) / zoomLevel);
+                            const y = Math.floor((e.clientY - rect.top) / zoomLevel);
+
+                            const brushSize = parseInt(brushSize.value);
+                            const halfBrushSize = brushSize / 2;
+
+                            curCtx.save();
+                            curCtx.beginPath();
+                            curCtx.arc(x, y, halfBrushSize, 0, Math.PI * 2);
+                            curCtx.clip();
+
+                            if (lastX !== null && lastY !== null) {
+                                const dx = x - lastX;
+                                const dy = y - lastY;
+                                curCtx.drawImage(
+                                    layers[currentLayer],
+                                    x - halfBrushSize - dx, y - halfBrushSize - dy, brushSize, brushSize,
+                                    x - halfBrushSize, y - halfBrushSize, brushSize, brushSize
+                                );
+                            }
+
+                            curCtx.restore();
+
+                            lastX = x;
+                            lastY = y;
+                        }
+                        const MAX_HISTORY_STATES = 1000;
+
+                        // Обводка
+                        const outlineLayers = {};
+                        const outlineSizes = {};
+                        let isInnerOutline = false;
+
+                        // Получаем элементы DOM
+                        // Получаем элемент DOM для выбора цвета обводки
+                        const outlineColorPicker = gel('outlineColorPicker');
+                        const toggleOutlineTypeBtn = gel('toggleOutlineTypeBtn');
+                        const outlineSizeInput = gel('outlineSize');
+                        const outlineSizeValue = gel('outlineSizeValue');
+
+                        // Устанавливаем максимальное значение для input размера обводки
+                        outlineSizeInput.max = "20";
+
+                        // Обработчики событий для кнопки переключения типа обводки
+                        toggleOutlineTypeBtn.addEventListener('click', () => {
+                            isInnerOutline = !isInnerOutline;
+                            toggleOutlineTypeBtn.textContent = isInnerOutline ? '🔽' : '🔼';
+                            applyOutline(currentLayer, parseInt(outlineSizeInput.value));
+                        });
+
+                        // Обработчик события для input размера обводки
+                        outlineSizeInput.addEventListener('input', function () {
+                            const size = parseInt(this.value);
+                            outlineSizeValue.textContent = size;
+                            applyOutline(currentLayer, size);
+                        });
+
+                        // Функция для применения обводки к слою
+                        function applyOutline(layerNum, size) {
+                            saveState();
+
+                            if (!layers[layerNum] || !contexts[layerNum]) {
+                                return;
+                            }
+
+                            let outlineLayerId = outlineLayers[layerNum] ? outlineLayers[layerNum].id : null;
+
+                            if (!outlineLayerId && size > 0) {
+                                outlineLayerId = createOutlineLayer(layerNum);
+                            }
+
+                            if (outlineLayerId) {
+                                const outlineCtx = contexts[outlineLayerId];
+                                const sourceCtx = contexts[layerNum];
+                                const canvas = layers[layerNum];
+
+                                outlineCtx.clearRect(0, 0, canvas.width, canvas.height);
+
+                                if (size > 0) {
+                                    const scaledSize = size * (realWidth / displayWidth);
+                                    const imageData = sourceCtx.getImageData(0, 0, realWidth, realHeight);
+                                    const outlineImageData = outlineCtx.createImageData(realWidth, realHeight);
+
+                                    requestAnimationFrame(() => {
+                                        createOutline(imageData, outlineImageData, scaledSize, realWidth, realHeight, isInnerOutline);
+                                        outlineCtx.putImageData(outlineImageData, 0, 0);
+                                        outlineSizes[layerNum] = size;
+                                        updateLayerList();
+                                    });
+                                } else {
+                                    // Если размер обводки 0, удаляем слой обводки
+                                    canvasContainer.removeChild(layers[outlineLayerId]);
+                                    delete layers[outlineLayerId];
+                                    delete contexts[outlineLayerId];
+                                    delete outlineLayers[layerNum];
+                                    delete outlineSizes[layerNum];
+                                }
+                            }
+
+                            outlineSizes[layerNum] = size;
+                            updateLayerList();
+                        }
+
+
+
+                        // Функция для создания слоя обводки
+                        function createOutlineLayer(layerNum) {
+                            const outlineCanvas = document.createElement('canvas');
+                            outlineCanvas.width = realWidth;
+                            outlineCanvas.height = realHeight;
+                            outlineCanvas.style.width = `${displayWidth}px`;
+                            outlineCanvas.style.height = `${displayHeight}px`;
+                            const outlineCtx = outlineCanvas.getContext('2d', { willReadFrequently: true });
+
+
+                            // Генерируем новый индекс для слоя обводки
+                            const newLayerIndex = Math.max(...Object.keys(layers).map(Number)) + 1;
+
+                            // Добавляем слой обводки в список слоев и контекстов
+                            layers[newLayerIndex] = outlineCanvas;
+                            contexts[newLayerIndex] = outlineCtx;
+
+                            // Сохраняем информацию о слое обводки
+                            outlineLayers[layerNum] = {
+                                id: newLayerIndex,
+                                canvas: outlineCanvas
+                            };
+
+                            // Устанавливаем z-index слоя обводки выше исходного слоя
+                            outlineCanvas.style.zIndex = parseInt(layers[layerNum].style.zIndex) + 1;
+
+                            // Вставляем слой обводки в DOM перед исходным слоем
+                            canvasContainer.insertBefore(outlineCanvas, layers[layerNum].nextSibling);
+
+                            // Инициализируем историю изменений для слоя обводки
+                            history[newLayerIndex] = [];
+                            redoHistory[newLayerIndex] = [];
+                            layerOpacities[newLayerIndex] = 100;
+
+                            // Возвращаем индекс нового слоя обводки
+                            return newLayerIndex;
+                        }
+                        function createOutline(sourceImageData, outlineImageData, size, width, height, isInner) {
+                            const sourceData = sourceImageData.data;
+                            const outlineData = outlineImageData.data;
+                            const outlineColor = hexToRgb(outlineColorPicker.value);
+
+                            for (let y = 0; y < height; y++) {
+                                for (let x = 0; x < width; x++) {
+                                    const index = (y * width + x) * 4;
+                                    if ((isInner && sourceData[index + 3] > 0) || (!isInner && sourceData[index + 3] === 0)) {
+                                        if (hasNeighborWithDifferentAlpha(sourceData, x, y, width, height, Math.ceil(size), isInner)) {
+                                            outlineData.set(outlineColor, index);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+
+                        function hasNeighborWithDifferentAlpha(sourceData, x, y, width, height, size, isInner) {
+                            const targetAlpha = isInner ? 0 : 255;
+                            for (let dy = -size; dy <= size; dy++) {
+                                for (let dx = -size; dx <= size; dx++) {
+                                    const nx = x + dx;
+                                    const ny = y + dy;
+                                    if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+                                        const neighborIndex = (ny * width + nx) * 4 + 3;
+                                        if (sourceData[neighborIndex] === targetAlpha) {
+                                            return true;
+                                        }
+                                    }
+                                }
+                            }
+                            return false;
+                        }
+
+
+                        // Функция для конвертации hex цвета в rgb массив
+                        function hexToRgb(hex) {
+                            hex = hex.replace('#', '');
+
+                            const r = parseInt(hex.substring(0, 2), 16);
+                            const g = parseInt(hex.substring(2, 4), 16);
+                            const b = parseInt(hex.substring(4, 6), 16);
+                            return [r, g, b, 255];
+                        }
+
+                        // Обновленная функция для перемещения слоя в стеке (вверх/вниз)
+                        function moveLayerInStack(direction) {
+                            const curLB = document.querySelector(`.layer-button[data-layer="${currentLayer}"]`);
+                            const targetLayerButton = direction === -1 ? curLB.previousElementSibling : curLB.nextElementSibling;
+
+                            if (targetLayerButton) {
+                                // Перемещаем кнопку слоя в DOM
+                                if (direction === -1) {
+                                    curLB.parentNode.insertBefore(curLB, targetLayerButton);
+                                } else {
+                                    curLB.parentNode.insertBefore(targetLayerButton, curLB);
+                                }
+
+                                // Обновляем порядок слоев
+                                updateLayerOrder();
+
+                                // Перемещаем слой обводки вместе с основным слоем
+                                if (outlineLayers[currentLayer]) {
+                                    const outlineLayerId = outlineLayers[currentLayer].id;
+                                    const outlineLayer = layers[outlineLayerId];
+                                    const mainLayer = layers[currentLayer];
+                                    outlineLayer.style.zIndex = parseInt(mainLayer.style.zIndex) + 1;
+                                }
+
+                                // Активируем перемещенный слой
+                                curLB.click();
+                            }
+                        }
+
+                        // Функция для обновления порядка слоев в DOM
+                        function updateLayerOrder() {
+                            const layerButtons = Array.from(document.querySelectorAll('.layer-button'));
+
+                            layerButtons.forEach((button, index) => {
+                                const layerId = parseInt(button.dataset.layer);
+
+                                if (layers[layerId]) {
+                                    // Устанавливаем z-index для фонового слоя
+                                    if (layerId === back) {
+                                        layers[layerId].style.zIndex = -100;
+                                    } else {
+                                        // Устанавливаем z-index для остальных слоев
+                                        const zIndex = layerButtons.length - index + 110;
+                                        layers[layerId].style.zIndex = zIndex;
+
+                                        // Обновляем z-index слоя обводки, если он существует
+                                        if (outlineLayers[layerId]) {
+                                            const outlineLayerId = outlineLayers[layerId].id;
+                                            layers[outlineLayerId].style.zIndex = zIndex + 1;
+                                        }
+                                    }
+                                }
+                            });
+                        }
+
+                        // Функция для обновления списка слоев в панели слоев
+                        function updateLayerList() {
+                            const layerButtonsContainer = gel('layerButtons');
+                            layerButtonsContainer.innerHTML = ''; // Очищаем текущий список слоев
+
+                            // Получаем список всех слоев, кроме фонового
+                            const allLayers = Object.keys(layers).filter(id => id !== back.toString());
+
+                            // Сортируем слои по z-index
+                            allLayers.sort((a, b) => parseInt(layers[b].style.zIndex) - parseInt(layers[a].style.zIndex));
+
+                            // Создаем кнопки для каждого слоя
+                            allLayers.forEach((layerId) => {
+                                createLayerButton(layerId, layerButtonsContainer);
+                            });
+
+                            // Обновляем порядок слоев в DOM
+                            updateLayerOrder();
+
+                            // Устанавливаем активный слой
+                            const activeLayerButton = layerButtonsContainer.querySelector(`[data-layer="${currentLayer}"]`);
+                            if (activeLayerButton) {
+                                activeLayerButton.classList.add('active-layer');
+                            }
+                        }
+
+                        // Функция для создания кнопки слоя в панели слоев
+                        function createLayerButton(layerId, container) {
+                            const button = document.createElement('button');
+                            button.textContent = " ❤ ";
+                            button.classList.add('layer-button');
+                            button.dataset.layer = layerId;
+
+                            // Добавляем иконку глаза
+                            const eyeIcon = document.createElement('span');
+                            eyeIcon.textContent = "👁️";
+                            eyeIcon.style.display = layerDrawnOn[layerId] ? 'inline' : 'none';
+                            eyeIcon.classList.add('eye-icon');
+                            button.appendChild(eyeIcon);
+
+                            // Добавляем обработчик клика на кнопку слоя
+                            button.addEventListener('click', function () {
+                                setCurrentLayer(parseInt(this.dataset.layer));
+                            });
+
+                            // Добавляем кнопку слоя в контейнер
+                            container.appendChild(button);
+
+                            // Обновляем цвет кнопки слоя
+                            updateLayerButtonColor(layerId);
+                        }
+
+
+                    </script>
+                    <script>
+
+
+                        // добавляем иконку задействованных слоев
+                        const layerDrawnOn = {};
+                        function updateLayerEyeIcon(layerNum) {
+                            const layerButton = document.querySelector(`.layer-button[data-layer="${layerNum}"]`);
+                            if (layerButton) {
+                                const eyeIcon = layerButton.querySelector('.eye-icon');
+                                if (eyeIcon) {
+                                    eyeIcon.style.display = layerDrawnOn[layerNum] ? 'inline' : 'none';
+                                }
+                            }
+                        }
+                    
+                    </script>
+                    <script>
+                        // сообщение
+$(document).ready(function () {
+    const messageButton = $('#message');
+    const messageContainer = $('#message-container');
+    const messageText = $('#message-text');
+
+    function showMessage(message) {
+        messageText.text(message);
+
+        messageContainer.show();
+    }
+
+    messageButton.on('click', function () {
+        if (messageContainer.is(':visible')) {
+            messageContainer.hide(); 
+        } else {
+            fetch('message.txt')
+                .then(response => {
+                    return response.text();
+                })
+                .then(data => {
+                    showMessage(data); 
+                });
+        }
+    });
+});
+                        // создание слоев
+                        document.addEventListener('DOMContentLoaded', () => {
+                            for (let i = 1; i < 100; i++) {
+                                createLayer();
+                                setCurrentLayer(50);
+                                const layerButtonsContainer = document.querySelector('.layer-panel');
+                                layerButtonsContainer.scrollTop = (layerButtonsContainer.scrollHeight / 120) * 50;
+                            }
+                        });
+                    </script>
+                    <script src="cursors.js" defer></script>
+                    <script type="module" src="constants.js" defer></script>
+                    <script type="module" src="main.js" defer></script>
+                    <script type="module" src="settings.js" defer></script>
+                    <script type="module" src="helperFunction.js" defer></script>
+                    <script type="module" src="listners.js" defer></script>
+                    <script type="module" src="hotkey.js" defer></script>
+                    <script type="module" src="settingsPanel.js" defer></script>
+                    <script type="module" src="tools.js" defer></script>
+</body>
+
+</html>

@@ -1,0 +1,18 @@
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+lib for 
+
+
+Отключает бред для планшета. когда не рисуются линии
+document.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+}, { passive: false });
+
+позволяет делать элементы в строку(по умолчанию все идут в колонку)
+            display: flex;
+
+
+! Важно включить виндовс инк. Это требуется, чтобы при включенном органайзере планшета работали нажатия. (стоит так же проверить, как это вообще работает в других врограммах, а именно в зибраш)
+
+hotkey
+    ctrl+g gotoline

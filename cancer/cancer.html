@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DrawCaterpillar</title>
+    <link rel="stylesheet" href="cancer.css">
+    <script src="../cursors.js" async></script>
+    <style>
+        #drawingCanvas {
+            cursor: url('../cursorsNum/4.png'), auto;
+        }
+
+        /* Улучшение структуры: удаление неиспользуемого стиля */
+        /* .canvas-container {
+            position: relative;
+        } */
+    </style>
+</head>
+
+<body>
+    <main class="base-container">
+        <aside class="sidebar" style="z-index: 10;">
+            <a href="../index.html" target="_self" title="Выйти из команты" id="exitLink"
+                style="font-size: 50px;">🚪</a>
+            <button id="undo" title="Отменить (Z)">⟲</button>
+            <button id="redo" title="Повторить (X)">⟳</button>
+            <button id="symmetryBtn" title="Симметрия (S)">🦋</button>
+            <button id="eyedropperBtn" title="Пипетка заливки (A)">💧</button>
+            <button id="changeCursorBtn" title="Сменить курсор">🎨</button>
+            <button id="clearBtn" title="Очистить">💀</button>
+            <button id="saveImageBtn" title="Сохранить изображение">💾</button>
+            <button id="eraserBtn" title="Стерка">🧽</button>
+            <button id="smoothDrawingBtn" title="Паутинка">🌀</button>
+        </aside>
+        <div class="canvas-and-sliders">
+            <div class="canvas-container">
+                <div class="color-picker-group">
+                    <input type="color" id="colorPicker" value="#000000" title="Цвет заливки (C)">
+                    <input type="color" id="backgroundPicker" value="#ffffff" title="Цвет фона (B)">
+                    <button id="previousWord" title="Предыдущее слово">&lt;</button>
+                    <p id="Quizz"></p>
+                    <button id="nextWord" title="Следующее слово">&gt;</button>
+                    <div id="elapsedTime" class="time"></div>
+                </div>
+                <div class="canvas-and-chat-container">
+                    <div class="canvas-container">
+                        <div class="canv-container" style="position: relative; width: 700px; height: 500px;">
+                            <canvas id="backgroundCanvas" width="700" height="500"
+                                style="position: absolute; top: 0; left: 0; z-index: 1;"></canvas>
+                            <canvas id="drawingCanvas" width="700" height="500"
+                                style="position: absolute; top: 0; left: 0; z-index: 3;"></canvas>
+                            <canvas id="overlayCanvas" width="700" height="500"
+                                style="position: absolute; top: 0; left: 0; z-index: 2; opacity: 0.5;"></canvas>
+                        </div>
+                        <div id="cursorPanel" class="cursor-panel" style="display: none;">
+                            <div id="cursorList"></div>
+                        </div>
+                    </div>
+                    <div id="chat-container">
+                        <div id="chat-messages"></div>
+                        <form id="chat-form">
+                            <input type="text" id="chat-input" placeholder="Введите сообщение...">
+                            <button type="submit">=</button>
+                        </form>
+                    </div>
+                </div>
+            <div class="slider-group">
+    <div class="slider">
+        <div class="pressure-bar" id="pressureBar"></div>
+        <label for="brushSize" title="Размер кисти">🖌️</label>
+
+<input type="range" id="brushSize" min="1" max="100" value="3" oninput="updateBrushSizeValue(this.value)">
+<span id="brushSizeValue" style="color: red;">3</span>
+<label for="maxBrushSize" title="Максимальный размер кисти">Макс:</label>
+<input type="range" id="maxBrushSize" min="1" max="1000" value="100" oninput="updateMaxBrushSizeValue(this.value)">
+<span id="maxBrushSizeValue" style="color: red;">300</span>
+    </div>
+</div>
+            </div>
+        </div>
+    </main>
+    <style>
+        .slider {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .slider input[type="range"] {
+            flex-grow: 1;
+    background-color: rgba(0, 0, 0, 0.2); /* Полупрозрачный белый */
+
+            /* Allow the slider to grow and fill the available space */
+            width: 100%;
+            /* Set width to 100% to fill the container */
+            -webkit-appearance: none;
+            appearance: none;
+            outline: none;
+            overflow: hidden;
+            touch-action: pan-y;
+            border-radius: 20px;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 50px;
+            background: #00ff08;
+            cursor: pointer;
+            border-radius: 20px;
+            box-shadow: -100vw 0 0 100vw rgb(0, 93, 186);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            height: 50px;
+            background: #4CAF50;
+            color: #00ff08;
+            cursor: progress;
+            border-radius: 50%;
+            box-shadow: -100vw 0 0 100vw dodgerblue;
+        }
+
+        .slider input[type="number"] {
+            /* width: 100px;  */
+            margin-left: 20px;
+            /* Space between slider and number input */
+        }
+    </style>
+    <script>
+const gel = id => document.getElementById(id);
+
+    const maxBrushSizeInput = gel('maxBrushSize');
+
+    function updateBrushSizeValue(value) {
+        gel('brushSizeValue').textContent = value; // Update displayed value
+    }
+function updateMaxBrushSizeValue(value) {
+    gel('maxBrushSizeValue').textContent = value; 
+    brushSizeInput.max = value; 
+    if (brushSizeInput.value > value) {
+        brushSizeInput.value = value; 
+        gel('brushSizeValue').textContent = value; 
+    }
+}
+
+        // Улучшение структуры: группировка переменных по смыслу
+        const canvasElements = [
+            'backgroundCanvas',
+            'drawingCanvas',
+            'overlayCanvas'
+        ].map(gel);
+        const [backgroundCanvas, drawingCanvas, overlayCanvas] = canvasElements;
+
+        const inputElements = [
+            'colorPicker',
+            'backgroundPicker',
+            'brushSize'
+        ].map(gel);
+        const [colorPicker, backgroundPicker, brushSizeInput] = inputElements;
+
+        const buttonElements = [
+            'symmetryBtn',
+            'eyedropperBtn',
+            'clearBtn',
+            'eraserBtn',
+            'undo',
+            'redo',
+            'saveImageBtn',
+            'smoothDrawingBtn'
+        ].map(gel);
+        const [symmetryButton, eyedropperBtn, clearBtn, eraserBtn, undoBtn, redoBtn, saveImageBtn, smoothDrawingBtn] = buttonElements;
+
+        const ctx = drawingCanvas.getContext('2d');
+        const bgCtx = backgroundCanvas.getContext('2d');
+        const overlayCtx = overlayCanvas.getContext('2d');
+
+        // Улучшение структуры: группировка переменных по смыслу
+        let isDrawing = false;
+        let isEyedropperActive = false;
+        let isErasing = false;
+        let symmetryBtn = true; // Возможно, опечатка: symmetryBtn вместо symmetry?
+        let overlayActive = false;
+        let isSmoothDrawing = false;
+
+        let lastX = 0;
+        let lastY = 0;
+        let currentCursor = 'url(../cursorsNum/1.png), auto';
+        let previousCursor = currentCursor;
+        let points = [];
+
+        let history = [];
+        let redoHistory = [];
+
+        ctx.imageSmoothingEnabled = false;
+        ctx.willReadFrequently = true;
+
+        // Улучшение структуры: объявление функций до их использования
+        function saveState() {
+            history.push(ctx.getImageData(0, 0, drawingCanvas.width, drawingCanvas.height));
+            redoHistory = [];
+            updateUndoRedoButtons();
+        }
+
+        function updateUndoRedoButtons() {
+            undoBtn.disabled = history.length <= 1;
+            redoBtn.disabled = redoHistory.length === 0;
+        }
+
+        function resizeCanvas() {
+            const rect = backgroundCanvas.getBoundingClientRect();
+            backgroundCanvas.width = rect.width * devicePixelRatio;
+            backgroundCanvas.height = rect.height * devicePixelRatio;
+            drawingCanvas.width = rect.width * devicePixelRatio;
+            drawingCanvas.height = rect.height * devicePixelRatio;
+            ctx.scale(devicePixelRatio, devicePixelRatio);
+            bgCtx.scale(devicePixelRatio, devicePixelRatio);
+            // initializeCanvas(); // Возможно, не требуется вызывать здесь
+        }
+
+        function drawSmoothLine(startX, startY, endX, endY) {
+            // Оптимизация: ctx.globalAlpha устанавливается один раз
+            ctx.globalAlpha = 1;
+            ctx.strokeStyle = colorPicker.value;
+            ctx.lineJoin = 'round';
+            ctx.lineCap = 'round';
+
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+            ctx.quadraticCurveTo(startX, startY, endX, endY);
+            ctx.stroke();
+
+            points.push({ x: endX, y: endY });
+
+            for (let i = 0; i < points.length; i++) {
+                const dx = points[i].x - endX;
+                const dy = points[i].y - endY;
+                const dd = dx * dx + dy * dy;
+
+                if (dd < 1000) {
+                    ctx.beginPath();
+                    ctx.moveTo(endX + (dx * 0.2), endY + (dy * 0.2));
+                    ctx.lineTo(points[i].x - (dx * 0.2), points[i].y - (dy * 0.2));
+                    ctx.stroke();
+                }
+            }
+        }
+
+        function startDrawing(e) {
+            isDrawing = true;
+            [lastX, lastY] = getCoordinates(e);
+            if (isSmoothDrawing) {
+                points.push({ x: lastX, y: lastY });
+            }
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            // e.preventDefault();
+
+            const [x, y] = getCoordinates(e);
+
+            // Оптимизация: ctx.lineWidth, ctx.lineCap и ctx.lineJoin устанавливаются один раз
+            ctx.lineWidth = brushSizeInput.value * (e.pressure || 1);
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            // Оптимизация: ctx.globalCompositeOperation устанавливается один раз
+            ctx.globalCompositeOperation = isErasing ? 'destination-out' : 'source-over';
+            if (!isErasing) {
+                ctx.strokeStyle = colorPicker.value;
+            }
+
+            if (isSmoothDrawing) {
+                drawSmoothLine(lastX, lastY, x, y);
+            } else {
+                ctx.beginPath(), ctx.moveTo(lastX, lastY), ctx.lineTo(x, y), ctx.stroke();
+            }
+
+            if (symmetryBtn) {
+                const centerX = drawingCanvas.width / 2;
+                const symmetricX = 2 * centerX - x;
+                if (isSmoothDrawing) {
+                    drawSmoothLine(2 * centerX - lastX, lastY, symmetricX, y);
+                } else {
+                    ctx.beginPath();
+                    ctx.moveTo(2 * centerX - lastX, lastY);
+                    ctx.lineTo(symmetricX, y);
+                    ctx.stroke();
+                }
+            }
+
+            [lastX, lastY] = [x, y];
+        }
+
+        function stopDrawing() {
+            if (isDrawing) {
+                isDrawing = false;
+                saveState();
+                if (isSmoothDrawing) {
+                    points.length = 0;
+                }
+            }
+        }
+
+        function getCoordinates(e) {
+            const rect = drawingCanvas.getBoundingClientRect();
+            return [
+                e.clientX - rect.left,
+                e.clientY - rect.top
+            ];
+        }
+
+        function toggleSymmetry() {
+            symmetryBtn = !symmetryBtn;
+            symmetryButton.classList.toggle('active', symmetryBtn);
+        }
+
+        function undo() {
+            if (history.length > 1) {
+                redoHistory.push(history.pop());
+                ctx.putImageData(history[history.length - 1], 0, 0);
+                updateUndoRedoButtons();
+            }
+        }
+
+        function redo() {
+            if (redoHistory.length > 0) {
+                const state = redoHistory.pop();
+                history.push(state);
+                ctx.putImageData(state, 0, 0);
+                updateUndoRedoButtons();
+            }
+        }
+
+        function clearCanvas() {
+            ctx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+            saveState();
+        }
+
+        function saveImage() {
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = drawingCanvas.width;
+            tempCanvas.height = drawingCanvas.height;
+            const tempCtx = tempCanvas.getContext('2d');
+
+            tempCtx.drawImage(drawingCanvas, 0, 0);
+
+            if (overlayActive) {
+                tempCtx.globalAlpha = parseFloat(overlayCanvas.style.opacity);
+                tempCtx.drawImage(overlayCanvas, 0, 0);
+                tempCtx.globalAlpha = 1.0;
+            }
+
+            const link = document.createElement('a');
+            link.download = 'my-drawing.png';
+            link.href = tempCanvas.toDataURL('image/png');
+            link.click();
+        }
+
+        function createOverlayLayer() {
+            overlayActive = true;
+            overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+            overlayCtx.drawImage(drawingCanvas, 0, 0);
+            overlayCanvas.style.opacity = '0.5';
+            clearCanvas();
+        }
+
+        function toggleOverlayOpacity() {
+            if (overlayActive) {
+                overlayCanvas.style.opacity = overlayCanvas.style.opacity === '0.5' ? '1' : '0.5';
+            }
+        }
+
+        function toggleEraser() {
+            isErasing = !isErasing;
+            eraserBtn.classList.toggle('active', isErasing);
+            // Оптимизация: курсор устанавливается только при изменении состояния
+            drawingCanvas.style.cursor = isErasing ? 'url(../cursorsNum/2.png), auto' : previousCursor;
+        }
+
+        // Исправление: удаление предыдущего обработчика событий перед добавлением нового
+        function toggleEyedropper() {
+            isEyedropperActive = !isEyedropperActive;
+            eyedropperBtn.classList.toggle('active', isEyedropperActive);
+            if (isEyedropperActive) {
+                previousCursor = drawingCanvas.style.cursor;
+                drawingCanvas.style.cursor = 'url(../cursorsNum/3.png), auto';
+                drawingCanvas.addEventListener('click', pickColor, { once: true }); // Добавлено { once: true }
+            } else {
+                drawingCanvas.style.cursor = previousCursor;
+                drawingCanvas.removeEventListener('click', pickColor);
+            }
+        }
+
+        function pickColor(e) {
+            const rect = drawingCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const pixel = ctx.getImageData(x, y, 1, 1).data;
+            const color = `rgb(${pixel[0]}, ${pixel[1]}, ${pixel[2]})`;
+            colorPicker.value = color;
+            ctx.strokeStyle = color;
+
+            // Возврат к предыдущему состоянию после выбора цвета
+            isEyedropperActive = false;
+            eyedropperBtn.classList.remove('active');
+            drawingCanvas.style.cursor = previousCursor;
+        }
+
+        function initializeCursor() {
+            drawingCanvas.style.cursor = currentCursor;
+        }
+
+        function toggleSmoothDrawing() {
+            isSmoothDrawing = !isSmoothDrawing;
+            smoothDrawingBtn.classList.toggle('active', isSmoothDrawing);
+        }
+
+        // Event Listeners
+        colorPicker.addEventListener('input', () => ctx.strokeStyle = colorPicker.value);
+        document.addEventListener('pointerdown', startDrawing);
+        document.addEventListener('pointermove', draw);
+        document.addEventListener('pointerup', stopDrawing);
+        document.addEventListener('pointercancel', stopDrawing);
+
+
+        symmetryButton.addEventListener('click', toggleSymmetry);
+        undoBtn.addEventListener('click', undo);
+        redoBtn.addEventListener('click', redo);
+        clearBtn.addEventListener('click', clearCanvas);
+        eraserBtn.addEventListener('click', toggleEraser);
+        saveImageBtn.addEventListener('click', saveImage);
+        eyedropperBtn.addEventListener('click', toggleEyedropper);
+        smoothDrawingBtn.addEventListener('click', toggleSmoothDrawing);
+        window.addEventListener('resize', resizeCanvas);
+
+        // Initialization
+        resizeCanvas();
+        initializeCursor();
+
+        // Вывод в консоль информации о поддержке Pointer Events
+        console.log(`Pointer events are ${window.PointerEvent ? '' : 'not '}supported`);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('a, button').forEach(icon => icon.classList.add('icon-hover'));
+        });
+    </script>
+    <script type="module" src="cancerSettings.js" defer></script>
+    <script type="module" src="..//helperFunction.js" defer></script>
+    <script type="module" src="cancerHotkey.js" defer></script>
+</body>
+
+</html>

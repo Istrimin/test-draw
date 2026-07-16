@@ -1,0 +1,15 @@
+{
+  "target": [
+    ".properties"
+  ],
+  "delimiter": "=",
+  "testBy": "keyvalue",
+  "groups": [],
+  "encoding": "utf-8",
+  "skipLinePrefix": [
+    "#"
+  ],
+  "whitelist": [],
+  "caseSensitive": false,
+  "src": ["./"]
+}
