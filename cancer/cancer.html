@@ -69,6 +69,7 @@
             <button id="saveImageBtn" title="Сохранить">💾</button>
             <button id="eraserBtn" title="Стерка">🧽</button>
             <button id="smoothDrawingBtn" title="Паутинка">🌀</button>
+            <button id="tabletModeBtn" title="Планшет/давление (T)">📱</button>
             <button id="overlayBtn" title="Трафарет (D)">👻</button>
         </div>
     </div>
@@ -637,10 +638,17 @@ colorPickers.forEach(picker => {
 colorPicker.addEventListener('input', () => ctx.strokeStyle = colorPicker.value);
 
 // Drawing events
-document.addEventListener('pointerdown', startDrawing);
-document.addEventListener('pointermove', draw);
-document.addEventListener('pointerup', stopDrawing);
-document.addEventListener('pointercancel', stopDrawing);
+function ensurePointerPressure(e){
+    // Some browsers provide pressure in pen/touch via e.pressure.
+    // Fallback for mouse: treat as fully pressed.
+    if (typeof e.pressure !== 'number' || Number.isNaN(e.pressure)) e.pressure = 1;
+    return e;
+}
+
+document.addEventListener('pointerdown', (e) => startDrawing(ensurePointerPressure(e)));
+        document.addEventListener('pointermove', (e) => draw(ensurePointerPressure(e)));
+        document.addEventListener('pointerup', (e) => stopDrawing(ensurePointerPressure(e)));
+        document.addEventListener('pointercancel', (e) => stopDrawing(ensurePointerPressure(e)));
 
 // Button events
 symmetryButton.addEventListener('click', toggleSymmetry);
