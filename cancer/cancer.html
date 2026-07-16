@@ -419,13 +419,23 @@ function toggleSmoothDrawing() {
     smoothDrawingBtn.classList.toggle('active', isSmoothDrawing);
 }
 
-// Cursor panel - using SVG data URIs (works with file:// protocol)
+// Cursor panel
 const cursorPanel = gel('cursorPanel');
 const cursorList = gel('cursorList');
 const changeCursorBtn = gel('changeCursorBtn');
+let cursorSize = 32;
 
-// Predefined cursors as SVG data URIs
-const cursors = [
+// PNG cursors from ../cursorsNum/
+const cursorFiles = [
+    '1.png','2.png','3.png','4.png','5.png','6.png','7.png','9.png','10.png',
+    '12.png','13.png','14.png','15.png','16.png','17.png','18.png','19.png','20.png',
+    '22.png','23.png','30.png','31.png','32.png','33.png','34.png','35.png','36.png',
+    '37.png','38.png','39.png','40.png','41.png','42.png','43.png','44.png','45.png',
+    '46.png','47.png','48.png','49.png','50.png','51.png','52.png','53.png'
+];
+
+// SVG cursors
+const svgCursors = [
     { name: 'Карандаш', svg: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><circle cx="16" cy="16" r="2" fill="black"/><line x1="16" y1="16" x2="28" y2="4" stroke="black" stroke-width="1.5"/></svg>' },
     { name: 'Кисть', svg: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><circle cx="16" cy="16" r="4" fill="black" opacity="0.5"/><circle cx="16" cy="16" r="2" fill="black"/></svg>' },
     { name: 'Кисть 2', svg: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><circle cx="16" cy="16" r="6" fill="black" opacity="0.3"/><circle cx="16" cy="16" r="3" fill="black" opacity="0.6"/><circle cx="16" cy="16" r="1" fill="black"/></svg>' },
@@ -434,21 +444,66 @@ const cursors = [
     { name: 'Крест', svg: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><line x1="16" y1="0" x2="16" y2="32" stroke="black" stroke-width="1"/><line x1="0" y1="16" x2="32" y2="16" stroke="black" stroke-width="1"/><circle cx="16" cy="16" r="1" fill="red"/></svg>' },
     { name: 'Точка', svg: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><circle cx="16" cy="16" r="3" fill="black"/></svg>' },
     { name: 'Цель', svg: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><circle cx="16" cy="16" r="8" fill="none" stroke="black" stroke-width="1"/><circle cx="16" cy="16" r="2" fill="black"/><line x1="16" y1="4" x2="16" y2="10" stroke="black" stroke-width="1"/><line x1="16" y1="22" x2="16" y2="28" stroke="black" stroke-width="1"/><line x1="4" y1="16" x2="10" y2="16" stroke="black" stroke-width="1"/><line x1="22" y1="16" x2="28" y2="16" stroke="black" stroke-width="1"/></svg>' },
-    { name: 'Стандарт', svg: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><polygon points="2,2 2,30 10,22 16,30 18,28 12,20 22,20" fill="black"/></svg>' },
+    { name: 'Стрелка', svg: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><polygon points="2,2 2,30 10,22 16,30 18,28 12,20 22,20" fill="black"/></svg>' },
 ];
 
-function svgToCursorUrl(svgString) {
-    const encoded = encodeURIComponent(svgString);
-    return 'url("data:image/svg+xml,' + encoded + '") 16 16, auto';
+function applyCursor(cursorUrl) {
+    document.body.style.cursor = cursorUrl;
+    drawingCanvas.style.cursor = cursorUrl;
+    currentCursor = cursorUrl;
+    previousCursor = cursorUrl;
 }
 
-function buildCursorList() {
+function setPngCursor(src) {
+    const img = new Image();
+    img.onload = function() {
+        const c = document.createElement('canvas');
+        const s = cursorSize;
+        c.width = s;
+        c.height = s;
+        const ctx2 = c.getContext('2d');
+        ctx2.drawImage(img, 0, 0, s, s);
+        const dataUrl = c.toDataURL('image/png');
+        const hotspot = Math.floor(s / 2);
+        applyCursor('url(' + dataUrl + ') ' + hotspot + ' ' + hotspot + ', auto');
+    };
+    img.src = src;
+}
+
+function setSvgCursor(svgString) {
+    const s = cursorSize;
+    const sizedSvg = svgString.replace('width="32"', 'width="' + s + '"').replace('height="32"', 'height="' + s + '"');
+    const encoded = encodeURIComponent(sizedSvg);
+    const hotspot = Math.floor(s / 2);
+    // SVG cursors: hotspot at center (where the tip/dot is drawn)
+    applyCursor('url("data:image/svg+xml,' + encoded + '") ' + hotspot + ' ' + hotspot + ', auto');
+}
+
+function buildPngTab() {
     cursorList.innerHTML = '';
-    cursors.forEach((c, i) => {
+    cursorFiles.forEach(file => {
+        const item = document.createElement('div');
+        item.className = 'cursor-item';
+        const img = document.createElement('img');
+        img.src = '../cursorsNum/' + file;
+        img.className = 'cursor-preview';
+        img.draggable = false;
+        img.loading = 'eager';
+        item.appendChild(img);
+        item.addEventListener('click', () => {
+            setPngCursor('../cursorsNum/' + file);
+            cursorPanel.style.display = 'none';
+        });
+        cursorList.appendChild(item);
+    });
+}
+
+function buildSvgTab() {
+    cursorList.innerHTML = '';
+    svgCursors.forEach(c => {
         const item = document.createElement('div');
         item.className = 'cursor-item';
         item.title = c.name;
-        
         const preview = document.createElement('img');
         preview.src = 'data:image/svg+xml,' + encodeURIComponent(c.svg);
         preview.className = 'cursor-preview';
@@ -456,13 +511,8 @@ function buildCursorList() {
         preview.style.background = 'rgba(255,255,255,0.2)';
         preview.style.borderRadius = '4px';
         item.appendChild(preview);
-        
         item.addEventListener('click', () => {
-            const cursorUrl = svgToCursorUrl(c.svg);
-            currentCursor = cursorUrl;
-            previousCursor = cursorUrl;
-            document.body.style.cursor = cursorUrl;
-            drawingCanvas.style.cursor = cursorUrl;
+            setSvgCursor(c.svg);
             cursorPanel.style.display = 'none';
         });
         cursorList.appendChild(item);
@@ -471,7 +521,93 @@ function buildCursorList() {
 
 function toggleCursorPanel() {
     if (cursorPanel.style.display === 'none' || !cursorPanel.style.display) {
-        buildCursorList();
+        // Build panel with tabs
+        cursorList.innerHTML = '';
+        
+        // Tabs
+        const tabsDiv = document.createElement('div');
+        tabsDiv.style.cssText = 'display:flex;gap:4px;margin-bottom:8px;';
+        const pngTab = document.createElement('button');
+        pngTab.textContent = 'Мои';
+        pngTab.style.cssText = 'flex:1;padding:4px;background:rgba(255,255,255,0.2);color:white;border:none;border-radius:6px;cursor:pointer;font-size:14px;';
+        const svgTab = document.createElement('button');
+        svgTab.textContent = 'SVG';
+        svgTab.style.cssText = 'flex:1;padding:4px;background:rgba(255,255,255,0.1);color:white;border:none;border-radius:6px;cursor:pointer;font-size:14px;';
+        tabsDiv.appendChild(pngTab);
+        tabsDiv.appendChild(svgTab);
+        cursorList.appendChild(tabsDiv);
+        
+        // Size slider
+        const sizeDiv = document.createElement('div');
+        sizeDiv.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:8px;color:white;font-size:13px;';
+        sizeDiv.innerHTML = 'Размер: <input type="range" id="cursorSizeSlider" min="16" max="128" value="' + cursorSize + '" style="width:100px;height:4px;"> <span id="cursorSizeLabel">' + cursorSize + '</span>';
+        cursorList.appendChild(sizeDiv);
+        
+        // Grid container
+        const grid = document.createElement('div');
+        grid.id = 'cursorGrid';
+        cursorList.appendChild(grid);
+        
+        // Tab switching
+        let activeTab = 'png';
+        function switchTab(tab) {
+            activeTab = tab;
+            pngTab.style.background = tab === 'png' ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.1)';
+            svgTab.style.background = tab === 'svg' ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.1)';
+            grid.innerHTML = '';
+            if (tab === 'png') {
+                cursorFiles.forEach(file => {
+                    const item = document.createElement('div');
+                    item.className = 'cursor-item';
+                    const img = document.createElement('img');
+                    img.src = '../cursorsNum/' + file;
+                    img.className = 'cursor-preview';
+                    img.draggable = false;
+                    img.loading = 'eager';
+                    item.appendChild(img);
+                    item.addEventListener('click', () => {
+                        setPngCursor('../cursorsNum/' + file);
+                        cursorPanel.style.display = 'none';
+                    });
+                    grid.appendChild(item);
+                });
+            } else {
+                svgCursors.forEach(c => {
+                    const item = document.createElement('div');
+                    item.className = 'cursor-item';
+                    item.title = c.name;
+                    const preview = document.createElement('img');
+                    preview.src = 'data:image/svg+xml,' + encodeURIComponent(c.svg);
+                    preview.className = 'cursor-preview';
+                    preview.draggable = false;
+                    preview.style.background = 'rgba(255,255,255,0.2)';
+                    preview.style.borderRadius = '4px';
+                    item.appendChild(preview);
+                    item.addEventListener('click', () => {
+                        setSvgCursor(c.svg);
+                        cursorPanel.style.display = 'none';
+                    });
+                    grid.appendChild(item);
+                });
+            }
+        }
+        
+        pngTab.addEventListener('click', () => switchTab('png'));
+        svgTab.addEventListener('click', () => switchTab('svg'));
+        
+        // Size slider handler
+        setTimeout(() => {
+            const slider = gel('cursorSizeSlider');
+            const label = gel('cursorSizeLabel');
+            if (slider) {
+                slider.addEventListener('input', () => {
+                    cursorSize = parseInt(slider.value);
+                    label.textContent = cursorSize;
+                });
+            }
+        }, 0);
+        
+        switchTab('png');
         cursorPanel.style.display = 'block';
     } else {
         cursorPanel.style.display = 'none';
