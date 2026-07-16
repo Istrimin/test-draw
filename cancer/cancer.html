@@ -15,43 +15,40 @@
 </head>
 
 <body>
-    <div class="sidebar" style="z-index: 10;">
-        <a href="../index.html" target="_self" title="Выйти из команты" id="exitLink"
-            style="font-size: 50px;">🚪</a>
-        <button id="undo" title="Отменить (Z)">⟲</button>
-        <button id="redo" title="Повторить (X)">⟳</button>
-        <button id="symmetryBtn" title="Симметрия (S)">🦋</button>
-        <button id="eyedropperBtn" title="Пипетка заливки (A)">💧</button>
-        <button id="changeCursorBtn" title="Сменить курсор">🎨</button>
-        <button id="clearBtn" title="Очистить">💀</button>
-        <button id="saveImageBtn" title="Сохранить изображение">💾</button>
-        <button id="eraserBtn" title="Стерка">🧽</button>
-        <button id="smoothDrawingBtn" title="Паутинка">🌀</button>
-        <hr>
-        <div class="color-picker-group" id="colorPickerGroup">
-            <input type="color" id="colorPicker" value="#000000" title="Текущий цвет (C)">
-            <input type="color" id="colorPicker2" value="#ff0000" title="Красный">
-            <input type="color" id="colorPicker3" value="#00ff00" title="Зелёный">
-            <input type="color" id="colorPicker4" value="#0000ff" title="Синий">
-            <input type="color" id="colorPicker5" value="#ffff00" title="Жёлтый">
-            <input type="color" id="colorPicker6" value="#ff00ff" title="Пурпурный">
-            <input type="color" id="colorPicker7" value="#00ffff" title="Голубой">
+    <!-- Верхняя панель: колорпикеры + загадка по центру -->
+    <div class="top-bar">
+        <div class="top-center">
+            <div class="color-picker-group" id="colorPickerGroup">
+                <input type="color" id="colorPicker" value="#000000" title="Текущий цвет (C)">
+                <input type="color" id="colorPicker2" value="#ff0000" title="Красный">
+                <input type="color" id="colorPicker3" value="#00ff00" title="Зелёный">
+                <input type="color" id="colorPicker4" value="#0000ff" title="Синий">
+                <input type="color" id="colorPicker5" value="#ffff00" title="Жёлтый">
+                <input type="color" id="colorPicker6" value="#ff00ff" title="Пурпурный">
+                <input type="color" id="colorPicker7" value="#00ffff" title="Голубой">
+            </div>
+            <div class="quizz-area">
+                <button id="previousWord" title="Предыдущее слово"><</button>
+                <p id="Quizz"></p>
+                <button id="nextWord" title="Следующее слово">></button>
+                <div id="elapsedTime" class="time"></div>
+            </div>
         </div>
-        <hr>
         <div class="slider-group">
             <div class="slider">
-                <div class="pressure-bar" id="pressureBar"></div>
                 <label for="brushSize" title="Размер кисти">🖌️</label>
                 <input type="range" id="brushSize" min="1" max="100" value="3" oninput="updateBrushSizeValue(this.value)">
                 <span id="brushSizeValue" style="color: red;">3</span>
-                <label for="maxBrushSize" title="Максимальный размер кисти">Макс:</label>
+                <label for="maxBrushSize" title="Макс">М:</label>
                 <input type="range" id="maxBrushSize" min="1" max="1000" value="100" oninput="updateMaxBrushSizeValue(this.value)">
                 <span id="maxBrushSizeValue" style="color: red;">300</span>
             </div>
         </div>
     </div>
-    <div class="canvas-and-sliders">
-        <div class="canvas-container">
+
+    <!-- Основная область: канвас слева, кнопки справа -->
+    <div class="main-area">
+        <div class="canvas-wrapper">
             <div class="canv-container" id="canvContainer" style="position: relative; width: 100%; height: 100%;">
                 <canvas id="backgroundCanvas" style="position: absolute; top: 0; left: 0; z-index: 1;"></canvas>
                 <canvas id="drawingCanvas" style="position: absolute; top: 0; left: 0; z-index: 3;"></canvas>
@@ -61,48 +58,56 @@
                 <div id="cursorList"></div>
             </div>
         </div>
+        <div class="sidebar-right">
+            <a href="../index.html" target="_self" title="Выйти" id="exitLink" style="font-size: 30px;">🚪</a>
+            <button id="undo" title="Отменить (Z)">⟲</button>
+            <button id="redo" title="Повторить (X)">⟳</button>
+            <button id="symmetryBtn" title="Симметрия (S)">🦋</button>
+            <button id="eyedropperBtn" title="Пипетка (A)">💧</button>
+            <button id="changeCursorBtn" title="Курсор">🎨</button>
+            <button id="clearBtn" title="Очистить">💀</button>
+            <button id="saveImageBtn" title="Сохранить">💾</button>
+            <button id="eraserBtn" title="Стерка">🧽</button>
+            <button id="smoothDrawingBtn" title="Паутинка">🌀</button>
+            <button id="overlayBtn" title="Трафарет (D)">👻</button>
+        </div>
     </div>
+
     <style>
         .slider {
             display: flex;
             align-items: center;
-            width: 100%;
+            gap: 4px;
         }
-
         .slider input[type="range"] {
             flex-grow: 1;
             background-color: rgba(0, 0, 0, 0.2);
-            width: 100%;
+            width: 60px;
             -webkit-appearance: none;
             appearance: none;
             outline: none;
             overflow: hidden;
             touch-action: pan-y;
             border-radius: 20px;
+            height: 6px;
         }
-
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 20px;
-            height: 50px;
+            width: 12px;
+            height: 20px;
             background: #00ff08;
             cursor: pointer;
-            border-radius: 20px;
+            border-radius: 10px;
             box-shadow: -100vw 0 0 100vw rgb(0, 93, 186);
         }
-
         input[type="range"]::-moz-range-thumb {
-            height: 50px;
+            height: 20px;
             background: #4CAF50;
             color: #00ff08;
             cursor: progress;
-            border-radius: 50%;
+            border-radius: 10px;
             box-shadow: -100vw 0 0 100vw dodgerblue;
-        }
-
-        .slider input[type="number"] {
-            margin-left: 20px;
         }
     </style>
     <script>
@@ -155,9 +160,10 @@ const buttonElements = [
     'undo',
     'redo',
     'saveImageBtn',
-    'smoothDrawingBtn'
+    'smoothDrawingBtn',
+    'overlayBtn'
 ].map(gel);
-const [symmetryButton, eyedropperBtn, clearBtn, eraserBtn, undoBtn, redoBtn, saveImageBtn, smoothDrawingBtn] = buttonElements;
+const [symmetryButton, eyedropperBtn, clearBtn, eraserBtn, undoBtn, redoBtn, saveImageBtn, smoothDrawingBtn, overlayBtn] = buttonElements;
 
 const ctx = drawingCanvas.getContext('2d');
 const bgCtx = backgroundCanvas.getContext('2d');
@@ -215,7 +221,6 @@ function resizeCanvases() {
     ctx.scale(devicePixelRatio, devicePixelRatio);
     bgCtx.scale(devicePixelRatio, devicePixelRatio);
     
-    // Restore history if exists
     if (history.length > 0) {
         ctx.putImageData(history[history.length - 1], 0, 0);
     }
@@ -357,19 +362,20 @@ function saveImage() {
     link.click();
 }
 
-function createOverlayLayer() {
+window.createOverlayLayer = function() {
     overlayActive = true;
     overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
     overlayCtx.drawImage(drawingCanvas, 0, 0);
     overlayCanvas.style.opacity = '0.5';
     clearCanvas();
-}
+    overlayBtn.classList.add('active');
+};
 
-function toggleOverlayOpacity() {
+window.toggleOverlayOpacity = function() {
     if (overlayActive) {
         overlayCanvas.style.opacity = overlayCanvas.style.opacity === '0.5' ? '1' : '0.5';
     }
-}
+};
 
 function toggleEraser() {
     isErasing = !isErasing;
@@ -413,7 +419,7 @@ function toggleSmoothDrawing() {
     smoothDrawingBtn.classList.toggle('active', isSmoothDrawing);
 }
 
-// Color picker palette: click sets as current color
+// Color picker palette
 colorPickers.forEach(picker => {
     picker.addEventListener('input', () => {
         colorPicker.value = picker.value;
@@ -439,6 +445,7 @@ eraserBtn.addEventListener('click', toggleEraser);
 saveImageBtn.addEventListener('click', saveImage);
 eyedropperBtn.addEventListener('click', toggleEyedropper);
 smoothDrawingBtn.addEventListener('click', toggleSmoothDrawing);
+overlayBtn.addEventListener('click', window.createOverlayLayer);
 window.addEventListener('resize', resizeCanvases);
 
 // Initialization
@@ -451,9 +458,83 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('a, button').forEach(icon => icon.classList.add('icon-hover'));
 });
     </script>
-    <script type="module" src="cancerSettings.js" defer></script>
-    <script type="module" src="..//helperFunction.js" defer></script>
-    <script type="module" src="cancerHotkey.js" defer></script>
+    <!-- Встроенные скрипты (CORS fix for file://) -->
+    <script>
+    // cancerSettings.js
+    (function() {
+        const $e = (event, handler, options) => document.addEventListener(event, handler, options);
+        const preventDefault = (e) => {
+            if (e.target instanceof Element && !['BUTTON', 'INPUT'].includes(e.target.tagName) && !e.target.closest('.slider')) {
+                e.preventDefault();
+            }
+        };
+        document.querySelectorAll('*').forEach(element => element.setAttribute('draggable', 'false'));
+        const events = ['touchstart', 'mousedown', 'pointerleave', 'mouseleave', 'touchmove', 'keydown'];
+        events.forEach(event => $e(event, preventDefault, { passive: false }));
+        $e('contextmenu', e => e.preventDefault());
+    })();
+
+    // helperFunction.js (таймер + слова)
+    const gameStartTime = new Date();
+    setInterval(() => {
+        const el = gel('elapsedTime');
+        if (el) {
+            const elapsedSeconds = Math.floor((new Date() - gameStartTime) / 1000);
+            el.textContent = `${Math.floor(elapsedSeconds / 60).toString().padStart(2, '0')}:${(elapsedSeconds % 60).toString().padStart(2, '0')}`;
+        }
+    }, 1000);
+
+    const fetchWords = async () => {
+        try {
+            const response = await fetch('../Quizz.txt');
+            return (await response.text()).split(/[\s,]+/).map(word => word.trim());
+        } catch (error) {
+            console.error('Error loading words:', error);
+            return [];
+        }
+    };
+
+    (async () => {
+        const wordList = await fetchWords();
+        if (wordList.length > 0) {
+            let currentWordIndex = Math.floor(Math.random() * wordList.length);
+            const updateWord = () => { const q = gel("Quizz"); if (q) q.textContent = wordList[currentWordIndex]; };
+            const prevBtn = gel("previousWord");
+            const nextBtn = gel("nextWord");
+            if (prevBtn) prevBtn.addEventListener("click", () => {
+                currentWordIndex = (currentWordIndex - 1 + wordList.length) % wordList.length;
+                updateWord();
+            });
+            if (nextBtn) nextBtn.addEventListener("click", () => {
+                currentWordIndex = (currentWordIndex + 1) % wordList.length;
+                updateWord();
+            });
+            updateWord();
+        }
+    })();
+
+    // cancerHotkey.js
+    document.addEventListener('keydown', function(event) {
+        const action = {
+            'KeyA': 'eyedropperBtn',
+            'KeyZ': 'undo',
+            'KeyX': 'redo',
+            'KeyB': 'backgroundPicker',
+            'KeyE': 'eraserBtn',
+            'KeyS': 'saveImageBtn',
+            'KeyR': 'clear',
+            'KeyQ': 'symmetryBtn',
+            'KeyV': 'smoothDrawingBtn',
+            'KeyD': window.createOverlayLayer,
+            'KeyG': window.toggleOverlayOpacity,
+        }[event.code];
+
+        if (action) {
+            event.preventDefault();
+            typeof action === 'string' ? gel(action)?.click() : action();
+        }
+    });
+    </script>
 </body>
 
 </html>
