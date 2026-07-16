@@ -82,7 +82,7 @@
         .slider input[type="range"] {
             flex-grow: 1;
             background-color: rgba(0, 0, 0, 0.2);
-            width: 60px;
+            width: 180px;
             -webkit-appearance: none;
             appearance: none;
             outline: none;
@@ -658,7 +658,7 @@ window.addEventListener('resize', resizeCanvases);
 resizeCanvases();
 initializeCursor();
 
-console.log(`Pointer events are ${window.PointerEvent ? '' : 'not '}supported`);
+
 
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('a, button').forEach(icon => icon.classList.add('icon-hover'));
