@@ -202,6 +202,7 @@ let panStartMX = 0;
 let panStartMY = 0;
 let bgOffsetX = 0;
 let bgOffsetY = 0;
+let bgZoom = 1;
 let bgPanStartX = 0;
 let bgPanStartY = 0;
 let bgPanStartMX = 0;
@@ -322,7 +323,7 @@ function startDrawing(e) {
 }
 
 function applyBgOffset() {
-    backgroundCanvas.style.backgroundPosition = bgOffsetX + 'px ' + bgOffsetY + 'px';
+    backgroundCanvas.style.backgroundPosition = 'calc(50% + ' + bgOffsetX + 'px) calc(50% + ' + bgOffsetY + 'px)';
 }
 
 function draw(e) {
@@ -971,10 +972,16 @@ zoomBtn.addEventListener('click', function() {
 
 container.addEventListener('wheel', function(e) {
     e.preventDefault();
-    var dir = e.deltaY < 0 ? 1.1 : 0.9;
-    zoomToCenter(zoom * dir);
-    applyZoomActive(zoom > 1);
-});
+    if (e.altKey) {
+        var dir = e.deltaY < 0 ? 1.1 : 0.9;
+        bgZoom = Math.max(0.1, Math.min(10, bgZoom * dir));
+        backgroundCanvas.style.backgroundSize = (bgZoom * 100) + '%';
+    } else {
+        var dir = e.deltaY < 0 ? 1.1 : 0.9;
+        zoomToCenter(zoom * dir);
+        applyZoomActive(zoom > 1);
+    }
+}, { passive: false });
 
 var lastAltY = 0;
 document.addEventListener('pointermove', function(e) {
