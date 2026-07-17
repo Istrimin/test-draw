@@ -962,12 +962,11 @@ document.addEventListener('pointerdown', (e) => {
 });
 
 document.addEventListener('pointermove', (e) => {
-    if (!isDrawingTarget(e) && !isDrawing) return;
     draw(ensurePointerPressure(e));
 });
 
 document.addEventListener('pointerup', (e) => {
-    if (!isDrawing) {
+    if (!isDrawing && !isBgPanning && !isPanning) {
         // Если не рисовали — не мешаем кнопкам/пикерам.
         if (isFloodFillActive) {
             var r = drawingCanvas.getBoundingClientRect();
@@ -990,7 +989,7 @@ document.addEventListener('pointerup', (e) => {
 });
 
 document.addEventListener('pointercancel', (e) => {
-    if (isDrawing) stopDrawing(ensurePointerPressure(e));
+    stopDrawing(ensurePointerPressure(e));
 });
 
 // Button events
