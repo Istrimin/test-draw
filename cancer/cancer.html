@@ -194,11 +194,18 @@ let zoom = 1.5;
 let panX = 0;
 let panY = 0;
 let isPanning = false;
+let isBgPanning = false;
 let spaceHeld = false;
 let panStartX = 0;
 let panStartY = 0;
 let panStartMX = 0;
 let panStartMY = 0;
+let bgOffsetX = 0;
+let bgOffsetY = 0;
+let bgPanStartX = 0;
+let bgPanStartY = 0;
+let bgPanStartMX = 0;
+let bgPanStartMY = 0;
 let lastX = 0;
 let lastY = 0;
 let currentCursor = 'url(../cursorsNum/1.png), auto';
@@ -285,8 +292,19 @@ function drawSmoothLine(startX, startY, endX, endY) {
 function startDrawing(e) {
     closeColorPicker();
     if (isFloodFillActive) return;
+    if (e.button === 1) {
+        e.preventDefault();
+        isBgPanning = true;
+        bgPanStartMX = e.clientX;
+        bgPanStartMY = e.clientY;
+        bgPanStartX = bgOffsetX;
+        bgPanStartY = bgOffsetY;
+        return;
+    }
+    if (e.altKey) return;
     if (spaceHeld) {
         isPanning = true;
+        _savedCursorPan = document.body.style.cursor || currentCursor;
         document.body.style.cursor = 'grabbing';
         drawingCanvas.style.cursor = 'grabbing';
         panStartMX = e.clientX;
@@ -303,7 +321,21 @@ function startDrawing(e) {
     }
 }
 
+function applyBgOffset() {
+    backgroundCanvas.style.backgroundPosition = bgOffsetX + 'px ' + bgOffsetY + 'px';
+}
+
 function draw(e) {
+    if (isBgPanning) {
+        var dx = e.clientX - bgPanStartMX;
+        var dy = e.clientY - bgPanStartMY;
+        if (e.altKey) dx = 0;
+        if (e.shiftKey) dy = 0;
+        bgOffsetX = bgPanStartX + dx;
+        bgOffsetY = bgPanStartY + dy;
+        applyBgOffset();
+        return;
+    }
     if (isPanning) {
         panX = panStartX + (e.clientX - panStartMX);
         panY = panStartY + (e.clientY - panStartMY);
@@ -347,6 +379,10 @@ function draw(e) {
 }
 
 function stopDrawing() {
+    if (isBgPanning) {
+        isBgPanning = false;
+        return;
+    }
     if (isPanning) {
         isPanning = false;
         if (spaceHeld) {
@@ -942,7 +978,7 @@ container.addEventListener('wheel', function(e) {
 
 var lastAltY = 0;
 document.addEventListener('pointermove', function(e) {
-    if (e.altKey && !isDrawing) {
+    if (e.altKey && (e.buttons & 1) && !isDrawing) {
         if (lastAltY !== 0) {
             var delta = e.clientY - lastAltY;
             if (Math.abs(delta) >= 3) {
@@ -1009,6 +1045,7 @@ resizeCanvases();
 initializeCursor();
 zoomToCenter(1.5);
 applyZoomActive(true);
+applyBgOffset();
 
 // === Load image to canvas ===
 const imageInput = gel('imageInput');
