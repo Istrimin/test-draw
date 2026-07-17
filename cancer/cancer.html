@@ -189,6 +189,14 @@ let tabletModeActive = false;
 let isSmoothDrawing = false;
 
 let zoom = 1;
+let panX = 0;
+let panY = 0;
+let isPanning = false;
+let spaceHeld = false;
+let panStartX = 0;
+let panStartY = 0;
+let panStartMX = 0;
+let panStartMY = 0;
 let lastX = 0;
 let lastY = 0;
 let currentCursor = 'url(../cursorsNum/1.png), auto';
@@ -274,6 +282,16 @@ function drawSmoothLine(startX, startY, endX, endY) {
 
 function startDrawing(e) {
     if (isFloodFillActive) return;
+    if (spaceHeld) {
+        isPanning = true;
+        document.body.style.cursor = 'grabbing';
+        drawingCanvas.style.cursor = 'grabbing';
+        panStartMX = e.clientX;
+        panStartMY = e.clientY;
+        panStartX = panX;
+        panStartY = panY;
+        return;
+    }
     isDrawing = true;
     drawingCanvas.style.cursor = currentCursor;
     [lastX, lastY] = getCoordinates(e);
@@ -283,6 +301,12 @@ function startDrawing(e) {
 }
 
 function draw(e) {
+    if (isPanning) {
+        panX = panStartX + (e.clientX - panStartMX);
+        panY = panStartY + (e.clientY - panStartMY);
+        updateTransform();
+        return;
+    }
     if (!isDrawing) return;
     drawingCanvas.style.cursor = currentCursor;
 
@@ -320,6 +344,17 @@ function draw(e) {
 }
 
 function stopDrawing() {
+    if (isPanning) {
+        isPanning = false;
+        if (spaceHeld) {
+            document.body.style.cursor = 'grab';
+            drawingCanvas.style.cursor = 'grab';
+        } else {
+            document.body.style.cursor = _savedCursorPan;
+            drawingCanvas.style.cursor = _savedCursorPan;
+        }
+        return;
+    }
     if (isDrawing) {
         isDrawing = false;
         saveState();
@@ -858,18 +893,24 @@ var container = gel('canvContainer');
 var zoomBtn = gel('zoomBtn');
 var ZOOM_LEVEL = 2;
 
+function updateTransform() {
+    container.style.transform = 'translate(' + panX + 'px, ' + panY + 'px) scale(' + zoom + ')';
+    container.style.transformOrigin = '0 0';
+}
+
 function zoomToCenter(v) {
     zoom = Math.max(0.1, Math.min(4, v));
-    container.style.transform = 'scale(' + zoom + ')';
-    container.style.transformOrigin = '50% 50%';
+    updateTransform();
 }
 
 zoomBtn.addEventListener('click', function() {
     if (zoom === 1) {
+        panX = 0; panY = 0;
         zoomToCenter(ZOOM_LEVEL);
         zoomBtn.style.color = '#00ff08';
         zoomBtn.style.textShadow = '0 0 10px #00ff08';
     } else {
+        panX = 0; panY = 0;
         zoomToCenter(1);
         zoomBtn.style.color = '';
         zoomBtn.style.textShadow = '';
@@ -896,6 +937,29 @@ document.addEventListener('pointermove', function(e) {
         }
     } else {
         lastAltY = 0;
+    }
+});
+
+// Space + drag → pan
+var _savedCursorPan = '';
+
+document.addEventListener('keydown', function(e) {
+    if (e.code === 'Space' && !e.repeat) {
+        e.preventDefault();
+        spaceHeld = true;
+        _savedCursorPan = document.body.style.cursor || currentCursor;
+        document.body.style.cursor = 'grab';
+        drawingCanvas.style.cursor = 'grab';
+    }
+});
+
+document.addEventListener('keyup', function(e) {
+    if (e.code === 'Space') {
+        spaceHeld = false;
+        if (!isPanning) {
+            document.body.style.cursor = _savedCursorPan;
+            drawingCanvas.style.cursor = _savedCursorPan;
+        }
     }
 });
 
