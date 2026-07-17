@@ -503,44 +503,59 @@ function getPixelColor(x, y, data, width) {
 }
 
 function floodFill(e) {
-    if (!isFloodFillActive) return;
-    saveState();
-    var rect = drawingCanvas.getBoundingClientRect();
-    var w = drawingCanvas.width;
-    var h = drawingCanvas.height;
-    var dw = rect.width;
-    var dh = rect.height;
-    var startX = Math.floor((e.clientX - rect.left) / dw * w);
-    var startY = Math.floor((e.clientY - rect.top) / dh * h);
-    var imageData = ctx.getImageData(0, 0, w, h);
-    var data = imageData.data;
-    var targetColor = getPixelColor(startX, startY, data, w);
-    var fillColor = hexToRgba(colorPicker.value);
-    var tolerance = 30;
-    if (colorMatch(targetColor, fillColor, tolerance)) return;
-    var visited = new Uint8Array(w * h);
-    var stack = [[startX, startY]];
-    while (stack.length) {
-        var p = stack.pop();
-        var px = p[0], py = p[1];
-        var idx = py * w + px;
-        if (visited[idx]) continue;
-        visited[idx] = 1;
-        var pi = idx * 4;
-        if (colorMatch([data[pi], data[pi + 1], data[pi + 2], data[pi + 3]], targetColor, tolerance)) {
-            data[pi] = fillColor[0];
-            data[pi + 1] = fillColor[1];
-            data[pi + 2] = fillColor[2];
-            data[pi + 3] = fillColor[3];
-            if (px > 0) stack.push([px - 1, py]);
-            if (px < w - 1) stack.push([px + 1, py]);
-            if (py > 0) stack.push([px, py - 1]);
-            if (py < h - 1) stack.push([px, py + 1]);
+    try {
+        if (!isFloodFillActive) return;
+        saveState();
+        var rect = drawingCanvas.getBoundingClientRect();
+        var w = drawingCanvas.width;
+        var h = drawingCanvas.height;
+        var dw = rect.width;
+        var dh = rect.height;
+        var startX = Math.floor((e.clientX - rect.left) / dw * w);
+        var startY = Math.floor((e.clientY - rect.top) / dh * h);
+        var imageData = ctx.getImageData(0, 0, w, h);
+        var data = imageData.data;
+        var targetColor = getPixelColor(startX, startY, data, w);
+        var fillColor = hexToRgba(colorPicker.value);
+        var tolerance = 30;
+        if (colorMatch(targetColor, fillColor, tolerance)) return;
+        function fillFrom(x, y, visited) {
+            var stack = [[x, y]];
+            while (stack.length) {
+                var p = stack.pop();
+                var px = p[0], py = p[1];
+                var idx = py * w + px;
+                if (visited[idx]) continue;
+                visited[idx] = 1;
+                var pi = idx * 4;
+                if (colorMatch([data[pi], data[pi + 1], data[pi + 2], data[pi + 3]], targetColor, tolerance)) {
+                    data[pi] = fillColor[0];
+                    data[pi + 1] = fillColor[1];
+                    data[pi + 2] = fillColor[2];
+                    data[pi + 3] = fillColor[3];
+                    if (px > 0) stack.push([px - 1, py]);
+                    if (px < w - 1) stack.push([px + 1, py]);
+                    if (py > 0) stack.push([px, py - 1]);
+                    if (py < h - 1) stack.push([px, py + 1]);
+                }
+            }
         }
+        fillFrom(startX, startY, new Uint8Array(w * h));
+        if (symmetryBtn) {
+            var centerX = w / 2;
+            var symX = Math.floor(centerX + (centerX - startX));
+            if (symX >= 0 && symX < w) {
+                fillFrom(symX, startY, new Uint8Array(w * h));
+            }
+        }
+        ctx.putImageData(imageData, 0, 0);
+        isFloodFillActive = false;
+        gel('fillBtn').classList.remove('active');
+    } catch(err) {
+        console.warn('floodFill error:', err);
+        isFloodFillActive = false;
+        gel('fillBtn').classList.remove('active');
     }
-    ctx.putImageData(imageData, 0, 0);
-    isFloodFillActive = false;
-    gel('fillBtn').classList.remove('active');
 }
 
 // Cursor panel
@@ -626,6 +641,7 @@ function buildPngTab() {
         item.appendChild(img);
         item.addEventListener('pointerdown', () => {
             _lastCursor = { type: 'png', src: '../cursorsNum/' + file };
+            applyCursor('url(../cursorsNum/' + file + ') 16 16, auto');
             setPngCursor(_lastCursor.src);
             cursorPanel.style.display = 'none';
         });
@@ -694,6 +710,7 @@ function toggleCursorPanel() {
                     item.appendChild(img);
                     item.addEventListener('pointerdown', function() {
                         _lastCursor = { type: 'png', src: '../cursorsNum/' + file };
+                        applyCursor('url(../cursorsNum/' + file + ') 16 16, auto');
                         setPngCursor(_lastCursor.src);
                         cursorPanel.style.display = 'none';
                     });
@@ -782,7 +799,16 @@ function ensurePointerPressure(e){
 
 document.addEventListener('pointerdown', (e) => startDrawing(ensurePointerPressure(e)));
         document.addEventListener('pointermove', (e) => draw(ensurePointerPressure(e)));
-        document.addEventListener('pointerup', (e) => stopDrawing(ensurePointerPressure(e)));
+        document.addEventListener('pointerup', (e) => {
+            if (isFloodFillActive) {
+                var r = drawingCanvas.getBoundingClientRect();
+                if (e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom) {
+                    floodFill(e);
+                    return;
+                }
+            }
+            stopDrawing(ensurePointerPressure(e));
+        });
         document.addEventListener('pointercancel', (e) => stopDrawing(ensurePointerPressure(e)));
 
 // Button events
@@ -799,7 +825,6 @@ gel('fillBtn').addEventListener('click', function() {
     isFloodFillActive = !isFloodFillActive;
     gel('fillBtn').classList.toggle('active', isFloodFillActive);
 });
-drawingCanvas.addEventListener('click', floodFill);
 window.addEventListener('resize', resizeCanvases);
 
 // Ctrl + pointermove → brush size
@@ -992,33 +1017,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }, 1000);
 
-    const fetchWords = async () => {
+    var defaultWords = ['кисть', 'карандаш', 'ластик', 'палитра', 'мазок', 'заливка', 'цвет', 'тень', 'блик', 'рамка', 'фон', 'слой', 'симметрия', 'контур', 'штрих', 'перо', 'планшет', 'экран', 'холст', 'пиксель'];
+
+    async function loadWords() {
         try {
-            const response = await fetch('../Quizz.txt');
-            return (await response.text()).split(/[\s,]+/).map(word => word.trim());
-        } catch (error) {
-            console.error('Error loading words:', error);
-            return [];
-        }
-    };
+            var r = await fetch('../cancerQuizz.txt');
+            var text = await r.text();
+            var words = text.split(/[\s,]+/).map(function(w) { return w.trim(); }).filter(Boolean);
+            if (words.length > 0) return words;
+        } catch(e) {}
+        return defaultWords;
+    }
 
     (async () => {
-        const wordList = await fetchWords();
-        if (wordList.length > 0) {
-            let currentWordIndex = Math.floor(Math.random() * wordList.length);
-            const updateWord = () => { const q = gel("Quizz"); if (q) q.textContent = wordList[currentWordIndex]; };
-            const prevBtn = gel("previousWord");
-            const nextBtn = gel("nextWord");
-            if (prevBtn) prevBtn.addEventListener("click", () => {
-                currentWordIndex = (currentWordIndex - 1 + wordList.length) % wordList.length;
-                updateWord();
-            });
-            if (nextBtn) nextBtn.addEventListener("click", () => {
-                currentWordIndex = (currentWordIndex + 1) % wordList.length;
-                updateWord();
-            });
+        const wordList = await loadWords();
+        let currentWordIndex = Math.floor(Math.random() * wordList.length);
+        const updateWord = () => { const q = gel("Quizz"); if (q) q.textContent = wordList[currentWordIndex]; };
+        const prevBtn = gel("previousWord");
+        const nextBtn = gel("nextWord");
+        if (prevBtn) prevBtn.addEventListener("click", () => {
+            currentWordIndex = (currentWordIndex - 1 + wordList.length) % wordList.length;
             updateWord();
-        }
+        });
+        if (nextBtn) nextBtn.addEventListener("click", () => {
+            currentWordIndex = (currentWordIndex + 1) % wordList.length;
+            updateWord();
+        });
+        updateWord();
     })();
 
     // cancerHotkey.js
