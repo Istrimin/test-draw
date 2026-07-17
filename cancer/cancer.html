@@ -233,7 +233,42 @@ function updateUndoRedoButtons() {
     redoBtn.disabled = redoHistory.length === 0;
 }
 
-var CANVAS_SIZE = 4096;
+var CANVAS_W = 0;
+var CANVAS_H = 0;
+
+function allocCanvas(w, h) {
+    var bw = Math.ceil(w * devicePixelRatio);
+    var bh = Math.ceil(h * devicePixelRatio);
+    if (bw <= drawingCanvas.width && bh <= drawingCanvas.height) return;
+    var oldW = drawingCanvas.width, oldH = drawingCanvas.height;
+    var oldData = oldW > 0 ? ctx.getImageData(0, 0, oldW, oldH) : null;
+    bw = Math.max(bw, oldW);
+    bh = Math.max(bh, oldH);
+    drawingCanvas.width = bw;
+    drawingCanvas.height = bh;
+    drawingCanvas.style.width = (bw / devicePixelRatio) + 'px';
+    drawingCanvas.style.height = (bh / devicePixelRatio) + 'px';
+    overlayCanvas.width = bw;
+    overlayCanvas.height = bh;
+    overlayCanvas.style.width = (bw / devicePixelRatio) + 'px';
+    overlayCanvas.style.height = (bh / devicePixelRatio) + 'px';
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.scale(devicePixelRatio, devicePixelRatio);
+    if (oldData) ctx.putImageData(oldData, 0, 0);
+    CANVAS_W = bw / devicePixelRatio;
+    CANVAS_H = bh / devicePixelRatio;
+}
+
+function ensureCanvasBounds(x, y, margin) {
+    margin = margin || 100;
+    if (!CANVAS_W) return;
+    var needW = Math.max(CANVAS_W, x + margin);
+    var needH = Math.max(CANVAS_H, y + margin);
+    if (needW > CANVAS_W || needH > CANVAS_H) {
+        allocCanvas(needW, needH);
+        redoHistory = [];
+    }
+}
 
 function resizeCanvases() {
     const container = gel('canvContainer');
@@ -245,20 +280,11 @@ function resizeCanvases() {
     backgroundCanvas.style.width = vw + 'px';
     backgroundCanvas.style.height = vh + 'px';
     
-    var bs = CANVAS_SIZE * devicePixelRatio;
-    drawingCanvas.width = bs;
-    drawingCanvas.height = bs;
-    drawingCanvas.style.width = CANVAS_SIZE + 'px';
-    drawingCanvas.style.height = CANVAS_SIZE + 'px';
-    overlayCanvas.width = bs;
-    overlayCanvas.height = bs;
-    overlayCanvas.style.width = CANVAS_SIZE + 'px';
-    overlayCanvas.style.height = CANVAS_SIZE + 'px';
+    if (!CANVAS_W) {
+        allocCanvas(vw, vh);
+    }
     
-    // Prevent scale accumulation on repeated resizes
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
     bgCtx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.scale(devicePixelRatio, devicePixelRatio);
     bgCtx.scale(devicePixelRatio, devicePixelRatio);
     
     if (history.length > 0) {
@@ -320,6 +346,7 @@ function startDrawing(e) {
     isDrawing = true;
     drawingCanvas.style.cursor = currentCursor;
     [lastX, lastY] = getCoordinates(e);
+    ensureCanvasBounds(lastX, lastY);
     if (isSmoothDrawing) {
         points.push({ x: lastX, y: lastY });
     }
@@ -350,6 +377,7 @@ function draw(e) {
     drawingCanvas.style.cursor = currentCursor;
 
     const [x, y] = getCoordinates(e);
+    ensureCanvasBounds(x, y);
 
     ctx.lineWidth = (isErasing ? eraserSize : parseInt(brushSizeInput.value)) * (e.pressure || 1);
     ctx.lineCap = 'round';
@@ -967,8 +995,8 @@ function updateTransform() {
 
 function recenterCanvas() {
     var cc = gel('canvContainer');
-    panX = (cc.clientWidth - CANVAS_SIZE) * zoom / 2;
-    panY = (cc.clientHeight - CANVAS_SIZE) * zoom / 2;
+    panX = (cc.clientWidth - CANVAS_W) * zoom / 2;
+    panY = (cc.clientHeight - CANVAS_H) * zoom / 2;
 }
 
 function zoomToCenter(v) {
@@ -1082,10 +1110,9 @@ document.addEventListener('mousedown', function(e) {
 resizeCanvases();
 initializeCursor();
 zoom = 1.5;
-var cc = gel('canvContainer');
-panX = (cc.clientWidth - CANVAS_SIZE) * zoom / 2;
-panY = (cc.clientHeight - CANVAS_SIZE) * zoom / 2;
+panX = 0; panY = 0;
 updateTransform();
+recenterCanvas();
 applyZoomActive(true);
 applyBgOffset();
 
