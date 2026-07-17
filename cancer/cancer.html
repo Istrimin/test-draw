@@ -190,7 +190,7 @@ let overlayActive = false;
 let tabletModeActive = false;
 let isSmoothDrawing = false;
 
-let zoom = 1;
+let zoom = 1.5;
 let panX = 0;
 let panY = 0;
 let isPanning = false;
@@ -283,6 +283,7 @@ function drawSmoothLine(startX, startY, endX, endY) {
 }
 
 function startDrawing(e) {
+    closeColorPicker();
     if (isFloodFillActive) return;
     if (spaceHeld) {
         isPanning = true;
@@ -427,6 +428,7 @@ function saveImage() {
 }
 
 window.createOverlayLayer = function() {
+    closeColorPicker();
     overlayActive = true;
     overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
     overlayCtx.drawImage(drawingCanvas, 0, 0);
@@ -824,10 +826,12 @@ colorPickers.forEach(picker => {
         colorPicker.value = picker.value;
         ctx.strokeStyle = picker.value;
     });
+    picker.addEventListener('change', closeColorPicker);
 });
 
 // Main color picker
 colorPicker.addEventListener('input', () => ctx.strokeStyle = colorPicker.value);
+colorPicker.addEventListener('change', closeColorPicker);
 
 // Drawing events
 function ensurePointerPressure(e){
@@ -852,16 +856,17 @@ document.addEventListener('pointerdown', (e) => startDrawing(ensurePointerPressu
         document.addEventListener('pointercancel', (e) => stopDrawing(ensurePointerPressure(e)));
 
 // Button events
-symmetryButton.addEventListener('click', toggleSymmetry);
+symmetryButton.addEventListener('click', function() { closeColorPicker(); toggleSymmetry(); });
 undoBtn.addEventListener('click', undo);
 redoBtn.addEventListener('click', redo);
-clearBtn.addEventListener('click', clearCanvas);
-eraserBtn.addEventListener('click', toggleEraser);
+clearBtn.addEventListener('click', function() { closeColorPicker(); clearCanvas(); });
+eraserBtn.addEventListener('click', function() { closeColorPicker(); toggleEraser(); });
 saveImageBtn.addEventListener('click', saveImage);
-eyedropperBtn.addEventListener('click', toggleEyedropper);
-smoothDrawingBtn.addEventListener('click', toggleSmoothDrawing);
-overlayBtn.addEventListener('click', window.createOverlayLayer);
+eyedropperBtn.addEventListener('click', function() { closeColorPicker(); toggleEyedropper(); });
+smoothDrawingBtn.addEventListener('click', function() { closeColorPicker(); toggleSmoothDrawing(); });
+overlayBtn.addEventListener('click', function() { closeColorPicker(); window.createOverlayLayer(); });
 gel('fillBtn').addEventListener('click', function() {
+    closeColorPicker();
     isFloodFillActive = !isFloodFillActive;
     gel('fillBtn').classList.toggle('active', isFloodFillActive);
 });
@@ -894,7 +899,7 @@ document.addEventListener('pointermove', (e) => {
 var container = gel('canvContainer');
 var drawingLayer = gel('drawingLayer');
 var zoomBtn = gel('zoomBtn');
-var ZOOM_LEVEL = 2;
+var ZOOM_LEVEL = 1.5;
 
 function updateTransform() {
     drawingLayer.style.transform = 'translate(' + panX + 'px, ' + panY + 'px) scale(' + zoom + ')';
@@ -906,17 +911,25 @@ function zoomToCenter(v) {
     updateTransform();
 }
 
-zoomBtn.addEventListener('click', function() {
-    if (zoom === 1) {
-        panX = 0; panY = 0;
-        zoomToCenter(ZOOM_LEVEL);
+function applyZoomActive(active) {
+    if (active) {
         zoomBtn.style.color = '#00ff08';
         zoomBtn.style.textShadow = '0 0 10px #00ff08';
     } else {
-        panX = 0; panY = 0;
-        zoomToCenter(1);
         zoomBtn.style.color = '';
         zoomBtn.style.textShadow = '';
+    }
+}
+
+zoomBtn.addEventListener('click', function() {
+    if (zoom <= 1) {
+        panX = 0; panY = 0;
+        zoomToCenter(ZOOM_LEVEL);
+        applyZoomActive(true);
+    } else {
+        panX = 0; panY = 0;
+        zoomToCenter(1);
+        applyZoomActive(false);
     }
 });
 
@@ -924,6 +937,7 @@ container.addEventListener('wheel', function(e) {
     e.preventDefault();
     var dir = e.deltaY < 0 ? 1.1 : 0.9;
     zoomToCenter(zoom * dir);
+    applyZoomActive(zoom > 1);
 });
 
 var lastAltY = 0;
@@ -933,6 +947,7 @@ document.addEventListener('pointermove', function(e) {
             var delta = e.clientY - lastAltY;
             if (Math.abs(delta) >= 3) {
                 zoomToCenter(zoom - delta * 0.01);
+                applyZoomActive(zoom > 1);
                 lastAltY = e.clientY;
             }
         } else {
@@ -966,16 +981,34 @@ document.addEventListener('keyup', function(e) {
     }
 });
 
-// Blur active element (color picker) on canvas click
-canvasElements.forEach(c => c.addEventListener('pointerdown', () => {
-    if (document.activeElement && document.activeElement !== document.body) {
-        document.activeElement.blur();
+// Close color picker popup reliably
+function closeColorPicker() {
+    colorPickers.forEach(function(p) {
+        var t = p.type;
+        p.type = 'text';
+        p.type = t;
+        p.blur();
+    });
+    document.body.focus();
+}
+
+document.addEventListener('pointerdown', function(e) {
+    if (!e.target.closest('.color-picker-group')) {
+        closeColorPicker();
     }
-}));
+});
+// Also force close on any mousedown (catches edge cases with pen)
+document.addEventListener('mousedown', function(e) {
+    if (!e.target.closest('.color-picker-group')) {
+        closeColorPicker();
+    }
+});
 
 // Initialization
 resizeCanvases();
 initializeCursor();
+zoomToCenter(1.5);
+applyZoomActive(true);
 
 // === Load image to canvas ===
 const imageInput = gel('imageInput');
@@ -1182,6 +1215,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (action) {
             event.preventDefault();
+            closeColorPicker();
             typeof action === 'string' ? gel(action)?.click() : action();
         }
     });
