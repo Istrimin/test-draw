@@ -975,7 +975,8 @@ container.addEventListener('wheel', function(e) {
     if (e.altKey) {
         var dir = e.deltaY < 0 ? 1.1 : 0.9;
         bgZoom = Math.max(0.1, Math.min(10, bgZoom * dir));
-        backgroundCanvas.style.backgroundSize = (bgZoom * 100) + '%';
+        backgroundCanvas.style.transformOrigin = '50% 50%';
+        backgroundCanvas.style.transform = 'scale(' + bgZoom + ')';
     } else {
         var dir = e.deltaY < 0 ? 1.1 : 0.9;
         zoomToCenter(zoom * dir);
