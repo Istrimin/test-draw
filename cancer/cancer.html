@@ -54,8 +54,10 @@
         <div class="canvas-wrapper">
             <div class="canv-container" id="canvContainer" style="position: relative; width: 100%; height: 100%;">
                 <canvas id="backgroundCanvas" style="position: absolute; top: 0; left: 0; z-index: 1;"></canvas>
-                <canvas id="drawingCanvas" style="position: absolute; top: 0; left: 0; z-index: 3;"></canvas>
-                <canvas id="overlayCanvas" style="position: absolute; top: 0; left: 0; z-index: 2; opacity: 0.5;"></canvas>
+                <div id="drawingLayer" style="position: absolute; top:0;left:0;width:100%;height:100%;z-index:2;">
+                    <canvas id="drawingCanvas" style="position: absolute; top: 0; left: 0; z-index: 2;"></canvas>
+                    <canvas id="overlayCanvas" style="position: absolute; top: 0; left: 0; z-index: 1; opacity: 0.5;"></canvas>
+                </div>
             </div>
             <div id="cursorPanel" class="cursor-panel" style="display: none;">
                 <div id="cursorList"></div>
@@ -890,12 +892,13 @@ document.addEventListener('pointermove', (e) => {
 
 // === Zoom ===
 var container = gel('canvContainer');
+var drawingLayer = gel('drawingLayer');
 var zoomBtn = gel('zoomBtn');
 var ZOOM_LEVEL = 2;
 
 function updateTransform() {
-    container.style.transform = 'translate(' + panX + 'px, ' + panY + 'px) scale(' + zoom + ')';
-    container.style.transformOrigin = '0 0';
+    drawingLayer.style.transform = 'translate(' + panX + 'px, ' + panY + 'px) scale(' + zoom + ')';
+    drawingLayer.style.transformOrigin = '0 0';
 }
 
 function zoomToCenter(v) {
