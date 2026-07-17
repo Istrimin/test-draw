@@ -13,6 +13,7 @@
             touch-action: none;
             -ms-touch-action: none;
         }
+
     </style>
 </head>
 
@@ -76,6 +77,7 @@
             <button id="loadImageBtn" title="Загрузить изображение">📂</button>
             <button id="bgImageBtn" title="Фон">🌄</button>
             <button id="fillBtn" title="Заливка (F)">🪣</button>
+            <button id="zoomBtn" title="Зум (200%)" style="font-size:18px;">🔍</button>
         </div>
     </div>
 
@@ -97,7 +99,7 @@
             border-radius: 20px;
             height: 6px;
         }
-        input[type="range"]::-webkit-slider-thumb {
+        .slider input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
             width: 12px;
@@ -107,7 +109,7 @@
             border-radius: 10px;
             box-shadow: -100vw 0 0 100vw rgb(0, 93, 186);
         }
-        input[type="range"]::-moz-range-thumb {
+        .slider input[type="range"]::-moz-range-thumb {
             height: 20px;
             background: #4CAF50;
             color: #00ff08;
@@ -186,6 +188,7 @@ let overlayActive = false;
 let tabletModeActive = false;
 let isSmoothDrawing = false;
 
+let zoom = 1;
 let lastX = 0;
 let lastY = 0;
 let currentCursor = 'url(../cursorsNum/1.png), auto';
@@ -327,10 +330,10 @@ function stopDrawing() {
 }
 
 function getCoordinates(e) {
-    const rect = drawingCanvas.getBoundingClientRect();
+    var rect = drawingCanvas.getBoundingClientRect();
     return [
-        e.clientX - rect.left,
-        e.clientY - rect.top
+        (e.clientX - rect.left) / zoom,
+        (e.clientY - rect.top) / zoom
     ];
 }
 
@@ -850,6 +853,52 @@ document.addEventListener('pointermove', (e) => {
     }
 });
 
+// === Zoom ===
+var container = gel('canvContainer');
+var zoomBtn = gel('zoomBtn');
+var ZOOM_LEVEL = 2;
+
+function zoomToCenter(v) {
+    zoom = Math.max(0.1, Math.min(4, v));
+    container.style.transform = 'scale(' + zoom + ')';
+    container.style.transformOrigin = '50% 50%';
+}
+
+zoomBtn.addEventListener('click', function() {
+    if (zoom === 1) {
+        zoomToCenter(ZOOM_LEVEL);
+        zoomBtn.style.color = '#00ff08';
+        zoomBtn.style.textShadow = '0 0 10px #00ff08';
+    } else {
+        zoomToCenter(1);
+        zoomBtn.style.color = '';
+        zoomBtn.style.textShadow = '';
+    }
+});
+
+container.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    var dir = e.deltaY < 0 ? 1.1 : 0.9;
+    zoomToCenter(zoom * dir);
+});
+
+var lastAltY = 0;
+document.addEventListener('pointermove', function(e) {
+    if (e.altKey && !isDrawing) {
+        if (lastAltY !== 0) {
+            var delta = e.clientY - lastAltY;
+            if (Math.abs(delta) >= 3) {
+                zoomToCenter(zoom - delta * 0.01);
+                lastAltY = e.clientY;
+            }
+        } else {
+            lastAltY = e.clientY;
+        }
+    } else {
+        lastAltY = 0;
+    }
+});
+
 // Blur active element (color picker) on canvas click
 canvasElements.forEach(c => c.addEventListener('pointerdown', () => {
     if (document.activeElement && document.activeElement !== document.body) {
@@ -1021,7 +1070,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadWords() {
         try {
-            var r = await fetch('../cancerQuizz.txt');
+            var r = await fetch('./cancerQuizz.txt');
             var text = await r.text();
             var words = text.split(/[\s,]+/).map(function(w) { return w.trim(); }).filter(Boolean);
             if (words.length > 0) return words;
