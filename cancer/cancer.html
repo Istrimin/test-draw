@@ -187,6 +187,7 @@ let lastX = 0;
 let lastY = 0;
 let currentCursor = 'url(../cursorsNum/1.png), auto';
 let previousCursor = currentCursor;
+let _savedCursor = '';
 let points = [];
 
 let history = [];
@@ -413,6 +414,7 @@ function toggleEraser() {
     isErasing = !isErasing;
     eraserBtn.classList.toggle('active', isErasing);
     if (isErasing) {
+        _savedCursor = drawingCanvas.style.cursor || currentCursor;
         try { localStorage.setItem('cancerBrushSize', brushSizeInput.value); } catch(e) {}
         brushSizeInput.value = eraserSize;
         gel('brushSizeValue').textContent = eraserSize;
@@ -423,7 +425,9 @@ function toggleEraser() {
         var restore = parseInt(localStorage.getItem('cancerBrushSize')) || 3;
         brushSizeInput.value = restore;
         gel('brushSizeValue').textContent = restore;
-        drawingCanvas.style.cursor = currentCursor;
+        drawingCanvas.style.cursor = _savedCursor;
+        document.body.style.cursor = _savedCursor;
+        currentCursor = _savedCursor;
     }
 }
 
