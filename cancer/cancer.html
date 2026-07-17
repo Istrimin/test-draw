@@ -320,6 +320,7 @@ function drawSmoothLine(startX, startY, endX, endY) {
 }
 
 function startDrawing(e) {
+    if (e.target && e.target.closest && e.target.closest('.color-picker-group')) return;
     closeColorPicker();
     if (isFloodFillActive) return;
     if (e.button === 1) {
@@ -944,40 +945,9 @@ function ensurePointerPressure(e){
     return e;
 }
 
-function isDrawingTarget(e) {
-    // Рисуем только по канвасу/слою рисования, а не по UI (кнопкам/слайдерам/пикерам).
-    const t = e.target;
-    if (!t) return false;
-    if (t.closest && (t.closest('button') || t.closest('input') || t.closest('label') || t.closest('.slider') || t.closest('.top-bar'))) return false;
-    const drawingLayerEl = gel('drawingLayer');
-    const drawingCanvasEl = gel('drawingCanvas');
-    if (drawingCanvasEl && t === drawingCanvasEl) return true;
-    if (drawingLayerEl && drawingLayerEl.contains(t)) return true;
-    return false;
-}
-
-document.addEventListener('pointerdown', (e) => {
-    if (!isDrawingTarget(e)) return;
-    startDrawing(ensurePointerPressure(e));
-});
-
-document.addEventListener('pointermove', (e) => {
-    draw(ensurePointerPressure(e));
-});
-
+document.addEventListener('pointerdown', (e) => startDrawing(ensurePointerPressure(e)));
+document.addEventListener('pointermove', (e) => draw(ensurePointerPressure(e)));
 document.addEventListener('pointerup', (e) => {
-    if (!isDrawing && !isBgPanning && !isPanning) {
-        // Если не рисовали — не мешаем кнопкам/пикерам.
-        if (isFloodFillActive) {
-            var r = drawingCanvas.getBoundingClientRect();
-            if (e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom) {
-                floodFill(e);
-                return;
-            }
-        }
-        return;
-    }
-
     if (isFloodFillActive) {
         var r = drawingCanvas.getBoundingClientRect();
         if (e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom) {
@@ -987,10 +957,7 @@ document.addEventListener('pointerup', (e) => {
     }
     stopDrawing(ensurePointerPressure(e));
 });
-
-document.addEventListener('pointercancel', (e) => {
-    stopDrawing(ensurePointerPressure(e));
-});
+document.addEventListener('pointercancel', (e) => stopDrawing(ensurePointerPressure(e)));
 
 // Button events
 symmetryButton.addEventListener('click', function() { closeColorPicker(); toggleSymmetry(); });
