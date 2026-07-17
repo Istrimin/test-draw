@@ -539,7 +539,8 @@ function buildPngTab() {
         img.draggable = false;
         img.loading = 'eager';
         item.appendChild(img);
-        item.addEventListener('click', () => {
+        item.addEventListener('pointerdown', (e) => {
+            e.preventDefault();
             setPngCursor('../cursorsNum/' + file);
             cursorPanel.style.display = 'none';
         });
@@ -560,7 +561,8 @@ function buildSvgTab() {
         preview.style.background = 'rgba(255,255,255,0.2)';
         preview.style.borderRadius = '4px';
         item.appendChild(preview);
-        item.addEventListener('click', () => {
+        item.addEventListener('pointerdown', (e) => {
+            e.preventDefault();
             setSvgCursor(c.svg);
             cursorPanel.style.display = 'none';
         });
@@ -614,7 +616,8 @@ function toggleCursorPanel() {
                     img.draggable = false;
                     img.loading = 'eager';
                     item.appendChild(img);
-                    item.addEventListener('click', () => {
+                    item.addEventListener('pointerdown', (e) => {
+                        e.preventDefault();
                         setPngCursor('../cursorsNum/' + file);
                         cursorPanel.style.display = 'none';
                     });
@@ -632,7 +635,8 @@ function toggleCursorPanel() {
                     preview.style.background = 'rgba(255,255,255,0.2)';
                     preview.style.borderRadius = '4px';
                     item.appendChild(preview);
-                    item.addEventListener('click', () => {
+                    item.addEventListener('pointerdown', (e) => {
+                        e.preventDefault();
                         setSvgCursor(c.svg, c.hx, c.hy);
                         cursorPanel.style.display = 'none';
                     });
