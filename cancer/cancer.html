@@ -898,7 +898,7 @@ var ZOOM_LEVEL = 2;
 
 function updateTransform() {
     drawingLayer.style.transform = 'translate(' + panX + 'px, ' + panY + 'px) scale(' + zoom + ')';
-    drawingLayer.style.transformOrigin = '0 0';
+    drawingLayer.style.transformOrigin = '50% 50%';
 }
 
 function zoomToCenter(v) {
