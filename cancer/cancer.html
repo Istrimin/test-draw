@@ -729,33 +729,70 @@ imageInput.addEventListener('change', function() {
     this.value = '';
 });
 
+// === IndexedDB for background persistence ===
+function bgDbSave(dataUrl) {
+    return new Promise(function(resolve, reject) {
+        var req = indexedDB.open('CancerBgDB', 1);
+        req.onupgradeneeded = function() {
+            req.result.createObjectStore('store');
+        };
+        req.onsuccess = function() {
+            var tx = req.result.transaction('store', 'readwrite');
+            tx.objectStore('store').put(dataUrl, 'background');
+            tx.oncomplete = function() { resolve(); };
+            tx.onerror = function() { reject(tx.error); };
+        };
+        req.onerror = function() { reject(req.error); };
+    });
+}
+
+function bgDbLoad() {
+    return new Promise(function(resolve) {
+        var req = indexedDB.open('CancerBgDB', 1);
+        req.onupgradeneeded = function() {
+            req.result.createObjectStore('store');
+        };
+        req.onsuccess = function() {
+            var tx = req.result.transaction('store', 'readonly');
+            var get = tx.objectStore('store').get('background');
+            get.onsuccess = function() { resolve(get.result); };
+            get.onerror = function() { resolve(null); };
+        };
+        req.onerror = function() { resolve(null); };
+    });
+}
+
+var _bgGen = 0;
+
 bgImageInput.addEventListener('change', function() {
     if (this.files && this.files[0]) {
-        const reader = new FileReader();
+        var gen = ++_bgGen;
+        var reader = new FileReader();
         reader.onload = function(e) {
-            const dataUrl = e.target.result;
+            if (gen !== _bgGen) return;
+            var dataUrl = e.target.result;
             backgroundCanvas.style.backgroundImage = 'url(' + dataUrl + ')';
-            try { localStorage.setItem('cancerBackground', dataUrl); }
-            catch(err) { console.warn('localStorage set failed:', err); }
+            bgDbSave(dataUrl).catch(function(err) {
+                console.warn('IndexedDB save failed:', err);
+                try { localStorage.setItem('cancerBackground', dataUrl); }
+                catch(e) { console.warn('localStorage fallback also failed'); }
+            });
         };
         reader.readAsDataURL(this.files[0]);
     }
     this.value = '';
 });
 
-(function restoreSavedBackground() {
-    const saved = localStorage.getItem('cancerBackground');
-    if (saved) {
-        const img = new Image();
-        img.onload = function() {
-            backgroundCanvas.style.backgroundImage = 'url(' + saved + ')';
-        };
-        img.onerror = function() {
-            localStorage.removeItem('cancerBackground');
-        };
-        img.src = saved;
+bgDbLoad().then(function(dataUrl) {
+    if (dataUrl) {
+        backgroundCanvas.style.backgroundImage = 'url(' + dataUrl + ')';
     }
-})();
+}).catch(function() {
+    var saved = localStorage.getItem('cancerBackground');
+    if (saved) {
+        backgroundCanvas.style.backgroundImage = 'url(' + saved + ')';
+    }
+});
 
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('a, button').forEach(icon => icon.classList.add('icon-hover'));
