@@ -233,24 +233,27 @@ function updateUndoRedoButtons() {
     redoBtn.disabled = redoHistory.length === 0;
 }
 
+var CANVAS_SIZE = 4096;
+
 function resizeCanvases() {
     const container = gel('canvContainer');
-    const w = container.clientWidth;
-    const h = container.clientHeight;
+    const vw = container.clientWidth;
+    const vh = container.clientHeight;
     
-    backgroundCanvas.width = w * devicePixelRatio;
-    backgroundCanvas.height = h * devicePixelRatio;
-    drawingCanvas.width = w * devicePixelRatio;
-    drawingCanvas.height = h * devicePixelRatio;
-    overlayCanvas.width = w * devicePixelRatio;
-    overlayCanvas.height = h * devicePixelRatio;
+    backgroundCanvas.width = vw * devicePixelRatio;
+    backgroundCanvas.height = vh * devicePixelRatio;
+    backgroundCanvas.style.width = vw + 'px';
+    backgroundCanvas.style.height = vh + 'px';
     
-    backgroundCanvas.style.width = w + 'px';
-    backgroundCanvas.style.height = h + 'px';
-    drawingCanvas.style.width = w + 'px';
-    drawingCanvas.style.height = h + 'px';
-    overlayCanvas.style.width = w + 'px';
-    overlayCanvas.style.height = h + 'px';
+    var bs = CANVAS_SIZE * devicePixelRatio;
+    drawingCanvas.width = bs;
+    drawingCanvas.height = bs;
+    drawingCanvas.style.width = CANVAS_SIZE + 'px';
+    drawingCanvas.style.height = CANVAS_SIZE + 'px';
+    overlayCanvas.width = bs;
+    overlayCanvas.height = bs;
+    overlayCanvas.style.width = CANVAS_SIZE + 'px';
+    overlayCanvas.style.height = CANVAS_SIZE + 'px';
     
     // Prevent scale accumulation on repeated resizes
     ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -439,22 +442,41 @@ function clearCanvas() {
     saveState();
 }
 
+function getContentBounds() {
+    var w = drawingCanvas.width, h = drawingCanvas.height;
+    var d = ctx.getImageData(0, 0, w, h).data;
+    var minX = w, minY = h, maxX = 0, maxY = 0;
+    for (var y = 0; y < h; y++) {
+        for (var x = 0; x < w; x++) {
+            if (d[(y * w + x) * 4 + 3] !== 0) {
+                if (x < minX) minX = x;
+                if (x > maxX) maxX = x;
+                if (y < minY) minY = y;
+                if (y > maxY) maxY = y;
+            }
+        }
+    }
+    if (minX > maxX) return null;
+    return { x: minX, y: minY, w: maxX - minX + 1, h: maxY - minY + 1 };
+}
+
 function saveImage() {
     try {
-        const tempCanvas = document.createElement('canvas');
-        tempCanvas.width = drawingCanvas.width;
-        tempCanvas.height = drawingCanvas.height;
-        const tempCtx = tempCanvas.getContext('2d');
-
-        tempCtx.drawImage(drawingCanvas, 0, 0);
+        var bounds = getContentBounds();
+        if (!bounds) { alert('Нет рисунка для сохранения.'); return; }
+        var tempCanvas = document.createElement('canvas');
+        tempCanvas.width = bounds.w;
+        tempCanvas.height = bounds.h;
+        var tempCtx = tempCanvas.getContext('2d');
+        tempCtx.drawImage(drawingCanvas, bounds.x, bounds.y, bounds.w, bounds.h, 0, 0, bounds.w, bounds.h);
 
         if (overlayActive) {
             tempCtx.globalAlpha = parseFloat(overlayCanvas.style.opacity) || 1;
-            tempCtx.drawImage(overlayCanvas, 0, 0);
+            tempCtx.drawImage(overlayCanvas, bounds.x, bounds.y, bounds.w, bounds.h, 0, 0, bounds.w, bounds.h);
             tempCtx.globalAlpha = 1.0;
         }
 
-        const link = document.createElement('a');
+        var link = document.createElement('a');
         link.download = 'my-drawing.png';
         link.href = tempCanvas.toDataURL('image/png');
         link.click();
@@ -943,6 +965,12 @@ function updateTransform() {
     drawingLayer.style.transformOrigin = '50% 50%';
 }
 
+function recenterCanvas() {
+    var cc = gel('canvContainer');
+    panX = (cc.clientWidth - CANVAS_SIZE) * zoom / 2;
+    panY = (cc.clientHeight - CANVAS_SIZE) * zoom / 2;
+}
+
 function zoomToCenter(v) {
     zoom = Math.max(0.1, Math.min(4, v));
     updateTransform();
@@ -960,12 +988,14 @@ function applyZoomActive(active) {
 
 zoomBtn.addEventListener('click', function() {
     if (zoom <= 1) {
-        panX = 0; panY = 0;
-        zoomToCenter(ZOOM_LEVEL);
+        zoom = ZOOM_LEVEL;
+        recenterCanvas();
+        updateTransform();
         applyZoomActive(true);
     } else {
-        panX = 0; panY = 0;
-        zoomToCenter(1);
+        zoom = 1;
+        recenterCanvas();
+        updateTransform();
         applyZoomActive(false);
     }
 });
@@ -1051,7 +1081,11 @@ document.addEventListener('mousedown', function(e) {
 // Initialization
 resizeCanvases();
 initializeCursor();
-zoomToCenter(1.5);
+zoom = 1.5;
+var cc = gel('canvContainer');
+panX = (cc.clientWidth - CANVAS_SIZE) * zoom / 2;
+panY = (cc.clientHeight - CANVAS_SIZE) * zoom / 2;
+updateTransform();
 applyZoomActive(true);
 applyBgOffset();
 
