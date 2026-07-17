@@ -667,6 +667,36 @@ smoothDrawingBtn.addEventListener('click', toggleSmoothDrawing);
 overlayBtn.addEventListener('click', window.createOverlayLayer);
 window.addEventListener('resize', resizeCanvases);
 
+// Ctrl + pointermove → brush size
+let lastCtrlX = 0;
+document.addEventListener('pointermove', (e) => {
+    if (e.ctrlKey && !isDrawing) {
+        const rect = drawingCanvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        if (lastCtrlX !== 0) {
+            const delta = x - lastCtrlX;
+            if (Math.abs(delta) >= 3) {
+                let s = parseInt(brushSizeInput.value) + Math.sign(delta);
+                s = Math.max(1, Math.min(parseInt(maxBrushSizeInput.value), s));
+                brushSizeInput.value = s;
+                gel('brushSizeValue').textContent = s;
+                lastCtrlX = x;
+            }
+        } else {
+            lastCtrlX = x;
+        }
+    } else {
+        lastCtrlX = 0;
+    }
+});
+
+// Blur active element (color picker) on canvas click
+canvasElements.forEach(c => c.addEventListener('pointerdown', () => {
+    if (document.activeElement && document.activeElement !== document.body) {
+        document.activeElement.blur();
+    }
+}));
+
 // Initialization
 resizeCanvases();
 initializeCursor();
