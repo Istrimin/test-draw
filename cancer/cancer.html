@@ -157,7 +157,7 @@
 
 <div id="colorPopup" class="color-popup" style="display:none;">
     <div class="color-popup-content">
-        <canvas id="popupWheel" width="300" height="300"></canvas>
+        <canvas id="popupWheel" width="500" height="500"></canvas>
         <div class="popup-controls">
             <div class="popup-preview" id="popupPreview"></div>
             <span id="popupHex" style="color:#fff;font-family:monospace;">#000000</span>
@@ -230,8 +230,9 @@ function renderColorWheel(canvas) {
             var dist = Math.sqrt(dx*dx + dy*dy);
             var idx4 = (y * w + x) * 4;
             if (dist > r) { d[idx4 + 3] = 0; continue; }
+            var t = dist / r;
             if (isGray) {
-                var gray = Math.round((r - dy) / (2 * r) * 255);
+                var gray = Math.round(255 * (1 - t));
                 gray = Math.max(0, Math.min(255, gray));
                 d[idx4] = gray;
                 d[idx4 + 1] = gray;
@@ -239,9 +240,15 @@ function renderColorWheel(canvas) {
                 d[idx4 + 3] = 255;
             } else {
                 var hue = (Math.atan2(dy, dx) * 180 / Math.PI + 360) % 360;
-                var sat = dist / r;
-                var val = Math.pow(sat, 0.5) * 100;
-                var rgb = hsvToRgb(hue, sat * 100, val);
+                var s, v;
+                if (t <= 0.5) {
+                    s = t * 200;
+                    v = 100;
+                } else {
+                    s = 100;
+                    v = (1 - t) * 200;
+                }
+                var rgb = hsvToRgb(hue, s, v);
                 d[idx4] = rgb[0];
                 d[idx4 + 1] = rgb[1];
                 d[idx4 + 2] = rgb[2];
@@ -798,12 +805,18 @@ function updateWheelMarker(idx) {
     var cx = canvas.width / 2, cy = canvas.height / 2;
     var r = Math.min(cx, cy) - 1;
     if (idx === 0) {
-        var yOff = r * (1 - 2 * hsv[2] / 100);
-        canvas._markerY = Math.round(cy + yOff);
-        canvas._markerX = cx;
+        var t = 1 - hsv[2] / 100;
+        canvas._markerX = Math.round(cx + t * r);
+        canvas._markerY = cy;
     } else {
         var angle = hsv[0] * Math.PI / 180;
-        var dist = (hsv[1] / 100) * r;
+        var t;
+        if (hsv[1] >= hsv[2]) {
+            t = 1 - hsv[2] / 200;
+        } else {
+            t = hsv[1] / 200;
+        }
+        var dist = t * r;
         canvas._markerX = Math.round(cx + dist * Math.cos(angle));
         canvas._markerY = Math.round(cy + dist * Math.sin(angle));
     }
@@ -1441,9 +1454,16 @@ function renderPopupWheel(highlightHex) {
             var i4 = (y * w + x) * 4;
             if (dst > r) { d[i4 + 3] = 0; continue; }
             var hue = (Math.atan2(dy, dx) * 180 / Math.PI + 360) % 360;
-            var sat = dst / r;
-            var val = Math.pow(sat, 0.5) * 100;
-            var rgb = hsvToRgb(hue, sat * 100, val);
+            var t = dst / r;
+            var s, v;
+            if (t <= 0.5) {
+                s = t * 200;
+                v = 100;
+            } else {
+                s = 100;
+                v = (1 - t) * 200;
+            }
+            var rgb = hsvToRgb(hue, s, v);
             d[i4] = rgb[0]; d[i4 + 1] = rgb[1]; d[i4 + 2] = rgb[2]; d[i4 + 3] = 255;
         }
     }
@@ -1452,28 +1472,20 @@ function renderPopupWheel(highlightHex) {
     if (highlightHex) {
         var hsv = hexToHsv(highlightHex);
         var angle = hsv[0] * Math.PI / 180;
-        var dst = (hsv[1] / 100) * r;
+        var t;
+        if (hsv[1] >= hsv[2]) {
+            t = 1 - hsv[2] / 200;
+        } else {
+            t = hsv[1] / 200;
+        }
+        var dst = t * r;
         var mx = Math.round(cx + dst * Math.cos(angle));
         var my = Math.round(cy + dst * Math.sin(angle));
-        ctx.beginPath(); ctx.arc(mx, my, 4, 0, Math.PI * 2);
+        ctx.beginPath(); ctx.arc(mx, my, 6, 0, Math.PI * 2);
         ctx.strokeStyle = '#fff'; ctx.lineWidth = 2.5; ctx.stroke();
-        ctx.beginPath(); ctx.arc(mx, my, 5, 0, Math.PI * 2);
-        ctx.strokeStyle = '#000'; ctx.lineWidth = 1; ctx.stroke();
+        ctx.beginPath(); ctx.arc(mx, my, 7, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(0,0,0,0.4)'; ctx.lineWidth = 1; ctx.stroke();
     }
-    // Click to pick
-    canvas.onclick = function(e) {
-        var rect = canvas.getBoundingClientRect();
-        var px = Math.round(e.clientX - rect.left);
-        var py = Math.round(e.clientY - rect.top);
-        var pixel = ctx.getImageData(px, py, 1, 1).data;
-        if (pixel[3] < 128) return;
-        _popupColor = '#' + [pixel[0], pixel[1], pixel[2]].map(function(v) {
-            return ('0' + v.toString(16)).slice(-2);
-        }).join('');
-        gel('popupPreview').style.background = _popupColor;
-        gel('popupHex').textContent = _popupColor;
-        renderPopupWheel(_popupColor);
-    };
 }
 
 function openColorPopup(idx, anchor) {
@@ -1484,11 +1496,10 @@ function openColorPopup(idx, anchor) {
     var content = popup.querySelector('.color-popup-content');
     if (anchor) {
         var rect = anchor.getBoundingClientRect();
-        var pw = 300 + 40;
         var left = rect.right + 10;
-        var top = rect.top + rect.height / 2 - 175;
+        var top = rect.top + rect.height / 2 - 290;
         if (top < 10) top = 10;
-        if (top + 350 > window.innerHeight) top = window.innerHeight - 360;
+        if (top + 640 > window.innerHeight) top = window.innerHeight - 650;
         content.style.left = left + 'px';
         content.style.top = top + 'px';
         popup.classList.add('anchored');
@@ -1530,6 +1541,24 @@ function closeColorPopup(save) {
 gel('popupOk').addEventListener('click', function() { closeColorPopup(true); });
 gel('colorPopup').addEventListener('click', function(e) {
     if (e.target === this) closeColorPopup(false);
+});
+// Popup wheel click (one-time setup)
+gel('popupWheel').addEventListener('click', function(e) {
+    var canvas = this;
+    var ctx = canvas.getContext('2d');
+    var rect = canvas.getBoundingClientRect();
+    var scaleX = canvas.width / rect.width;
+    var scaleY = canvas.height / rect.height;
+    var px = Math.round((e.clientX - rect.left) * scaleX);
+    var py = Math.round((e.clientY - rect.top) * scaleY);
+    var pixel = ctx.getImageData(px, py, 1, 1).data;
+    if (pixel[3] < 128) return;
+    _popupColor = '#' + [pixel[0], pixel[1], pixel[2]].map(function(v) {
+        return ('0' + v.toString(16)).slice(-2);
+    }).join('');
+    gel('popupPreview').style.background = _popupColor;
+    gel('popupHex').textContent = _popupColor;
+    renderPopupWheel(_popupColor);
 });
 
 // Click on wheel label → open popup
