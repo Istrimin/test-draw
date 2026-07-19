@@ -55,6 +55,7 @@
     <div class="main-area">
         <div class="color-picker-group" id="colorPickerGroup">
             <input type="color" id="colorPicker" value="#000000" style="display:none;">
+            <div class="active-indicator" id="activeIndicator"></div>
             <div class="wheel-wrap">
                 <canvas class="color-wheel" id="colorWheel0" width="120" height="120" title="Текущий цвет (C)"></canvas>
                 <span class="wheel-label">1</span>
@@ -192,6 +193,17 @@ var colorWheels = [];
 for (var i = 0; i < 7; i++) {
     var el = gel('colorWheel' + i);
     if (el) colorWheels.push(el);
+}
+
+function drawSolidWheel(canvas) {
+    var ctx = canvas.getContext('2d');
+    var w = canvas.width, h = canvas.height;
+    var cx = w / 2, cy = h / 2, r = Math.min(cx, cy);
+    ctx.clearRect(0, 0, w, h);
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fillStyle = canvas._solidHex || '#000';
+    ctx.fill();
 }
 
 function renderColorWheel(canvas) {
@@ -660,6 +672,7 @@ function pickColor(e) {
     colorPicker.value = color;
     ctx.strokeStyle = color;
     updateWheelMarker(0);
+    updateActiveIndicator(0);
 
     isEyedropperActive = false;
     eyedropperBtn.classList.remove('active');
@@ -740,6 +753,7 @@ function updateColorFromSliders() {
     gel('satValue').textContent = s;
     gel('valValue').textContent = v;
     updateWheelMarker(0);
+    updateActiveIndicator(0);
 }
 
 function syncSlidersFromColor(hex) {
@@ -761,6 +775,7 @@ function updateWheelMarker(idx) {
         if (!m || m.length < 3) return;
         hex = rgbToHex(parseInt(m[0]), parseInt(m[1]), parseInt(m[2]));
     }
+    canvas._solidHex = hex;
     var hsv = hexToHsv(hex);
     var cx = canvas.width / 2, cy = canvas.height / 2;
     var r = Math.min(cx, cy) - 1;
@@ -768,7 +783,11 @@ function updateWheelMarker(idx) {
     var dist = (hsv[1] / 100) * r;
     canvas._markerX = Math.round(cx + dist * Math.cos(angle));
     canvas._markerY = Math.round(cy + dist * Math.sin(angle));
-    renderColorWheel(canvas);
+    if (canvas._isHovered) {
+        renderColorWheel(canvas);
+    } else {
+        drawSolidWheel(canvas);
+    }
 }
 
 function floodFill(e) {
@@ -1120,10 +1139,41 @@ colorWheels.forEach(function(canvas) {
         canvas._markerY = y;
         canvas._lastColor = hex;
         renderColorWheel(canvas);
+        updateActiveIndicator(colorWheels.indexOf(canvas));
     }
     canvas.addEventListener('click', pickFromWheel);
     canvas.addEventListener('pointerdown', pickFromWheel);
 });
+
+// Hover: show/hide palette
+function onWheelEnter(canvas) {
+    canvas._isHovered = true;
+    renderColorWheel(canvas);
+}
+function onWheelLeave(canvas) {
+    canvas._isHovered = false;
+    drawSolidWheel(canvas);
+}
+colorWheels.forEach(function(canvas) {
+    var wrap = canvas.parentElement;
+    wrap.addEventListener('mouseenter', function() { onWheelEnter(canvas); });
+    wrap.addEventListener('mouseleave', function() { onWheelLeave(canvas); });
+});
+
+// Active indicator (pulsing dot)
+var _activeWheelIdx = 0;
+function updateActiveIndicator(idx) {
+    _activeWheelIdx = idx;
+    var dot = gel('activeIndicator');
+    var wraps = document.querySelectorAll('.color-picker-group .wheel-wrap');
+    if (dot && wraps[idx]) {
+        var group = gel('colorPickerGroup');
+        var gRect = group.getBoundingClientRect();
+        var wRect = wraps[idx].getBoundingClientRect();
+        var dotH = dot.offsetHeight || 10;
+        dot.style.top = (wRect.top - gRect.top + wRect.height / 2 - dotH / 2) + 'px';
+    }
+}
 
 // Main color picker (hidden, for value storage)
 colorPicker.addEventListener('input', function() {
@@ -1320,11 +1370,17 @@ document.addEventListener('mousedown', function(e) {
 // Initialization
 resizeCanvases();
 initializeCursor();
-colorWheels.forEach(renderColorWheel);
 // Init markers and lastColor for preset colors
 colorWheels.forEach(function(canvas, idx) {
     canvas._lastColor = presetColors[idx];
+    canvas._isHovered = false;
     updateWheelMarker(idx);
+});
+updateActiveIndicator(0);
+
+// Re-position indicator on resize
+window.addEventListener('resize', function() {
+    updateActiveIndicator(_activeWheelIdx);
 });
 syncSlidersFromColor(colorPicker.value);
 zoom = 1.5;
@@ -1529,6 +1585,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 colorPicker.value = canvas._lastColor;
                 ctx.strokeStyle = canvas._lastColor;
                 syncSlidersFromColor(canvas._lastColor);
+                updateActiveIndicator(idx);
+                updateWheelMarker(0);
             }
             return;
         }

@@ -57,6 +57,31 @@ body {
 	align-items: center;
 	align-self: center;
 	gap: 8px;
+	position: relative;
+}
+
+.active-indicator {
+	position: absolute;
+	right: -18px;
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background: #ff3333;
+	pointer-events: none;
+	transition: top 0.25s ease;
+	animation: glow-pulse 1.2s ease-in-out infinite;
+	z-index: 5;
+}
+
+@keyframes glow-pulse {
+	0%, 100% {
+		box-shadow: 0 0 3px 2px rgba(255, 50, 50, 0.7);
+		transform: scale(1);
+	}
+	50% {
+		box-shadow: 0 0 14px 8px rgba(255, 50, 50, 0.15);
+		transform: scale(0.75);
+	}
 }
 
 .wheel-wrap {
