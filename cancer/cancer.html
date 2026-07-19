@@ -675,42 +675,33 @@ function floodFill(e) {
                 }
             }
 
-            var edgeStack = [];
-            for (var ey = 0; ey < h; ey++) {
-                for (var ex = 0; ex < w; ex++) {
-                    var eidx = ey * w + ex;
-                    if (filled[eidx]) continue;
-                    var epi = eidx * 4;
-                    if (data[epi + 3] > 0) {
-                        if ((ex > 0     && filled[eidx - 1]) ||
-                            (ex < w - 1 && filled[eidx + 1]) ||
-                            (ey > 0     && filled[eidx - w]) ||
-                            (ey < h - 1 && filled[eidx + w])) {
-                            edgeStack.push([ex, ey]);
+            for (var n = 0; n < 3; n++) {
+                var expand = [];
+                for (var dy = 0; dy < h; dy++) {
+                    for (var dx = 0; dx < w; dx++) {
+                        var didx = dy * w + dx;
+                        if (filled[didx]) continue;
+                        var dpi = didx * 4;
+                        if (data[dpi + 3] > 0) {
+                            if ((dx > 0     && filled[didx - 1]) ||
+                                (dx < w - 1 && filled[didx + 1]) ||
+                                (dy > 0     && filled[didx - w]) ||
+                                (dy < h - 1 && filled[didx + w])) {
+                                expand.push([dx, dy]);
+                            }
                         }
                     }
                 }
-            }
-
-            while (edgeStack.length) {
-                var ep = edgeStack.pop();
-                var ex = ep[0], ey = ep[1];
-                if (ex < 0 || ex >= w || ey < 0 || ey >= h) continue;
-                var eidx = ey * w + ex;
-                if (filled[eidx]) continue;
-                filled[eidx] = 1;
-
-                var epi = eidx * 4;
-                if (data[epi + 3] > 0) {
+                for (var ei = 0; ei < expand.length; ei++) {
+                    var ex = expand[ei][0], ey = expand[ei][1];
+                    var eidx = ey * w + ex;
+                    if (filled[eidx]) continue;
+                    filled[eidx] = 1;
+                    var epi = eidx * 4;
                     data[epi]     = fillColor[0];
                     data[epi + 1] = fillColor[1];
                     data[epi + 2] = fillColor[2];
-                    data[epi + 3] = 255;
-
-                    if (ex > 0)     edgeStack.push([ex - 1, ey]);
-                    if (ex < w - 1) edgeStack.push([ex + 1, ey]);
-                    if (ey > 0)     edgeStack.push([ex, ey - 1]);
-                    if (ey < h - 1) edgeStack.push([ex, ey + 1]);
+                    data[epi + 3] = fillColor[3];
                 }
             }
         }
