@@ -616,84 +616,113 @@ function hexToRgba(hex) {
     return [r, g, b, 255];
 }
 
-function colorMatch(a, b, tolerance) {
-    return Math.abs(a[0] - b[0]) <= tolerance &&
-        Math.abs(a[1] - b[1]) <= tolerance &&
-        Math.abs(a[2] - b[2]) <= tolerance &&
-        (a.length < 4 || b.length < 4 || Math.abs(a[3] - b[3]) <= tolerance);
-}
-
-function getPixelColor(x, y, data, width) {
-    x = Math.floor(x);
-    y = Math.floor(y);
-    var h = data.length / 4 / width;
-    if (x < 0 || x >= width || y < 0 || y >= h) return [0, 0, 0, 0];
-    var idx = (y * width + x) * 4;
-    return [data[idx], data[idx + 1], data[idx + 2], data[idx + 3]];
-}
-
 function floodFill(e) {
     try {
         if (!isFloodFillActive) return;
         saveState();
+
         var rect = drawingCanvas.getBoundingClientRect();
         var w = drawingCanvas.width;
         var h = drawingCanvas.height;
-        var dw = rect.width;
-        var dh = rect.height;
-        var startX = Math.floor((e.clientX - rect.left) / dw * w);
-        var startY = Math.floor((e.clientY - rect.top) / dh * h);
+
+        var startX = Math.floor((e.clientX - rect.left) / rect.width * w);
+        var startY = Math.floor((e.clientY - rect.top) / rect.height * h);
+        startX = Math.max(0, Math.min(w - 1, startX));
+        startY = Math.max(0, Math.min(h - 1, startY));
+
         var imageData = ctx.getImageData(0, 0, w, h);
         var data = imageData.data;
-        var targetColor = getPixelColor(startX, startY, data, w);
         var fillColor = hexToRgba(colorPicker.value);
         var tolerance = 30;
-        if (colorMatch(targetColor, fillColor, tolerance)) return;
-        function fillFrom(x, y, visited) {
-            var stack = [[x, y]];
+
+        function match(a, b) {
+            return Math.abs(a[0] - b[0]) <= tolerance &&
+                   Math.abs(a[1] - b[1]) <= tolerance &&
+                   Math.abs(a[2] - b[2]) <= tolerance &&
+                   Math.abs(a[3] - b[3]) <= tolerance;
+        }
+
+        function fillFrom(sx, sy) {
+            var si = (sy * w + sx) * 4;
+            var target = [data[si], data[si + 1], data[si + 2], data[si + 3]];
+            if (match(target, fillColor)) return;
+
+            var visited = new Uint8Array(w * h);
+            var stack = [[sx, sy]];
+
             while (stack.length) {
                 var p = stack.pop();
-                var px = p[0], py = p[1];
-                var idx = py * w + px;
+                var x = p[0], y = p[1];
+                if (x < 0 || x >= w || y < 0 || y >= h) continue;
+                var idx = y * w + x;
                 if (visited[idx]) continue;
                 visited[idx] = 1;
+
                 var pi = idx * 4;
-                if (colorMatch([data[pi], data[pi + 1], data[pi + 2], data[pi + 3]], targetColor, tolerance)) {
-                    data[pi] = fillColor[0];
+                var pc = [data[pi], data[pi + 1], data[pi + 2], data[pi + 3]];
+                if (match(pc, target)) {
+                    data[pi]     = fillColor[0];
                     data[pi + 1] = fillColor[1];
                     data[pi + 2] = fillColor[2];
                     data[pi + 3] = fillColor[3];
-                    if (px > 0) stack.push([px - 1, py]);
-                    if (px < w - 1) stack.push([px + 1, py]);
-                    if (py > 0) stack.push([px, py - 1]);
-                    if (py < h - 1) stack.push([px, py + 1]);
+
+                    stack.push([x - 1, y]);
+                    stack.push([x + 1, y]);
+                    stack.push([x, y - 1]);
+                    stack.push([x, y + 1]);
+                }
+            }
+
+            var edgeStack = [];
+            for (var ey = 0; ey < h; ey++) {
+                for (var ex = 0; ex < w; ex++) {
+                    var eidx = ey * w + ex;
+                    if (visited[eidx]) continue;
+                    var epi = eidx * 4;
+                    if (data[epi + 3] > 0 && data[epi + 3] < 255) {
+                        if ((ex > 0     && visited[eidx - 1]) ||
+                            (ex < w - 1 && visited[eidx + 1]) ||
+                            (ey > 0     && visited[eidx - w]) ||
+                            (ey < h - 1 && visited[eidx + w])) {
+                            edgeStack.push([ex, ey]);
+                        }
+                    }
+                }
+            }
+
+            while (edgeStack.length) {
+                var ep = edgeStack.pop();
+                var ex = ep[0], ey = ep[1];
+                if (ex < 0 || ex >= w || ey < 0 || ey >= h) continue;
+                var eidx = ey * w + ex;
+                if (visited[eidx]) continue;
+                visited[eidx] = 1;
+
+                var epi = eidx * 4;
+                if (data[epi + 3] > 0) {
+                    data[epi]     = fillColor[0];
+                    data[epi + 1] = fillColor[1];
+                    data[epi + 2] = fillColor[2];
+                    data[epi + 3] = 255;
+
+                    if (ex > 0)     edgeStack.push([ex - 1, ey]);
+                    if (ex < w - 1) edgeStack.push([ex + 1, ey]);
+                    if (ey > 0)     edgeStack.push([ex, ey - 1]);
+                    if (ey < h - 1) edgeStack.push([ex, ey + 1]);
                 }
             }
         }
-        var visited = new Uint8Array(w * h);
-        fillFrom(startX, startY, visited);
+
+        fillFrom(startX, startY);
+
         if (symmetryBtn) {
             var centerX = w / 2;
             var symX = Math.floor(centerX + (centerX - startX));
             if (symX >= 0 && symX < w) {
-                fillFrom(symX, startY, new Uint8Array(w * h));
+                fillFrom(symX, startY);
             }
         }
-        for (var py = 1; py < h - 1; py++) {
-            for (var px = 1; px < w - 1; px++) {
-                var idx = py * w + px;
-                if (visited[idx]) continue;
-                var pi = idx * 4;
-                if (data[pi + 3] === 0 || data[pi + 3] === 255) continue;
-                if (visited[idx - 1] || visited[idx + 1] || visited[idx - w] || visited[idx + w]) {
-                    data[pi] = fillColor[0];
-                    data[pi + 1] = fillColor[1];
-                    data[pi + 2] = fillColor[2];
-                    data[pi + 3] = fillColor[3];
-                    visited[idx] = 1;
-                }
-            }
-        }
+
         ctx.putImageData(imageData, 0, 0);
         isFloodFillActive = false;
         gel('fillBtn').classList.remove('active');
