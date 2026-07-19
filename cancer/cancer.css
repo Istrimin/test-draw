@@ -62,6 +62,14 @@ body {
 
 .wheel-wrap {
 	position: relative;
+	width: 70px;
+	height: 70px;
+	transition: width 0.25s ease, height 0.25s ease;
+}
+
+.wheel-wrap.active {
+	width: 120px;
+	height: 120px;
 }
 
 .wheel-label {
@@ -114,8 +122,8 @@ body {
 	padding: 0;
 	cursor: pointer;
 	overflow: hidden;
-	width: 120px;
-	height: 120px;
+	width: 100%;
+	height: 100%;
 	border-radius: 50%;
 	background: #222;
 }
@@ -378,6 +386,11 @@ button.active {
 	align-items: center;
 	justify-content: center;
 }
+.color-popup.anchored {
+	background: transparent;
+	align-items: flex-start;
+	justify-content: flex-start;
+}
 .color-popup-content {
 	background: #2a2a2a;
 	border-radius: 14px;
@@ -387,6 +400,10 @@ button.active {
 	align-items: center;
 	gap: 12px;
 	border: 1px solid #555;
+	pointer-events: auto;
+}
+.color-popup.anchored .color-popup-content {
+	position: fixed;
 }
 .popup-controls {
 	display: flex;

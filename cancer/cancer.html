@@ -1148,9 +1148,17 @@ changeCursorBtn.addEventListener('click', toggleCursorPanel);
 // Color wheel palette
 colorWheels.forEach(function(canvas) {
     function pickFromWheel(e) {
+        if (e.altKey) {
+            e.preventDefault();
+            if (e.type === 'click') return;
+            openColorPopup(colorWheels.indexOf(canvas), canvas);
+            return;
+        }
         var rect = canvas.getBoundingClientRect();
-        var x = Math.round(e.clientX - rect.left);
-        var y = Math.round(e.clientY - rect.top);
+        var scaleX = canvas.width / rect.width;
+        var scaleY = canvas.height / rect.height;
+        var x = Math.round((e.clientX - rect.left) * scaleX);
+        var y = Math.round((e.clientY - rect.top) * scaleY);
         var c = canvas.getContext('2d');
         var pixel = c.getImageData(x, y, 1, 1).data;
         if (pixel[3] < 128) return;
@@ -1188,11 +1196,13 @@ colorWheels.forEach(function(canvas) {
     wrap.addEventListener('mouseleave', function() { onWheelLeave(canvas); });
 });
 
-// Active indicator (glowing number)
+// Active indicator (glowing number + larger wheel)
 var _activeWheelIdx = 0;
 function updateActiveIndicator(idx) {
     var labels = document.querySelectorAll('.wheel-label');
+    var wraps = document.querySelectorAll('.wheel-wrap');
     labels.forEach(function(l, i) { l.classList.toggle('active', i === idx); });
+    wraps.forEach(function(w, i) { w.classList.toggle('active', i === idx); });
     _activeWheelIdx = idx;
 }
 
@@ -1466,18 +1476,39 @@ function renderPopupWheel(highlightHex) {
     };
 }
 
-function openColorPopup(idx) {
+function openColorPopup(idx, anchor) {
     _popupTargetIdx = idx;
     var canvas = colorWheels[idx];
     _popupColor = canvas._lastColor || presetColors[idx] || '#000000';
-    gel('colorPopup').style.display = 'flex';
+    var popup = gel('colorPopup');
+    var content = popup.querySelector('.color-popup-content');
+    if (anchor) {
+        var rect = anchor.getBoundingClientRect();
+        var pw = 300 + 40;
+        var left = rect.right + 10;
+        var top = rect.top + rect.height / 2 - 175;
+        if (top < 10) top = 10;
+        if (top + 350 > window.innerHeight) top = window.innerHeight - 360;
+        content.style.left = left + 'px';
+        content.style.top = top + 'px';
+        popup.classList.add('anchored');
+    } else {
+        content.style.left = '';
+        content.style.top = '';
+        popup.classList.remove('anchored');
+    }
+    popup.style.display = 'flex';
     gel('popupPreview').style.background = _popupColor;
     gel('popupHex').textContent = _popupColor;
     renderPopupWheel(_popupColor);
 }
 
 function closeColorPopup(save) {
-    gel('colorPopup').style.display = 'none';
+    var popup = gel('colorPopup');
+    popup.style.display = 'none';
+    popup.classList.remove('anchored');
+    popup.querySelector('.color-popup-content').style.left = '';
+    popup.querySelector('.color-popup-content').style.top = '';
     if (save) {
         var canvas = colorWheels[_popupTargetIdx];
         canvas._lastColor = _popupColor;
