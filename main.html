@@ -169,12 +169,11 @@
                     </div>
                     <script>
                         const gel = id => document.getElementById(id);
-                        gel('canvasContainer').style.width = '100%';
                         // Глобальные переменные для размеров
                         let displayWidth = 600;
                         let displayHeight = 400;
                         let realWidth = displayWidth;
-                        let realHeight = displayWidth;
+                        let realHeight = displayHeight;
 
                         let scale = displayWidth / realWidth;
                         const layerFilters = {};
@@ -386,17 +385,27 @@
                         }
 
 
+                        function getLayerCoords(clientX, clientY) {
+                            const canvas = layers[currentLayer];
+                            if (!canvas) return {x: 0, y: 0};
+                            const cr = canvasContainer.getBoundingClientRect();
+                            const canvasLeft = parseFloat(canvas.style.left) || 0;
+                            const canvasTop = parseFloat(canvas.style.top) || 0;
+                            return {
+                                x: Math.floor((clientX - cr.left - canvasLeft) * (realWidth / displayWidth) / zoomLevel),
+                                y: Math.floor((clientY - cr.top - canvasTop) * (realHeight / displayHeight) / zoomLevel)
+                            };
+                        }
+
 // рисование
                         function startDrawing(e) {
                             if (currentLayer === 100 || !curCtx || isEyedropperActive || isCtrlPressed) {
                                 return;
                             }
                             isDrawing = true;
-                            const rect = layers[currentLayer].getBoundingClientRect();
                             const clientX = e.touches ? e.touches[0].clientX : e.clientX;
                             const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-                            const x = Math.floor((clientX - rect.left) * (realWidth / displayWidth) / zoomLevel);
-                            const y = Math.floor((clientY - rect.top) * (realHeight / displayHeight) / zoomLevel);
+                            const {x, y} = getLayerCoords(clientX, clientY);
 
                             points.length = 0;
                             symmetricPoints.length = 0;
@@ -416,11 +425,9 @@
                             }
                             if (!isDrawing || !curCtx) return;
 
-                            const rect = layers[currentLayer].getBoundingClientRect();
                             const clientX = e.touches ? e.touches[0].clientX : e.clientX;
                             const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-                            const x = Math.floor((clientX - rect.left) * (realWidth / displayWidth) / zoomLevel);
-                            const y = Math.floor((clientY - rect.top) * (realHeight / displayHeight) / zoomLevel);
+                            const {x, y} = getLayerCoords(clientX, clientY);
 
                             const pressure = e.pressure || 1;
                             curCtx.lineWidth = brushSize.value * pressure * (realWidth / displayWidth);
@@ -567,9 +574,7 @@
 function floodFill(e) {
     if (!isFloodFillActive || !curCtx) return;
  
-    const rect = layers[currentLayer].getBoundingClientRect();
-    const startX = Math.floor((e.clientX - rect.left) * (realWidth / displayWidth) / zoomLevel);
-    const startY = Math.floor((e.clientY - rect.top) * (realHeight / displayHeight) / zoomLevel);
+    const {x: startX, y: startY} = getLayerCoords(e.clientX, e.clientY);
 
     const tempCanvas = document.createElement('canvas');
     const tempCtx = tempCanvas.getContext('2d');
@@ -582,14 +587,11 @@ function floodFill(e) {
                 tempCtx.drawImage(layer, 0, 0);
             }
         });
-        adf="asdf"
-        var a = 23;
-
         Object.entries(layers).forEach(([index, layer]) => {
-            if(index == 1) { return;}  });
-            if (index != 1) { // Пропускаем слой 1
+            if (index != 1) {
                 tempCtx.drawImage(layer, 0, 0);
             }
+        });
 
     // // Копируем содержимое всех слоев на временный канвас
     // Object.entries(layers).forEach(([index, layer]) => {
@@ -719,9 +721,7 @@ function floodFill(e) {
                             const clientX = e.touches ? e.touches[0].clientX : e.clientX;
                             const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
-                            const rect = canvasContainer.getBoundingClientRect();
-                            const x = Math.floor((clientX - rect.left) * (realWidth / displayWidth) / zoomLevel);
-                            const y = Math.floor((clientY - rect.top) * (realHeight / displayHeight) / zoomLevel);
+                            const {x, y} = getLayerCoords(clientX, clientY);
 
                             const color = getPixelColor2(x, y);
 
@@ -1064,29 +1064,14 @@ function floodFill(e) {
                         function updateZoom() {
                             Object.values(layers).forEach(layer => {
                                 layer.style.transformOrigin = '0 0';
-
-                                if (zoomLevel <= 1) {
-                                    offsetX = 0;
-                                    offsetY = 0;
-                                    layer.style.transform = `scale(${zoomLevel})`;
-                                    layer.style.left = '0';
-                                    layer.style.top = '0';
-                                } else {
-                                    layer.style.transform = `scale(${zoomLevel})`;
-
-                                    const layerRect = layer.getBoundingClientRect();
-                                    offsetX = Math.min(Math.max(offsetX, containerRect.width - layerRect.width), 0);
-                                    offsetY = Math.min(Math.max(offsetY, containerRect.height - layerRect.height), 0);
-
-                                    layer.style.left = `${offsetX}px`;
-                                    layer.style.top = `${offsetY}px`;
-                                }
+                                layer.style.transform = `scale(${zoomLevel})`;
+                                layer.style.left = '0';
+                                layer.style.top = '0';
                             });
 
                             canvasContainer.style.overflow = 'hidden';
                             gel('zoomLevelDisplay').textContent = `🔎${(zoomLevel * 100).toFixed(0)}%`;
 
-                            // Обновляем обводку для всех слоев
                             Object.keys(outlineLayers).forEach(layerNum => {
                                 const size = outlineSizes[layerNum];
                                 if (size > 0) {
@@ -1108,9 +1093,7 @@ function floodFill(e) {
 
                             if (!isDrawing || !curCtx || !isFinger) return;
 
-                            const rect = layers[currentLayer].getBoundingClientRect();
-                            const x = Math.floor((e.clientX - rect.left) / zoomLevel);
-                            const y = Math.floor((e.clientY - rect.top) / zoomLevel);
+                            const {x, y} = getLayerCoords(e.clientX, e.clientY);
 
                             const brushSize = parseInt(brushSize.value);
                             const halfBrushSize = brushSize / 2;

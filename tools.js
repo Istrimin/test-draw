@@ -350,11 +350,8 @@
         ctx.clearRect(0, 0, canvas.width, canvas.height);
        
         // Рисуем изображение по центру канваса
-        function calculateCenteredX(canvasWidth, newWidth) {
-            return (canvasWidth - newWidth) / 2;
-        }
-        // Usage
-        const x = calculateCenteredX(canvas.width, newWidth);
+        const x = (canvas.width - newWidth) / 2;
+        const y = (canvas.height - newHeight) / 2;
         ctx.drawImage(uploadedImage, x, y, newWidth, newHeight);
        
         // Обновляем состояние слоя
