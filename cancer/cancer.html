@@ -55,13 +55,13 @@
     <div class="main-area">
         <div class="color-picker-group" id="colorPickerGroup">
             <input type="color" id="colorPicker" value="#000000" style="display:none;">
-            <canvas class="color-wheel" id="colorWheel0" width="120" height="120" title="Текущий цвет (C)"></canvas>
-            <canvas class="color-wheel" id="colorWheel1" width="120" height="120" title="Красный"></canvas>
-            <canvas class="color-wheel" id="colorWheel2" width="120" height="120" title="Зелёный"></canvas>
-            <canvas class="color-wheel" id="colorWheel3" width="120" height="120" title="Синий"></canvas>
-            <canvas class="color-wheel" id="colorWheel4" width="120" height="120" title="Жёлтый"></canvas>
-            <canvas class="color-wheel" id="colorWheel5" width="120" height="120" title="Пурпурный"></canvas>
-            <canvas class="color-wheel" id="colorWheel6" width="120" height="120" title="Голубой"></canvas>
+            <canvas class="color-wheel" id="colorWheel0" data-num="1" width="120" height="120" title="Текущий цвет (C)"></canvas>
+            <canvas class="color-wheel" id="colorWheel1" data-num="2" width="120" height="120" title="Красный"></canvas>
+            <canvas class="color-wheel" id="colorWheel2" data-num="3" width="120" height="120" title="Зелёный"></canvas>
+            <canvas class="color-wheel" id="colorWheel3" data-num="4" width="120" height="120" title="Синий"></canvas>
+            <canvas class="color-wheel" id="colorWheel4" data-num="5" width="120" height="120" title="Жёлтый"></canvas>
+            <canvas class="color-wheel" id="colorWheel5" data-num="6" width="120" height="120" title="Пурпурный"></canvas>
+            <canvas class="color-wheel" id="colorWheel6" data-num="7" width="120" height="120" title="Голубой"></canvas>
         </div>
         <div class="canvas-wrapper">
             <div class="canv-container" id="canvContainer" style="position: relative; width: 100%; height: 100%;">
@@ -195,6 +195,34 @@ function renderColorWheel(canvas) {
         }
     }
     ctx.putImageData(imageData, 0, 0);
+
+    // Draw number badge
+    var num = canvas.getAttribute('data-num');
+    var bx = cx + r - 18, by = cy + r - 18;
+    ctx.fillStyle = 'rgba(0,0,0,0.7)';
+    ctx.beginPath();
+    ctx.arc(bx, by, 13, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(num, bx, by);
+
+    // Draw marker
+    var mx = canvas._markerX, my = canvas._markerY;
+    if (mx !== undefined && my !== undefined) {
+        ctx.beginPath();
+        ctx.arc(mx, my, 6, 0, Math.PI * 2);
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(mx, my, 7, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(0,0,0,0.4)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+    }
 }
 
 // Button elements
@@ -622,6 +650,7 @@ function pickColor(e) {
     const color = `rgb(${pixel[0]}, ${pixel[1]}, ${pixel[2]})`;
     colorPicker.value = color;
     ctx.strokeStyle = color;
+    updateWheelMarker(0);
 
     isEyedropperActive = false;
     eyedropperBtn.classList.remove('active');
@@ -701,6 +730,7 @@ function updateColorFromSliders() {
     gel('hueValue').textContent = h;
     gel('satValue').textContent = s;
     gel('valValue').textContent = v;
+    updateWheelMarker(0);
 }
 
 function syncSlidersFromColor(hex) {
@@ -711,6 +741,25 @@ function syncSlidersFromColor(hex) {
     gel('hueValue').textContent = hsv[0];
     gel('satValue').textContent = hsv[1];
     gel('valValue').textContent = hsv[2];
+}
+
+function updateWheelMarker(idx) {
+    var canvas = colorWheels[idx];
+    if (!canvas) return;
+    var hex = idx === 0 ? colorPicker.value : presetColors[idx];
+    if (hex.startsWith('rgb')) {
+        var m = hex.match(/(\d+)/g);
+        if (!m || m.length < 3) return;
+        hex = rgbToHex(parseInt(m[0]), parseInt(m[1]), parseInt(m[2]));
+    }
+    var hsv = hexToHsv(hex);
+    var cx = canvas.width / 2, cy = canvas.height / 2;
+    var r = Math.min(cx, cy) - 1;
+    var angle = hsv[0] * Math.PI / 180;
+    var dist = (hsv[1] / 100) * r;
+    canvas._markerX = Math.round(cx + dist * Math.cos(angle));
+    canvas._markerY = Math.round(cy + dist * Math.sin(angle));
+    renderColorWheel(canvas);
 }
 
 function floodFill(e) {
@@ -1058,6 +1107,9 @@ colorWheels.forEach(function(canvas) {
         colorPicker.value = hex;
         ctx.strokeStyle = hex;
         syncSlidersFromColor(hex);
+        canvas._markerX = x;
+        canvas._markerY = y;
+        renderColorWheel(canvas);
     }
     canvas.addEventListener('click', pickFromWheel);
     canvas.addEventListener('pointerdown', pickFromWheel);
@@ -1067,6 +1119,7 @@ colorWheels.forEach(function(canvas) {
 colorPicker.addEventListener('input', function() {
     ctx.strokeStyle = colorPicker.value;
     syncSlidersFromColor(colorPicker.value);
+    updateWheelMarker(0);
 });
 
 // HSV sliders
@@ -1258,6 +1311,10 @@ document.addEventListener('mousedown', function(e) {
 resizeCanvases();
 initializeCursor();
 colorWheels.forEach(renderColorWheel);
+// Init markers for preset colors
+colorWheels.forEach(function(canvas, idx) {
+    updateWheelMarker(idx);
+});
 syncSlidersFromColor(colorPicker.value);
 zoom = 1.5;
 panX = 0; panY = 0;
@@ -1460,6 +1517,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 colorPicker.value = presetColors[idx];
                 ctx.strokeStyle = presetColors[idx];
                 syncSlidersFromColor(presetColors[idx]);
+                updateWheelMarker(idx);
             }
             return;
         }
