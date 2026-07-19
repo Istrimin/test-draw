@@ -647,6 +647,7 @@ function floodFill(e) {
             var target = [data[si], data[si + 1], data[si + 2], data[si + 3]];
             if (match(target, fillColor)) return;
 
+            var filled = new Uint8Array(w * h);
             var visited = new Uint8Array(w * h);
             var stack = [[sx, sy]];
 
@@ -665,6 +666,7 @@ function floodFill(e) {
                     data[pi + 1] = fillColor[1];
                     data[pi + 2] = fillColor[2];
                     data[pi + 3] = fillColor[3];
+                    filled[idx] = 1;
 
                     stack.push([x - 1, y]);
                     stack.push([x + 1, y]);
@@ -677,13 +679,13 @@ function floodFill(e) {
             for (var ey = 0; ey < h; ey++) {
                 for (var ex = 0; ex < w; ex++) {
                     var eidx = ey * w + ex;
-                    if (visited[eidx]) continue;
+                    if (filled[eidx]) continue;
                     var epi = eidx * 4;
-                    if (data[epi + 3] > 0 && data[epi + 3] < 255) {
-                        if ((ex > 0     && visited[eidx - 1]) ||
-                            (ex < w - 1 && visited[eidx + 1]) ||
-                            (ey > 0     && visited[eidx - w]) ||
-                            (ey < h - 1 && visited[eidx + w])) {
+                    if (data[epi + 3] > 0) {
+                        if ((ex > 0     && filled[eidx - 1]) ||
+                            (ex < w - 1 && filled[eidx + 1]) ||
+                            (ey > 0     && filled[eidx - w]) ||
+                            (ey < h - 1 && filled[eidx + w])) {
                             edgeStack.push([ex, ey]);
                         }
                     }
@@ -695,8 +697,8 @@ function floodFill(e) {
                 var ex = ep[0], ey = ep[1];
                 if (ex < 0 || ex >= w || ey < 0 || ey >= h) continue;
                 var eidx = ey * w + ex;
-                if (visited[eidx]) continue;
-                visited[eidx] = 1;
+                if (filled[eidx]) continue;
+                filled[eidx] = 1;
 
                 var epi = eidx * 4;
                 if (data[epi + 3] > 0) {
