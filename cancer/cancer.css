@@ -52,80 +52,64 @@ body {
 }
 
 .color-picker-group {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	align-self: center;
-	gap: 8px;
-	position: relative;
+	display: none;
 }
 
-.wheel-wrap {
-	position: relative;
-	width: 70px;
-	height: 70px;
-	transition: width 0.25s ease, height 0.25s ease;
-}
-
-.wheel-wrap.active {
-	width: 120px;
-	height: 120px;
-}
-
-.wheel-label {
+.color-wheel-container {
 	position: absolute;
-	right: -6px;
-	bottom: -6px;
+	top: 4px;
+	left: 4px;
+	z-index: 20;
+	width: 28px;
+	height: 28px;
+	transition: width 0.2s ease, height 0.2s ease;
+	cursor: pointer;
+}
+.color-wheel-container:hover {
+	width: 80px;
+	height: 80px;
+}
+.color-wheel-container canvas {
+	width: 100%;
+	height: 100%;
+	border-radius: 50%;
+	display: block;
+}
+.color-wheel-container .wheel-label {
+	position: absolute;
+	right: -3px;
+	bottom: -3px;
 	background: rgba(0,0,0,0.85);
 	color: #888;
 	font-weight: bold;
-	font-size: 13px;
-	width: 24px;
-	height: 24px;
+	font-size: 8px;
+	width: 12px;
+	height: 12px;
 	border-radius: 50%;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	pointer-events: auto;
 	border: 1px solid rgba(255,255,255,0.15);
-	transition: color 0.3s, text-shadow 0.3s, border-color 0.3s, box-shadow 0.3s;
+	pointer-events: auto;
+	transition: all 0.2s ease;
 }
-
-.wheel-label.active {
+.color-wheel-container:hover .wheel-label {
+	width: 20px;
+	height: 20px;
+	font-size: 12px;
+	right: -5px;
+	bottom: -5px;
 	color: #fff;
 	border-color: rgba(255,50,50,0.7);
-	width: 30px;
-	height: 30px;
-	font-size: 16px;
-	right: -9px;
-	bottom: -9px;
 	text-shadow: 0 0 6px rgba(255,50,50,0.9), 0 0 14px rgba(255,50,50,0.5);
 	box-shadow: 0 0 10px rgba(255,50,50,0.35), inset 0 0 8px rgba(255,50,50,0.1);
-	animation: label-glow 1.5s ease-in-out infinite;
-}
-
-@keyframes label-glow {
-	0%, 100% {
-		text-shadow: 0 0 6px rgba(255,50,50,0.7), 0 0 14px rgba(255,50,50,0.3);
-		box-shadow: 0 0 8px rgba(255,50,50,0.25), inset 0 0 6px rgba(255,50,50,0.05);
-	}
-	50% {
-		text-shadow: 0 0 12px rgba(255,50,50,1), 0 0 28px rgba(255,50,50,0.6), 0 0 48px rgba(255,50,50,0.2);
-		box-shadow: 0 0 16px rgba(255,50,50,0.5), inset 0 0 12px rgba(255,50,50,0.15);
-	}
 }
 
 .color-picker-group canvas {
-	appearance: none;
-	-webkit-appearance: none;
-	border: none;
-	padding: 0;
-	cursor: pointer;
-	overflow: hidden;
 	width: 100%;
 	height: 100%;
 	border-radius: 50%;
-	background: #222;
+	cursor: pointer;
 }
 
 .color-picker-group canvas::-webkit-color-swatch-wrapper {

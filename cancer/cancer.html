@@ -55,34 +55,6 @@
     <div class="main-area">
         <div class="color-picker-group" id="colorPickerGroup">
             <input type="color" id="colorPicker" value="#000000" style="display:none;">
-            <div class="wheel-wrap">
-                <canvas class="color-wheel" id="colorWheel0" width="120" height="120" title="Текущий цвет (C)"></canvas>
-                <span class="wheel-label">1</span>
-            </div>
-            <div class="wheel-wrap">
-                <canvas class="color-wheel" id="colorWheel1" width="120" height="120" title="Красный"></canvas>
-                <span class="wheel-label">2</span>
-            </div>
-            <div class="wheel-wrap">
-                <canvas class="color-wheel" id="colorWheel2" width="120" height="120" title="Зелёный"></canvas>
-                <span class="wheel-label">3</span>
-            </div>
-            <div class="wheel-wrap">
-                <canvas class="color-wheel" id="colorWheel3" width="120" height="120" title="Синий"></canvas>
-                <span class="wheel-label">4</span>
-            </div>
-            <div class="wheel-wrap">
-                <canvas class="color-wheel" id="colorWheel4" width="120" height="120" title="Жёлтый"></canvas>
-                <span class="wheel-label">5</span>
-            </div>
-            <div class="wheel-wrap">
-                <canvas class="color-wheel" id="colorWheel5" width="120" height="120" title="Пурпурный"></canvas>
-                <span class="wheel-label">6</span>
-            </div>
-            <div class="wheel-wrap">
-                <canvas class="color-wheel" id="colorWheel6" width="120" height="120" title="Голубой"></canvas>
-                <span class="wheel-label">7</span>
-            </div>
         </div>
         <div class="canvas-wrapper">
             <div class="canv-container" id="canvContainer" style="position: relative; width: 100%; height: 100%;">
@@ -90,6 +62,10 @@
                 <div id="drawingLayer" style="position: absolute; top:0;left:0;width:100%;height:100%;z-index:2;">
                     <canvas id="drawingCanvas" style="position: absolute; top: 0; left: 0; z-index: 2;"></canvas>
                     <canvas id="overlayCanvas" style="position: absolute; top: 0; left: 0; z-index: 1; opacity: 0.5;"></canvas>
+                </div>
+                <div class="color-wheel-container" id="colorWheelContainer">
+                    <canvas id="activeColorWheel" width="80" height="80"></canvas>
+                    <span class="wheel-label" id="activeWheelLabel">1</span>
                 </div>
             </div>
             <div id="cursorPanel" class="cursor-panel" style="display: none;">
@@ -197,18 +173,17 @@ const brushSizeInput = gel('brushSize');
 let eraserSize = parseInt(brushSizeInput.value);
 const backgroundPicker = gel('backgroundPicker');
 
-// All color pickers for palette
-var presetColors = ['#000000', '#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+// Color slots (7 colors)
+var _slotColors = ['#000000', '#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+var _slotMarkers = [];
+for (var _si = 0; _si < 7; _si++) _slotMarkers.push({x:null, y:null});
+var _activeSlot = 0;
+var _wheelHovered = false;
+var activeWheelCanvas = gel('activeColorWheel');
 
-var colorWheels = [];
-for (var i = 0; i < 7; i++) {
-    var el = gel('colorWheel' + i);
-    if (el) colorWheels.push(el);
-}
-
-function drawSolidWheel(canvas, color) {
-    var ctx = canvas.getContext('2d');
-    var w = canvas.width, h = canvas.height;
+function drawSolidWheel(color) {
+    var ctx = activeWheelCanvas.getContext('2d');
+    var w = activeWheelCanvas.width, h = activeWheelCanvas.height;
     var cx = w / 2, cy = h / 2, r = Math.min(cx, cy);
     ctx.clearRect(0, 0, w, h);
     ctx.beginPath();
@@ -217,11 +192,11 @@ function drawSolidWheel(canvas, color) {
     ctx.fill();
 }
 
-function renderColorWheel(canvas) {
+function renderColorWheel() {
+    var canvas = activeWheelCanvas;
     var ctx = canvas.getContext('2d');
     var w = canvas.width, h = canvas.height;
     var cx = w / 2, cy = h / 2, r = Math.min(cx, cy) - 1;
-    var isGray = canvas.id === 'colorWheel0';
     var imageData = ctx.createImageData(w, h);
     var d = imageData.data;
     for (var y = 0; y < h; y++) {
@@ -231,46 +206,45 @@ function renderColorWheel(canvas) {
             var idx4 = (y * w + x) * 4;
             if (dist > r) { d[idx4 + 3] = 0; continue; }
             var t = dist / r;
-            if (isGray) {
-                var gray = Math.round(255 * (1 - t));
-                gray = Math.max(0, Math.min(255, gray));
-                d[idx4] = gray;
-                d[idx4 + 1] = gray;
-                d[idx4 + 2] = gray;
-                d[idx4 + 3] = 255;
+            var hue = (Math.atan2(dy, dx) * 180 / Math.PI + 360) % 360;
+            var s, v;
+            if (t <= 0.5) {
+                s = t * 200;
+                v = 100;
             } else {
-                var hue = (Math.atan2(dy, dx) * 180 / Math.PI + 360) % 360;
-                var s, v;
-                if (t <= 0.5) {
-                    s = t * 200;
-                    v = 100;
-                } else {
-                    s = 100;
-                    v = (1 - t) * 200;
-                }
-                var rgb = hsvToRgb(hue, s, v);
-                d[idx4] = rgb[0];
-                d[idx4 + 1] = rgb[1];
-                d[idx4 + 2] = rgb[2];
-                d[idx4 + 3] = 255;
+                s = 100;
+                v = (1 - t) * 200;
             }
+            var rgb = hsvToRgb(hue, s, v);
+            d[idx4] = rgb[0];
+            d[idx4 + 1] = rgb[1];
+            d[idx4 + 2] = rgb[2];
+            d[idx4 + 3] = 255;
         }
     }
     ctx.putImageData(imageData, 0, 0);
 
     // Draw marker
-    var mx = canvas._markerX, my = canvas._markerY;
-    if (mx !== undefined && my !== undefined) {
+    var m = _slotMarkers[_activeSlot];
+    if (m.x !== null && m.y !== null) {
         ctx.beginPath();
-        ctx.arc(mx, my, 6, 0, Math.PI * 2);
+        ctx.arc(m.x, m.y, 6, 0, Math.PI * 2);
         ctx.strokeStyle = '#fff';
         ctx.lineWidth = 2.5;
         ctx.stroke();
         ctx.beginPath();
-        ctx.arc(mx, my, 7, 0, Math.PI * 2);
+        ctx.arc(m.x, m.y, 7, 0, Math.PI * 2);
         ctx.strokeStyle = 'rgba(0,0,0,0.4)';
         ctx.lineWidth = 1;
         ctx.stroke();
+    }
+}
+
+function renderActiveWheel() {
+    if (_wheelHovered) {
+        renderColorWheel();
+    } else {
+        drawSolidWheel(_slotColors[_activeSlot]);
     }
 }
 
@@ -774,12 +748,15 @@ function updateColorFromSliders() {
     var v = parseInt(gel('valSlider').value);
     var rgb = hsvToRgb(h, s, v);
     var hex = rgbToHex(rgb[0], rgb[1], rgb[2]);
+    _slotColors[_activeSlot] = hex;
     colorPicker.value = hex;
     ctx.strokeStyle = hex;
     gel('hueValue').textContent = h;
     gel('satValue').textContent = s;
     gel('valValue').textContent = v;
-    updateActiveIndicator(0);
+    updateWheelMarker(_activeSlot);
+    updateActiveIndicator(_activeSlot);
+    saveWheelColors();
 }
 
 function syncSlidersFromColor(hex) {
@@ -793,21 +770,19 @@ function syncSlidersFromColor(hex) {
 }
 
 function updateWheelMarker(idx) {
-    var canvas = colorWheels[idx];
-    if (!canvas) return;
-    var hex = canvas._lastColor || presetColors[idx] || colorPicker.value;
+    var hex = _slotColors[idx] || '#000000';
     if (hex.startsWith('rgb')) {
         var m = hex.match(/(\d+)/g);
         if (!m || m.length < 3) return;
         hex = rgbToHex(parseInt(m[0]), parseInt(m[1]), parseInt(m[2]));
     }
     var hsv = hexToHsv(hex);
-    var cx = canvas.width / 2, cy = canvas.height / 2;
+    var cx = activeWheelCanvas.width / 2, cy = activeWheelCanvas.height / 2;
     var r = Math.min(cx, cy) - 1;
     if (idx === 0) {
         var t = 1 - hsv[2] / 100;
-        canvas._markerX = Math.round(cx + t * r);
-        canvas._markerY = cy;
+        _slotMarkers[idx].x = Math.round(cx + t * r);
+        _slotMarkers[idx].y = cy;
     } else {
         var angle = hsv[0] * Math.PI / 180;
         var t;
@@ -817,14 +792,11 @@ function updateWheelMarker(idx) {
             t = hsv[1] / 200;
         }
         var dist = t * r;
-        canvas._markerX = Math.round(cx + dist * Math.cos(angle));
-        canvas._markerY = Math.round(cy + dist * Math.sin(angle));
+        _slotMarkers[idx].x = Math.round(cx + dist * Math.cos(angle));
+        _slotMarkers[idx].y = Math.round(cy + dist * Math.sin(angle));
     }
-    if (canvas._isHovered) {
-        renderColorWheel(canvas);
-    } else {
-        var solid = canvas._lastColor || presetColors[idx] || '#000';
-        drawSolidWheel(canvas, solid);
+    if (idx === _activeSlot) {
+        renderActiveWheel();
     }
 }
 
@@ -1158,65 +1130,60 @@ function toggleCursorPanel() {
 
 changeCursorBtn.addEventListener('click', toggleCursorPanel);
 
-// Color wheel palette
-colorWheels.forEach(function(canvas) {
-    function pickFromWheel(e) {
-        if (e.altKey) {
-            e.preventDefault();
-            if (e.type === 'click') return;
-            openColorPopup(colorWheels.indexOf(canvas), canvas);
-            return;
-        }
-        var rect = canvas.getBoundingClientRect();
-        var scaleX = canvas.width / rect.width;
-        var scaleY = canvas.height / rect.height;
-        var x = Math.round((e.clientX - rect.left) * scaleX);
-        var y = Math.round((e.clientY - rect.top) * scaleY);
-        var c = canvas.getContext('2d');
-        var pixel = c.getImageData(x, y, 1, 1).data;
-        if (pixel[3] < 128) return;
-        var hex = '#' + [pixel[0], pixel[1], pixel[2]].map(function(v) {
-            return ('0' + v.toString(16)).slice(-2);
-        }).join('');
-        colorPicker.value = hex;
-        ctx.strokeStyle = hex;
-        syncSlidersFromColor(hex);
-        canvas._markerX = x;
-        canvas._markerY = y;
-        canvas._lastColor = hex;
-        renderColorWheel(canvas);
-        updateActiveIndicator(colorWheels.indexOf(canvas));
-        saveWheelColors();
+// Color wheel (single, over canvas)
+var _popupPickedWheel = false;
+activeWheelCanvas.addEventListener('pointerdown', function(e) {
+    if (e.altKey) {
+        e.preventDefault();
+        _popupPickedWheel = true;
+        openColorPopup(_activeSlot, activeWheelCanvas);
+        return;
     }
-    canvas.addEventListener('click', pickFromWheel);
-    canvas.addEventListener('pointerdown', pickFromWheel);
+    _popupPickedWheel = true;
+    pickFromActiveWheel(e);
 });
+activeWheelCanvas.addEventListener('click', function(e) {
+    if (_popupPickedWheel) { _popupPickedWheel = false; return; }
+    pickFromActiveWheel(e);
+});
+function pickFromActiveWheel(e) {
+    var canvas = activeWheelCanvas;
+    var rect = canvas.getBoundingClientRect();
+    var scaleX = canvas.width / rect.width;
+    var scaleY = canvas.height / rect.height;
+    var x = Math.round((e.clientX - rect.left) * scaleX);
+    var y = Math.round((e.clientY - rect.top) * scaleY);
+    var c = canvas.getContext('2d');
+    var pixel = c.getImageData(x, y, 1, 1).data;
+    if (pixel[3] < 128) return;
+    var hex = '#' + [pixel[0], pixel[1], pixel[2]].map(function(v) {
+        return ('0' + v.toString(16)).slice(-2);
+    }).join('');
+    _slotColors[_activeSlot] = hex;
+    _slotMarkers[_activeSlot].x = x;
+    _slotMarkers[_activeSlot].y = y;
+    colorPicker.value = hex;
+    ctx.strokeStyle = hex;
+    syncSlidersFromColor(hex);
+    renderActiveWheel();
+    saveWheelColors();
+}
 
 // Hover: show/hide palette
-function onWheelEnter(canvas) {
-    canvas._isHovered = true;
-    renderColorWheel(canvas);
-}
-function onWheelLeave(canvas) {
-    canvas._isHovered = false;
-    var idx = colorWheels.indexOf(canvas);
-    var color = canvas._lastColor || presetColors[idx] || '#000';
-    drawSolidWheel(canvas, color);
-}
-colorWheels.forEach(function(canvas) {
-    var wrap = canvas.parentElement;
-    wrap.addEventListener('mouseenter', function() { onWheelEnter(canvas); });
-    wrap.addEventListener('mouseleave', function() { onWheelLeave(canvas); });
+var wheelCtn = gel('colorWheelContainer');
+wheelCtn.addEventListener('mouseenter', function() {
+    _wheelHovered = true;
+    renderColorWheel();
+});
+wheelCtn.addEventListener('mouseleave', function() {
+    _wheelHovered = false;
+    drawSolidWheel(_slotColors[_activeSlot]);
 });
 
-// Active indicator (glowing number + larger wheel)
-var _activeWheelIdx = 0;
+// Active slot indicator
 function updateActiveIndicator(idx) {
-    var labels = document.querySelectorAll('.wheel-label');
-    var wraps = document.querySelectorAll('.wheel-wrap');
-    labels.forEach(function(l, i) { l.classList.toggle('active', i === idx); });
-    wraps.forEach(function(w, i) { w.classList.toggle('active', i === idx); });
-    _activeWheelIdx = idx;
+    _activeSlot = idx;
+    gel('activeWheelLabel').textContent = idx + 1;
 }
 
 // Main color picker (hidden, for value storage)
@@ -1399,13 +1366,13 @@ function closeColorPicker() {
 }
 
 document.addEventListener('pointerdown', function(e) {
-    if (!e.target.closest('.color-picker-group')) {
+    if (!e.target.closest('.color-picker-group') && !e.target.closest('.color-wheel-container')) {
         closeColorPicker();
     }
 });
 // Also force close on any mousedown (catches edge cases with pen)
 document.addEventListener('mousedown', function(e) {
-    if (!e.target.closest('.color-picker-group')) {
+    if (!e.target.closest('.color-picker-group') && !e.target.closest('.color-wheel-container')) {
         closeColorPicker();
     }
 });
@@ -1413,27 +1380,23 @@ document.addEventListener('mousedown', function(e) {
 // Initialization
 resizeCanvases();
 initializeCursor();
-// Init markers and lastColor for preset colors
 // Load saved colors from localStorage
 try {
     var saved = JSON.parse(localStorage.getItem('wheelColors'));
     if (saved && saved.length === 7) {
         saved.forEach(function(c, i) {
-            if (c && colorWheels[i]) colorWheels[i]._lastColor = c;
+            if (c) _slotColors[i] = c;
         });
     }
 } catch(e) {}
-colorWheels.forEach(function(canvas, idx) {
-    if (!canvas._lastColor) canvas._lastColor = presetColors[idx];
-    canvas._isHovered = false;
+_slotColors.forEach(function(c, idx) {
     updateWheelMarker(idx);
 });
 updateActiveIndicator(0);
 
 // localStorage save/load wheel colors
 function saveWheelColors() {
-    var arr = colorWheels.map(function(c) { return c._lastColor || '#000000'; });
-    try { localStorage.setItem('wheelColors', JSON.stringify(arr)); } catch(e) {}
+    try { localStorage.setItem('wheelColors', JSON.stringify(_slotColors)); } catch(e) {}
 }
 
 // Popup palette
@@ -1490,8 +1453,7 @@ function renderPopupWheel(highlightHex) {
 
 function openColorPopup(idx, anchor) {
     _popupTargetIdx = idx;
-    var canvas = colorWheels[idx];
-    _popupColor = canvas._lastColor || presetColors[idx] || '#000000';
+    _popupColor = _slotColors[idx] || '#000000';
     var popup = gel('colorPopup');
     var content = popup.querySelector('.color-popup-content');
     if (anchor) {
@@ -1521,8 +1483,7 @@ function closeColorPopup(save) {
     popup.querySelector('.color-popup-content').style.left = '';
     popup.querySelector('.color-popup-content').style.top = '';
     if (save) {
-        var canvas = colorWheels[_popupTargetIdx];
-        canvas._lastColor = _popupColor;
+        _slotColors[_popupTargetIdx] = _popupColor;
         colorPicker.value = _popupColor;
         ctx.strokeStyle = _popupColor;
         syncSlidersFromColor(_popupColor);
@@ -1565,12 +1526,10 @@ function handlePopupPick(e) {
     renderPopupWheel(_popupColor);
 }
 
-// Click on wheel label → open popup
-document.querySelectorAll('.wheel-label').forEach(function(label, idx) {
-    label.addEventListener('click', function(e) {
-        e.stopPropagation();
-        openColorPopup(idx);
-    });
+// Click on wheel label → open popup (centered)
+gel('activeWheelLabel').addEventListener('click', function(e) {
+    e.stopPropagation();
+    openColorPopup(_activeSlot);
 });
 syncSlidersFromColor(colorPicker.value);
 zoom = 1.5;
@@ -1768,13 +1727,13 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('keydown', function(event) {
         if (event.code >= 'Digit1' && event.code <= 'Digit7') {
             var idx = parseInt(event.code.slice(5)) - 1;
-            var canvas = colorWheels[idx];
-            if (canvas && canvas._lastColor) {
+            if (_slotColors && _slotColors[idx]) {
                 event.preventDefault();
-                colorPicker.value = canvas._lastColor;
-                ctx.strokeStyle = canvas._lastColor;
-                syncSlidersFromColor(canvas._lastColor);
+                colorPicker.value = _slotColors[idx];
+                ctx.strokeStyle = _slotColors[idx];
+                syncSlidersFromColor(_slotColors[idx]);
                 updateActiveIndicator(idx);
+                updateWheelMarker(idx);
             }
             return;
         }
