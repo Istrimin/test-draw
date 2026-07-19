@@ -1542,9 +1542,18 @@ gel('popupOk').addEventListener('click', function() { closeColorPopup(true); });
 gel('colorPopup').addEventListener('click', function(e) {
     if (e.target === this) closeColorPopup(false);
 });
-// Popup wheel click (one-time setup)
+// Popup wheel pick (pointerdown works for mouse, touch, pen)
+var _popupPicked = false;
+gel('popupWheel').addEventListener('pointerdown', function(e) {
+    _popupPicked = true;
+    handlePopupPick(e);
+});
 gel('popupWheel').addEventListener('click', function(e) {
-    var canvas = this;
+    if (_popupPicked) { _popupPicked = false; return; }
+    handlePopupPick(e);
+});
+function handlePopupPick(e) {
+    var canvas = gel('popupWheel');
     var ctx = canvas.getContext('2d');
     var rect = canvas.getBoundingClientRect();
     var scaleX = canvas.width / rect.width;
@@ -1559,7 +1568,7 @@ gel('popupWheel').addEventListener('click', function(e) {
     gel('popupPreview').style.background = _popupColor;
     gel('popupHex').textContent = _popupColor;
     renderPopupWheel(_popupColor);
-});
+}
 
 // Click on wheel label → open popup
 document.querySelectorAll('.wheel-label').forEach(function(label, idx) {
