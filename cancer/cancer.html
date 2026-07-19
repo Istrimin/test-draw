@@ -692,7 +692,6 @@ function pickColor(e) {
     const color = `rgb(${pixel[0]}, ${pixel[1]}, ${pixel[2]})`;
     colorPicker.value = color;
     ctx.strokeStyle = color;
-    updateWheelMarker(0);
     updateActiveIndicator(0);
 
     isEyedropperActive = false;
@@ -773,7 +772,6 @@ function updateColorFromSliders() {
     gel('hueValue').textContent = h;
     gel('satValue').textContent = s;
     gel('valValue').textContent = v;
-    updateWheelMarker(0);
     updateActiveIndicator(0);
 }
 
@@ -790,12 +788,7 @@ function syncSlidersFromColor(hex) {
 function updateWheelMarker(idx) {
     var canvas = colorWheels[idx];
     if (!canvas) return;
-    var hex;
-    if (idx === 0) {
-        hex = colorPicker.value;
-    } else {
-        hex = canvas._lastColor || presetColors[idx];
-    }
+    var hex = canvas._lastColor || presetColors[idx] || colorPicker.value;
     if (hex.startsWith('rgb')) {
         var m = hex.match(/(\d+)/g);
         if (!m || m.length < 3) return;
@@ -817,7 +810,7 @@ function updateWheelMarker(idx) {
     if (canvas._isHovered) {
         renderColorWheel(canvas);
     } else {
-        var solid = idx === 0 ? colorPicker.value : (canvas._lastColor || presetColors[idx]);
+        var solid = canvas._lastColor || presetColors[idx] || '#000';
         drawSolidWheel(canvas, solid);
     }
 }
@@ -1186,7 +1179,7 @@ function onWheelEnter(canvas) {
 function onWheelLeave(canvas) {
     canvas._isHovered = false;
     var idx = colorWheels.indexOf(canvas);
-    var color = idx === 0 ? colorPicker.value : (canvas._lastColor || presetColors[idx]);
+    var color = canvas._lastColor || presetColors[idx] || '#000';
     drawSolidWheel(canvas, color);
 }
 colorWheels.forEach(function(canvas) {
@@ -1207,7 +1200,6 @@ function updateActiveIndicator(idx) {
 colorPicker.addEventListener('input', function() {
     ctx.strokeStyle = colorPicker.value;
     syncSlidersFromColor(colorPicker.value);
-    updateWheelMarker(0);
 });
 
 // HSV sliders
@@ -1493,13 +1485,11 @@ function closeColorPopup(save) {
         ctx.strokeStyle = _popupColor;
         syncSlidersFromColor(_popupColor);
         updateActiveIndicator(_popupTargetIdx);
-        updateWheelMarker(0);
+        if (_popupTargetIdx === 0) updateWheelMarker(0);
         if (canvas._isHovered) {
             renderColorWheel(canvas);
         } else {
-            var idx = _popupTargetIdx;
-            var solid = idx === 0 ? colorPicker.value : _popupColor;
-            drawSolidWheel(canvas, solid);
+            drawSolidWheel(canvas, _popupColor);
         }
         saveWheelColors();
     }
@@ -1721,7 +1711,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.strokeStyle = canvas._lastColor;
                 syncSlidersFromColor(canvas._lastColor);
                 updateActiveIndicator(idx);
-                updateWheelMarker(0);
             }
             return;
         }

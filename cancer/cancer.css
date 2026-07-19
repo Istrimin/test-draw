@@ -85,20 +85,25 @@ body {
 
 .wheel-label.active {
 	color: #fff;
-	border-color: rgba(255,200,50,0.6);
-	text-shadow: 0 0 6px rgba(255,200,50,0.8), 0 0 14px rgba(255,200,50,0.4);
-	box-shadow: 0 0 8px rgba(255,200,50,0.3), inset 0 0 6px rgba(255,200,50,0.1);
-	animation: label-glow 1.8s ease-in-out infinite;
+	border-color: rgba(255,50,50,0.7);
+	width: 30px;
+	height: 30px;
+	font-size: 16px;
+	right: -9px;
+	bottom: -9px;
+	text-shadow: 0 0 6px rgba(255,50,50,0.9), 0 0 14px rgba(255,50,50,0.5);
+	box-shadow: 0 0 10px rgba(255,50,50,0.35), inset 0 0 8px rgba(255,50,50,0.1);
+	animation: label-glow 1.5s ease-in-out infinite;
 }
 
 @keyframes label-glow {
 	0%, 100% {
-		text-shadow: 0 0 6px rgba(255,200,50,0.7), 0 0 14px rgba(255,200,50,0.3);
-		box-shadow: 0 0 8px rgba(255,200,50,0.25), inset 0 0 6px rgba(255,200,50,0.08);
+		text-shadow: 0 0 6px rgba(255,50,50,0.7), 0 0 14px rgba(255,50,50,0.3);
+		box-shadow: 0 0 8px rgba(255,50,50,0.25), inset 0 0 6px rgba(255,50,50,0.05);
 	}
 	50% {
-		text-shadow: 0 0 10px rgba(255,200,50,1), 0 0 24px rgba(255,200,50,0.6), 0 0 40px rgba(255,200,50,0.2);
-		box-shadow: 0 0 14px rgba(255,200,50,0.45), inset 0 0 10px rgba(255,200,50,0.15);
+		text-shadow: 0 0 12px rgba(255,50,50,1), 0 0 28px rgba(255,50,50,0.6), 0 0 48px rgba(255,50,50,0.2);
+		box-shadow: 0 0 16px rgba(255,50,50,0.5), inset 0 0 12px rgba(255,50,50,0.15);
 	}
 }
 
