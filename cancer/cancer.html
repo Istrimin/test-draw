@@ -1526,10 +1526,15 @@ function handlePopupPick(e) {
     renderPopupWheel(_popupColor);
 }
 
-// Click on wheel label → open popup (centered)
+// Click on wheel label → cycle to next slot (tablet-friendly)
 gel('activeWheelLabel').addEventListener('click', function(e) {
     e.stopPropagation();
-    openColorPopup(_activeSlot);
+    var nxt = (_activeSlot + 1) % 7;
+    updateActiveIndicator(nxt);
+    colorPicker.value = _slotColors[nxt];
+    ctx.strokeStyle = _slotColors[nxt];
+    syncSlidersFromColor(_slotColors[nxt]);
+    updateWheelMarker(nxt);
 });
 syncSlidersFromColor(colorPicker.value);
 zoom = 1.5;
@@ -1724,18 +1729,30 @@ document.addEventListener('DOMContentLoaded', () => {
     })();
 
     // cancerHotkey.js
+    var _lastDigitKey = -1, _lastDigitTime = 0;
     document.addEventListener('keydown', function(event) {
         if (event.code >= 'Digit1' && event.code <= 'Digit7') {
+            if (!_slotColors) return;
+            event.preventDefault();
             var idx = parseInt(event.code.slice(5)) - 1;
-            if (_slotColors && _slotColors[idx]) {
-                event.preventDefault();
-                colorPicker.value = _slotColors[idx];
-                ctx.strokeStyle = _slotColors[idx];
-                syncSlidersFromColor(_slotColors[idx]);
-                updateActiveIndicator(idx);
-                updateWheelMarker(idx);
+            var now = Date.now();
+            if (idx === _lastDigitKey && now - _lastDigitTime < 400) {
+                _lastDigitKey = -1;
+                openColorPopup(idx);
+                return;
             }
+            _lastDigitKey = idx;
+            _lastDigitTime = now;
+            colorPicker.value = _slotColors[idx];
+            ctx.strokeStyle = _slotColors[idx];
+            syncSlidersFromColor(_slotColors[idx]);
+            updateActiveIndicator(idx);
+            updateWheelMarker(idx);
             return;
+        }
+        if (event.code === 'Backquote' || event.code === 'IntlBackslash') {
+            var pp = gel('colorPopup');
+            if (pp.style.display !== 'none') { closeColorPopup(false); return; }
         }
 
         var action = {
