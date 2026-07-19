@@ -67,19 +67,19 @@
             <a href="../index.html" target="_self" title="Выйти" id="exitLink" style="font-size: 30px;">🚪</a>
             <button id="undo" title="Отменить (Z)">⟲</button>
             <button id="redo" title="Повторить (X)">⟳</button>
-            <button id="symmetryBtn" title="Симметрия (S)">🦋</button>
+            <button id="symmetryBtn" title="Симметрия (Q)">🦋</button>
             <button id="eyedropperBtn" title="Пипетка (A)">💧</button>
-            <button id="changeCursorBtn" title="Курсор">🎨</button>
-            <button id="clearBtn" title="Очистить">💀</button>
-            <button id="saveImageBtn" title="Сохранить">💾</button>
-            <button id="eraserBtn" title="Стерка">🧽</button>
-            <button id="smoothDrawingBtn" title="Паутинка">🌀</button>
+            <button id="changeCursorBtn" title="Курсор (H)">🎨</button>
+            <button id="clearBtn" title="Очистить (C)">💀</button>
+            <button id="saveImageBtn" title="Сохранить (S)">💾</button>
+            <button id="eraserBtn" title="Стёрка (E)">🧽</button>
+            <button id="smoothDrawingBtn" title="Паутинка (V)">🌀</button>
             <button id="tabletModeBtn" title="Планшет/давление (T)">📱</button>
             <button id="overlayBtn" title="Трафарет (D)">👻</button>
-            <button id="loadImageBtn" title="Загрузить изображение">📂</button>
-            <button id="bgImageBtn" title="Фон">🌄</button>
+            <button id="loadImageBtn" title="Загрузить (L)">📂</button>
+            <button id="bgImageBtn" title="Фон (O)">🌄</button>
             <button id="fillBtn" title="Заливка (F)">🪣</button>
-            <button id="zoomBtn" title="Зум (200%)" style="font-size:18px;">🔍</button>
+            <button id="zoomBtn" title="Зум (M)">🔍</button>
         </div>
     </div>
 
@@ -1342,7 +1342,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // cancerHotkey.js
     document.addEventListener('keydown', function(event) {
-        const action = {
+        if (event.code >= 'Digit1' && event.code <= 'Digit7') {
+            var idx = parseInt(event.code.slice(5)) - 1;
+            var picker = colorPickers[idx];
+            if (picker) {
+                event.preventDefault();
+                closeColorPicker();
+                colorPicker.value = picker.value;
+                ctx.strokeStyle = picker.value;
+            }
+            return;
+        }
+
+        var action = {
             'KeyA': 'eyedropperBtn',
             'KeyZ': 'undo',
             'KeyX': 'redo',
@@ -1356,6 +1368,11 @@ document.addEventListener('DOMContentLoaded', () => {
             'KeyD': window.createOverlayLayer,
             'KeyG': window.toggleOverlayOpacity,
             'KeyF': 'fillBtn',
+            'KeyT': 'tabletModeBtn',
+            'KeyL': 'loadImageBtn',
+            'KeyH': 'changeCursorBtn',
+            'KeyO': 'bgImageBtn',
+            'KeyM': 'zoomBtn',
         }[event.code];
 
         if (action) {
