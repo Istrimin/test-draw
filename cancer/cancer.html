@@ -21,6 +21,7 @@
     <!-- Верхняя панель: колорпикеры + загадка по центру -->
     <div class="top-bar">
         <div class="top-center">
+            <span class="color-badge" id="colorBadge">1</span>
             <div class="quizz-area">
                 <button id="previousWord" title="Предыдущее слово"><</button>
                 <p id="Quizz"></p>
@@ -28,27 +29,24 @@
                 <div id="elapsedTime" class="time"></div>
             </div>
         </div>
-        <div class="slider-group">
-            <div class="slider">
-                <label for="brushSize" title="Размер кисти">🖌️</label>
-                <input type="range" id="brushSize" min="1" max="100" value="3" oninput="updateBrushSizeValue(this.value)">
-                <span id="brushSizeValue" style="color: red;">3</span>
-                <label for="maxBrushSize" title="Макс">М:</label>
-                <input type="range" id="maxBrushSize" min="1" max="1000" value="100" oninput="updateMaxBrushSizeValue(this.value)">
-                <span id="maxBrushSizeValue" style="color: red;">300</span>
-            </div>
-            <div class="slider" style="margin-top:5px;">
-                <label title="Оттенок">H</label>
-                <input type="range" id="hueSlider" min="0" max="360" value="0">
-                <span id="hueValue" style="color:red;min-width:28px;">0</span>
-                <label title="Насыщенность">S</label>
-                <input type="range" id="satSlider" min="0" max="100" value="0">
-                <span id="satValue" style="color:red;min-width:28px;">0</span>
-                <label title="Яркость">V</label>
-                <input type="range" id="valSlider" min="0" max="100" value="100">
-                <span id="valValue" style="color:red;min-width:28px;">100</span>
-            </div>
+    <div class="slider-group">
+        <div class="slider">
+            <label for="brushSize" title="Размер кисти">🖌️</label>
+            <input type="range" id="brushSize" min="1" max="100" value="3" oninput="updateBrushSizeValue(this.value)">
+            <span id="brushSizeValue" style="color: red;">3</span>
+            <label for="maxBrushSize" title="Макс">М:</label>
+            <input type="range" id="maxBrushSize" min="1" max="1000" value="100" oninput="updateMaxBrushSizeValue(this.value)">
+            <span id="maxBrushSizeValue" style="color: red;">300</span>
         </div>
+    </div>
+    <div style="display:none">
+        <input type="range" id="hueSlider" min="0" max="360" value="0">
+        <span id="hueValue">0</span>
+        <input type="range" id="satSlider" min="0" max="100" value="0">
+        <span id="satValue">0</span>
+        <input type="range" id="valSlider" min="0" max="100" value="100">
+        <span id="valValue">100</span>
+    </div>
     </div>
 
     <!-- Основная область: канвас слева, кнопки справа -->
@@ -63,7 +61,7 @@
                     <canvas id="drawingCanvas" style="position: absolute; top: 0; left: 0; z-index: 2;"></canvas>
                     <canvas id="overlayCanvas" style="position: absolute; top: 0; left: 0; z-index: 1; opacity: 0.5;"></canvas>
                 </div>
-                <div class="color-wheel-container" id="colorWheelContainer">
+                <div class="color-wheel-container" id="colorWheelContainer" style="display:none;">
                     <canvas id="activeColorWheel" width="80" height="80"></canvas>
                     <span class="wheel-label" id="activeWheelLabel">1</span>
                 </div>
@@ -138,6 +136,11 @@
             <div class="popup-preview" id="popupPreview"></div>
             <span id="popupHex" style="color:#fff;font-family:monospace;">#000000</span>
             <button id="popupOk">OK</button>
+        </div>
+        <div class="popup-sliders">
+            <div class="pslider"><label>H</label><input type="range" id="popupHueSlider" min="0" max="360" value="0"><span id="popupHueValue">0</span></div>
+            <div class="pslider"><label>S</label><input type="range" id="popupSatSlider" min="0" max="100" value="0"><span id="popupSatValue">0</span></div>
+            <div class="pslider"><label>V</label><input type="range" id="popupValSlider" min="0" max="100" value="100"><span id="popupValValue">100</span></div>
         </div>
     </div>
 </div>
@@ -1183,7 +1186,11 @@ wheelCtn.addEventListener('mouseleave', function() {
 // Active slot indicator
 function updateActiveIndicator(idx) {
     _activeSlot = idx;
-    gel('activeWheelLabel').textContent = idx + 1;
+    var badge = gel('colorBadge');
+    badge.textContent = idx + 1;
+    var hex = _slotColors[idx] || '#000000';
+    badge.style.color = hex;
+    badge.style.textShadow = '0 0 8px ' + hex + ', 0 0 20px ' + hex + ', 0 0 40px ' + hex;
 }
 
 // Main color picker (hidden, for value storage)
@@ -1471,9 +1478,7 @@ function openColorPopup(idx, anchor) {
         popup.classList.remove('anchored');
     }
     popup.style.display = 'flex';
-    gel('popupPreview').style.background = _popupColor;
-    gel('popupHex').textContent = _popupColor;
-    renderPopupWheel(_popupColor);
+    updatePopupUi();
 }
 
 function closeColorPopup(save) {
@@ -1521,13 +1526,40 @@ function handlePopupPick(e) {
     _popupColor = '#' + [pixel[0], pixel[1], pixel[2]].map(function(v) {
         return ('0' + v.toString(16)).slice(-2);
     }).join('');
+    updatePopupUi();
+}
+function updatePopupUi() {
     gel('popupPreview').style.background = _popupColor;
     gel('popupHex').textContent = _popupColor;
+    syncPopupSliders(_popupColor);
     renderPopupWheel(_popupColor);
 }
+function syncPopupSliders(hex) {
+    var hsv = hexToHsv(hex);
+    gel('popupHueSlider').value = hsv[0];
+    gel('popupSatSlider').value = hsv[1];
+    gel('popupValSlider').value = hsv[2];
+    gel('popupHueValue').textContent = hsv[0];
+    gel('popupSatValue').textContent = hsv[1];
+    gel('popupValValue').textContent = hsv[2];
+}
+function updatePopupColorFromSliders() {
+    var h = parseInt(gel('popupHueSlider').value);
+    var s = parseInt(gel('popupSatSlider').value);
+    var v = parseInt(gel('popupValSlider').value);
+    var rgb = hsvToRgb(h, s, v);
+    _popupColor = rgbToHex(rgb[0], rgb[1], rgb[2]);
+    gel('popupHueValue').textContent = h;
+    gel('popupSatValue').textContent = s;
+    gel('popupValValue').textContent = v;
+    updatePopupUi();
+}
+gel('popupHueSlider').addEventListener('input', updatePopupColorFromSliders);
+gel('popupSatSlider').addEventListener('input', updatePopupColorFromSliders);
+gel('popupValSlider').addEventListener('input', updatePopupColorFromSliders);
 
-// Click on wheel label → cycle to next slot (tablet-friendly)
-gel('activeWheelLabel').addEventListener('click', function(e) {
+// Click on color badge → cycle to next slot (tablet-friendly)
+gel('colorBadge').addEventListener('click', function(e) {
     e.stopPropagation();
     var nxt = (_activeSlot + 1) % 7;
     updateActiveIndicator(nxt);
