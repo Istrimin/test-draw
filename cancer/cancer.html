@@ -55,7 +55,6 @@
     <div class="main-area">
         <div class="color-picker-group" id="colorPickerGroup">
             <input type="color" id="colorPicker" value="#000000" style="display:none;">
-            <div class="active-indicator" id="activeIndicator"></div>
             <div class="wheel-wrap">
                 <canvas class="color-wheel" id="colorWheel0" width="120" height="120" title="Текущий цвет (C)"></canvas>
                 <span class="wheel-label">1</span>
@@ -1196,19 +1195,12 @@ colorWheels.forEach(function(canvas) {
     wrap.addEventListener('mouseleave', function() { onWheelLeave(canvas); });
 });
 
-// Active indicator (pulsing dot)
+// Active indicator (glowing number)
 var _activeWheelIdx = 0;
 function updateActiveIndicator(idx) {
+    var labels = document.querySelectorAll('.wheel-label');
+    labels.forEach(function(l, i) { l.classList.toggle('active', i === idx); });
     _activeWheelIdx = idx;
-    var dot = gel('activeIndicator');
-    var wraps = document.querySelectorAll('.color-picker-group .wheel-wrap');
-    if (dot && wraps[idx]) {
-        var group = gel('colorPickerGroup');
-        var gRect = group.getBoundingClientRect();
-        var wRect = wraps[idx].getBoundingClientRect();
-        var dotH = dot.offsetHeight || 10;
-        dot.style.top = (wRect.top - gRect.top + wRect.height / 2 - dotH / 2) + 'px';
-    }
 }
 
 // Main color picker (hidden, for value storage)
@@ -1422,11 +1414,6 @@ colorWheels.forEach(function(canvas, idx) {
     updateWheelMarker(idx);
 });
 updateActiveIndicator(0);
-
-// Re-position indicator on resize
-window.addEventListener('resize', function() {
-    updateActiveIndicator(_activeWheelIdx);
-});
 
 // localStorage save/load wheel colors
 function saveWheelColors() {
