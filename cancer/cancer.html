@@ -54,13 +54,14 @@
     <!-- Основная область: канвас слева, кнопки справа -->
     <div class="main-area">
         <div class="color-picker-group" id="colorPickerGroup">
-            <input type="color" id="colorPicker" value="#000000" title="Текущий цвет (C)">
-            <input type="color" id="colorPicker2" value="#ff0000" title="Красный">
-            <input type="color" id="colorPicker3" value="#00ff00" title="Зелёный">
-            <input type="color" id="colorPicker4" value="#0000ff" title="Синий">
-            <input type="color" id="colorPicker5" value="#ffff00" title="Жёлтый">
-            <input type="color" id="colorPicker6" value="#ff00ff" title="Пурпурный">
-            <input type="color" id="colorPicker7" value="#00ffff" title="Голубой">
+            <input type="color" id="colorPicker" value="#000000" style="display:none;">
+            <canvas class="color-wheel" id="colorWheel0" width="120" height="120" title="Текущий цвет (C)"></canvas>
+            <canvas class="color-wheel" id="colorWheel1" width="120" height="120" title="Красный"></canvas>
+            <canvas class="color-wheel" id="colorWheel2" width="120" height="120" title="Зелёный"></canvas>
+            <canvas class="color-wheel" id="colorWheel3" width="120" height="120" title="Синий"></canvas>
+            <canvas class="color-wheel" id="colorWheel4" width="120" height="120" title="Жёлтый"></canvas>
+            <canvas class="color-wheel" id="colorWheel5" width="120" height="120" title="Пурпурный"></canvas>
+            <canvas class="color-wheel" id="colorWheel6" width="120" height="120" title="Голубой"></canvas>
         </div>
         <div class="canvas-wrapper">
             <div class="canv-container" id="canvContainer" style="position: relative; width: 100%; height: 100%;">
@@ -164,15 +165,37 @@ let eraserSize = parseInt(brushSizeInput.value);
 const backgroundPicker = gel('backgroundPicker');
 
 // All color pickers for palette
-const colorPickers = [
-    'colorPicker',
-    'colorPicker2',
-    'colorPicker3',
-    'colorPicker4',
-    'colorPicker5',
-    'colorPicker6',
-    'colorPicker7'
-].map(gel).filter(Boolean);
+var presetColors = ['#000000', '#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+
+var colorWheels = [];
+for (var i = 0; i < 7; i++) {
+    var el = gel('colorWheel' + i);
+    if (el) colorWheels.push(el);
+}
+
+function renderColorWheel(canvas) {
+    var ctx = canvas.getContext('2d');
+    var w = canvas.width, h = canvas.height;
+    var cx = w / 2, cy = h / 2, r = Math.min(cx, cy) - 1;
+    var imageData = ctx.createImageData(w, h);
+    var d = imageData.data;
+    for (var y = 0; y < h; y++) {
+        for (var x = 0; x < w; x++) {
+            var dx = x - cx + 0.5, dy = y - cy + 0.5;
+            var dist = Math.sqrt(dx*dx + dy*dy);
+            var idx4 = (y * w + x) * 4;
+            if (dist > r) { d[idx4 + 3] = 0; continue; }
+            var hue = (Math.atan2(dy, dx) * 180 / Math.PI + 360) % 360;
+            var sat = dist / r;
+            var rgb = hsvToRgb(hue, sat * 100, 100);
+            d[idx4] = rgb[0];
+            d[idx4 + 1] = rgb[1];
+            d[idx4 + 2] = rgb[2];
+            d[idx4 + 3] = 255;
+        }
+    }
+    ctx.putImageData(imageData, 0, 0);
+}
 
 // Button elements
 const buttonElements = [
@@ -626,10 +649,12 @@ function hexToRgba(hex) {
 }
 
 function hsvToRgb(h, s, v) {
-    var c = v * s / 100;
+    s /= 100;
+    v /= 100;
+    var c = v * s;
     var hp = h / 60;
     var x = c * (1 - Math.abs(hp % 2 - 1));
-    var m = v / 100 - c;
+    var m = v - c;
     var r = 0, g = 0, b = 0;
     if (hp < 1) { r = c; g = x; }
     else if (hp < 2) { r = x; g = c; }
@@ -1018,22 +1043,31 @@ function toggleCursorPanel() {
 
 changeCursorBtn.addEventListener('click', toggleCursorPanel);
 
-// Color picker palette
-colorPickers.forEach(picker => {
-    picker.addEventListener('input', () => {
-        colorPicker.value = picker.value;
-        ctx.strokeStyle = picker.value;
-        syncSlidersFromColor(picker.value);
-    });
-    picker.addEventListener('change', closeColorPicker);
+// Color wheel palette
+colorWheels.forEach(function(canvas) {
+    function pickFromWheel(e) {
+        var rect = canvas.getBoundingClientRect();
+        var x = Math.round(e.clientX - rect.left);
+        var y = Math.round(e.clientY - rect.top);
+        var c = canvas.getContext('2d');
+        var pixel = c.getImageData(x, y, 1, 1).data;
+        if (pixel[3] < 128) return;
+        var hex = '#' + [pixel[0], pixel[1], pixel[2]].map(function(v) {
+            return ('0' + v.toString(16)).slice(-2);
+        }).join('');
+        colorPicker.value = hex;
+        ctx.strokeStyle = hex;
+        syncSlidersFromColor(hex);
+    }
+    canvas.addEventListener('click', pickFromWheel);
+    canvas.addEventListener('pointerdown', pickFromWheel);
 });
 
-// Main color picker
-colorPicker.addEventListener('input', () => {
+// Main color picker (hidden, for value storage)
+colorPicker.addEventListener('input', function() {
     ctx.strokeStyle = colorPicker.value;
     syncSlidersFromColor(colorPicker.value);
 });
-colorPicker.addEventListener('change', closeColorPicker);
 
 // HSV sliders
 gel('hueSlider').addEventListener('input', updateColorFromSliders);
@@ -1203,14 +1237,8 @@ document.addEventListener('keyup', function(e) {
     }
 });
 
-// Close color picker popup reliably
+// Close color picker popup reliably (no-op for canvas wheels)
 function closeColorPicker() {
-    colorPickers.forEach(function(p) {
-        var t = p.type;
-        p.type = 'text';
-        p.type = t;
-        p.blur();
-    });
     document.body.focus();
 }
 
@@ -1229,6 +1257,7 @@ document.addEventListener('mousedown', function(e) {
 // Initialization
 resizeCanvases();
 initializeCursor();
+colorWheels.forEach(renderColorWheel);
 syncSlidersFromColor(colorPicker.value);
 zoom = 1.5;
 panX = 0; panY = 0;
@@ -1426,12 +1455,11 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('keydown', function(event) {
         if (event.code >= 'Digit1' && event.code <= 'Digit7') {
             var idx = parseInt(event.code.slice(5)) - 1;
-            var picker = colorPickers[idx];
-            if (picker) {
+            if (presetColors[idx]) {
                 event.preventDefault();
-                closeColorPicker();
-                colorPicker.value = picker.value;
-                ctx.strokeStyle = picker.value;
+                colorPicker.value = presetColors[idx];
+                ctx.strokeStyle = presetColors[idx];
+                syncSlidersFromColor(presetColors[idx]);
             }
             return;
         }

@@ -54,34 +54,34 @@ body {
 .color-picker-group {
 	display: flex;
 	flex-direction: column;
-	gap: 3px;
 	align-items: center;
 	align-self: center;
-	padding: 0 4px;
+	gap: 6px;
 }
 
-.color-picker-group input[type="color"] {
+.color-picker-group canvas {
 	appearance: none;
 	-webkit-appearance: none;
 	border: none;
 	padding: 0;
 	cursor: pointer;
 	overflow: hidden;
-	width: 28px;
-	height: 28px;
+	width: 120px;
+	height: 120px;
 	border-radius: 50%;
+	background: #222;
 }
 
-.color-picker-group input[type="color"]::-webkit-color-swatch-wrapper {
+.color-picker-group canvas::-webkit-color-swatch-wrapper {
 	padding: 0;
 }
 
-.color-picker-group input[type="color"]::-webkit-color-swatch {
+.color-picker-group canvas::-webkit-color-swatch {
 	border: none;
 	border-radius: 50%;
 }
 
-.color-picker-group input[type="color"]::-moz-color-swatch {
+.color-picker-group canvas::-moz-color-swatch {
 	border: none;
 	border-radius: 0;
 }
