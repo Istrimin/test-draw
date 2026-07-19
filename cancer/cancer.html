@@ -155,6 +155,18 @@
     </style>
     <input type="file" id="imageInput" accept="image/*" style="display:none">
     <input type="file" id="bgImageInput" accept="image/*" style="display:none">
+
+<div id="colorPopup" class="color-popup" style="display:none;">
+    <div class="color-popup-content">
+        <canvas id="popupWheel" width="300" height="300"></canvas>
+        <div class="popup-controls">
+            <div class="popup-preview" id="popupPreview"></div>
+            <span id="popupHex" style="color:#fff;font-family:monospace;">#000000</span>
+            <button id="popupOk">OK</button>
+        </div>
+    </div>
+</div>
+
     <script>
 const gel = id => document.getElementById(id);
 
@@ -195,14 +207,14 @@ for (var i = 0; i < 7; i++) {
     if (el) colorWheels.push(el);
 }
 
-function drawSolidWheel(canvas) {
+function drawSolidWheel(canvas, color) {
     var ctx = canvas.getContext('2d');
     var w = canvas.width, h = canvas.height;
     var cx = w / 2, cy = h / 2, r = Math.min(cx, cy);
     ctx.clearRect(0, 0, w, h);
     ctx.beginPath();
     ctx.arc(cx, cy, r, 0, Math.PI * 2);
-    ctx.fillStyle = canvas._solidHex || '#000';
+    ctx.fillStyle = color || '#000';
     ctx.fill();
 }
 
@@ -210,6 +222,7 @@ function renderColorWheel(canvas) {
     var ctx = canvas.getContext('2d');
     var w = canvas.width, h = canvas.height;
     var cx = w / 2, cy = h / 2, r = Math.min(cx, cy) - 1;
+    var isGray = canvas.id === 'colorWheel0';
     var imageData = ctx.createImageData(w, h);
     var d = imageData.data;
     for (var y = 0; y < h; y++) {
@@ -218,14 +231,23 @@ function renderColorWheel(canvas) {
             var dist = Math.sqrt(dx*dx + dy*dy);
             var idx4 = (y * w + x) * 4;
             if (dist > r) { d[idx4 + 3] = 0; continue; }
-            var hue = (Math.atan2(dy, dx) * 180 / Math.PI + 360) % 360;
-            var sat = dist / r;
-            var val = Math.pow(sat, 0.5) * 100;
-            var rgb = hsvToRgb(hue, sat * 100, val);
-            d[idx4] = rgb[0];
-            d[idx4 + 1] = rgb[1];
-            d[idx4 + 2] = rgb[2];
-            d[idx4 + 3] = 255;
+            if (isGray) {
+                var gray = Math.round((r - dy) / (2 * r) * 255);
+                gray = Math.max(0, Math.min(255, gray));
+                d[idx4] = gray;
+                d[idx4 + 1] = gray;
+                d[idx4 + 2] = gray;
+                d[idx4 + 3] = 255;
+            } else {
+                var hue = (Math.atan2(dy, dx) * 180 / Math.PI + 360) % 360;
+                var sat = dist / r;
+                var val = Math.pow(sat, 0.5) * 100;
+                var rgb = hsvToRgb(hue, sat * 100, val);
+                d[idx4] = rgb[0];
+                d[idx4 + 1] = rgb[1];
+                d[idx4 + 2] = rgb[2];
+                d[idx4 + 3] = 255;
+            }
         }
     }
     ctx.putImageData(imageData, 0, 0);
@@ -769,24 +791,35 @@ function syncSlidersFromColor(hex) {
 function updateWheelMarker(idx) {
     var canvas = colorWheels[idx];
     if (!canvas) return;
-    var hex = idx === 0 ? colorPicker.value : presetColors[idx];
+    var hex;
+    if (idx === 0) {
+        hex = colorPicker.value;
+    } else {
+        hex = canvas._lastColor || presetColors[idx];
+    }
     if (hex.startsWith('rgb')) {
         var m = hex.match(/(\d+)/g);
         if (!m || m.length < 3) return;
         hex = rgbToHex(parseInt(m[0]), parseInt(m[1]), parseInt(m[2]));
     }
-    canvas._solidHex = hex;
     var hsv = hexToHsv(hex);
     var cx = canvas.width / 2, cy = canvas.height / 2;
     var r = Math.min(cx, cy) - 1;
-    var angle = hsv[0] * Math.PI / 180;
-    var dist = (hsv[1] / 100) * r;
-    canvas._markerX = Math.round(cx + dist * Math.cos(angle));
-    canvas._markerY = Math.round(cy + dist * Math.sin(angle));
+    if (idx === 0) {
+        var yOff = r * (1 - 2 * hsv[2] / 100);
+        canvas._markerY = Math.round(cy + yOff);
+        canvas._markerX = cx;
+    } else {
+        var angle = hsv[0] * Math.PI / 180;
+        var dist = (hsv[1] / 100) * r;
+        canvas._markerX = Math.round(cx + dist * Math.cos(angle));
+        canvas._markerY = Math.round(cy + dist * Math.sin(angle));
+    }
     if (canvas._isHovered) {
         renderColorWheel(canvas);
     } else {
-        drawSolidWheel(canvas);
+        var solid = idx === 0 ? colorPicker.value : (canvas._lastColor || presetColors[idx]);
+        drawSolidWheel(canvas, solid);
     }
 }
 
@@ -1140,6 +1173,7 @@ colorWheels.forEach(function(canvas) {
         canvas._lastColor = hex;
         renderColorWheel(canvas);
         updateActiveIndicator(colorWheels.indexOf(canvas));
+        saveWheelColors();
     }
     canvas.addEventListener('click', pickFromWheel);
     canvas.addEventListener('pointerdown', pickFromWheel);
@@ -1152,7 +1186,9 @@ function onWheelEnter(canvas) {
 }
 function onWheelLeave(canvas) {
     canvas._isHovered = false;
-    drawSolidWheel(canvas);
+    var idx = colorWheels.indexOf(canvas);
+    var color = idx === 0 ? colorPicker.value : (canvas._lastColor || presetColors[idx]);
+    drawSolidWheel(canvas, color);
 }
 colorWheels.forEach(function(canvas) {
     var wrap = canvas.parentElement;
@@ -1371,8 +1407,17 @@ document.addEventListener('mousedown', function(e) {
 resizeCanvases();
 initializeCursor();
 // Init markers and lastColor for preset colors
+// Load saved colors from localStorage
+try {
+    var saved = JSON.parse(localStorage.getItem('wheelColors'));
+    if (saved && saved.length === 7) {
+        saved.forEach(function(c, i) {
+            if (c && colorWheels[i]) colorWheels[i]._lastColor = c;
+        });
+    }
+} catch(e) {}
 colorWheels.forEach(function(canvas, idx) {
-    canvas._lastColor = presetColors[idx];
+    if (!canvas._lastColor) canvas._lastColor = presetColors[idx];
     canvas._isHovered = false;
     updateWheelMarker(idx);
 });
@@ -1381,6 +1426,110 @@ updateActiveIndicator(0);
 // Re-position indicator on resize
 window.addEventListener('resize', function() {
     updateActiveIndicator(_activeWheelIdx);
+});
+
+// localStorage save/load wheel colors
+function saveWheelColors() {
+    var arr = colorWheels.map(function(c) { return c._lastColor || '#000000'; });
+    try { localStorage.setItem('wheelColors', JSON.stringify(arr)); } catch(e) {}
+}
+
+// Popup palette
+var _popupTargetIdx = 0;
+var _popupColor = '#000000';
+
+function renderPopupWheel(highlightHex) {
+    var canvas = gel('popupWheel');
+    var ctx = canvas.getContext('2d');
+    var w = canvas.width, h = canvas.height;
+    var cx = w / 2, cy = h / 2, r = Math.min(cx, cy) - 1;
+    var imageData = ctx.createImageData(w, h);
+    var d = imageData.data;
+    for (var y = 0; y < h; y++) {
+        for (var x = 0; x < w; x++) {
+            var dx = x - cx + 0.5, dy = y - cy + 0.5;
+            var dst = Math.sqrt(dx*dx + dy*dy);
+            var i4 = (y * w + x) * 4;
+            if (dst > r) { d[i4 + 3] = 0; continue; }
+            var hue = (Math.atan2(dy, dx) * 180 / Math.PI + 360) % 360;
+            var sat = dst / r;
+            var val = Math.pow(sat, 0.5) * 100;
+            var rgb = hsvToRgb(hue, sat * 100, val);
+            d[i4] = rgb[0]; d[i4 + 1] = rgb[1]; d[i4 + 2] = rgb[2]; d[i4 + 3] = 255;
+        }
+    }
+    ctx.putImageData(imageData, 0, 0);
+    // Marker
+    if (highlightHex) {
+        var hsv = hexToHsv(highlightHex);
+        var angle = hsv[0] * Math.PI / 180;
+        var dst = (hsv[1] / 100) * r;
+        var mx = Math.round(cx + dst * Math.cos(angle));
+        var my = Math.round(cy + dst * Math.sin(angle));
+        ctx.beginPath(); ctx.arc(mx, my, 4, 0, Math.PI * 2);
+        ctx.strokeStyle = '#fff'; ctx.lineWidth = 2.5; ctx.stroke();
+        ctx.beginPath(); ctx.arc(mx, my, 5, 0, Math.PI * 2);
+        ctx.strokeStyle = '#000'; ctx.lineWidth = 1; ctx.stroke();
+    }
+    // Click to pick
+    canvas.onclick = function(e) {
+        var rect = canvas.getBoundingClientRect();
+        var px = Math.round(e.clientX - rect.left);
+        var py = Math.round(e.clientY - rect.top);
+        var pixel = ctx.getImageData(px, py, 1, 1).data;
+        if (pixel[3] < 128) return;
+        _popupColor = '#' + [pixel[0], pixel[1], pixel[2]].map(function(v) {
+            return ('0' + v.toString(16)).slice(-2);
+        }).join('');
+        gel('popupPreview').style.background = _popupColor;
+        gel('popupHex').textContent = _popupColor;
+        renderPopupWheel(_popupColor);
+    };
+}
+
+function openColorPopup(idx) {
+    _popupTargetIdx = idx;
+    var canvas = colorWheels[idx];
+    _popupColor = canvas._lastColor || presetColors[idx] || '#000000';
+    gel('colorPopup').style.display = 'flex';
+    gel('popupPreview').style.background = _popupColor;
+    gel('popupHex').textContent = _popupColor;
+    renderPopupWheel(_popupColor);
+}
+
+function closeColorPopup(save) {
+    gel('colorPopup').style.display = 'none';
+    if (save) {
+        var canvas = colorWheels[_popupTargetIdx];
+        canvas._lastColor = _popupColor;
+        colorPicker.value = _popupColor;
+        ctx.strokeStyle = _popupColor;
+        syncSlidersFromColor(_popupColor);
+        updateActiveIndicator(_popupTargetIdx);
+        updateWheelMarker(0);
+        if (canvas._isHovered) {
+            renderColorWheel(canvas);
+        } else {
+            var idx = _popupTargetIdx;
+            var solid = idx === 0 ? colorPicker.value : _popupColor;
+            drawSolidWheel(canvas, solid);
+        }
+        saveWheelColors();
+    }
+}
+
+// Popup events
+gel('popupOk').addEventListener('click', function() { closeColorPopup(true); });
+gel('colorPopup').addEventListener('click', function(e) {
+    if (e.target === this) closeColorPopup(false);
+});
+
+// Click on wheel label → open popup
+document.querySelectorAll('.wheel-label').forEach(function(label, idx) {
+    label.addEventListener('click', function(e) {
+        e.stopPropagation();
+        openColorPopup(idx);
+    });
 });
 syncSlidersFromColor(colorPicker.value);
 zoom = 1.5;
@@ -1520,7 +1669,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('a, button').forEach(icon => icon.classList.add('icon-hover'));
 });
     </script>
-    <!-- Встроенные скрипты (CORS fix for file://) -->
     <script>
     // cancerSettings.js
     (function() {
