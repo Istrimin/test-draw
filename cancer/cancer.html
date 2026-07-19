@@ -137,11 +137,6 @@
             <span id="popupHex" style="color:#fff;font-family:monospace;">#000000</span>
             <button id="popupOk">OK</button>
         </div>
-        <div class="popup-sliders">
-            <div class="pslider"><label>H</label><input type="range" id="popupHueSlider" min="0" max="360" value="0"><span id="popupHueValue">0</span></div>
-            <div class="pslider"><label>S</label><input type="range" id="popupSatSlider" min="0" max="100" value="0"><span id="popupSatValue">0</span></div>
-            <div class="pslider"><label>V</label><input type="range" id="popupValSlider" min="0" max="100" value="100"><span id="popupValValue">100</span></div>
-        </div>
     </div>
 </div>
 
@@ -176,10 +171,10 @@ const brushSizeInput = gel('brushSize');
 let eraserSize = parseInt(brushSizeInput.value);
 const backgroundPicker = gel('backgroundPicker');
 
-// Color slots (7 colors)
-var _slotColors = ['#000000', '#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+// Color slots (10 colors)
+var _slotColors = ['#000000', '#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ff8800', '#8800ff', '#00ff88'];
 var _slotMarkers = [];
-for (var _si = 0; _si < 7; _si++) _slotMarkers.push({x:null, y:null});
+for (var _si = 0; _si < 10; _si++) _slotMarkers.push({x:null, y:null});
 var _activeSlot = 0;
 var _wheelHovered = false;
 var activeWheelCanvas = gel('activeColorWheel');
@@ -1390,7 +1385,7 @@ initializeCursor();
 // Load saved colors from localStorage
 try {
     var saved = JSON.parse(localStorage.getItem('wheelColors'));
-    if (saved && saved.length === 7) {
+    if (saved && saved.length === 10) {
         saved.forEach(function(c, i) {
             if (c) _slotColors[i] = c;
         });
@@ -1531,37 +1526,13 @@ function handlePopupPick(e) {
 function updatePopupUi() {
     gel('popupPreview').style.background = _popupColor;
     gel('popupHex').textContent = _popupColor;
-    syncPopupSliders(_popupColor);
     renderPopupWheel(_popupColor);
 }
-function syncPopupSliders(hex) {
-    var hsv = hexToHsv(hex);
-    gel('popupHueSlider').value = hsv[0];
-    gel('popupSatSlider').value = hsv[1];
-    gel('popupValSlider').value = hsv[2];
-    gel('popupHueValue').textContent = hsv[0];
-    gel('popupSatValue').textContent = hsv[1];
-    gel('popupValValue').textContent = hsv[2];
-}
-function updatePopupColorFromSliders() {
-    var h = parseInt(gel('popupHueSlider').value);
-    var s = parseInt(gel('popupSatSlider').value);
-    var v = parseInt(gel('popupValSlider').value);
-    var rgb = hsvToRgb(h, s, v);
-    _popupColor = rgbToHex(rgb[0], rgb[1], rgb[2]);
-    gel('popupHueValue').textContent = h;
-    gel('popupSatValue').textContent = s;
-    gel('popupValValue').textContent = v;
-    updatePopupUi();
-}
-gel('popupHueSlider').addEventListener('input', updatePopupColorFromSliders);
-gel('popupSatSlider').addEventListener('input', updatePopupColorFromSliders);
-gel('popupValSlider').addEventListener('input', updatePopupColorFromSliders);
 
 // Click on color badge → cycle to next slot (tablet-friendly)
 gel('colorBadge').addEventListener('click', function(e) {
     e.stopPropagation();
-    var nxt = (_activeSlot + 1) % 7;
+    var nxt = (_activeSlot + 1) % 10;
     updateActiveIndicator(nxt);
     colorPicker.value = _slotColors[nxt];
     ctx.strokeStyle = _slotColors[nxt];
@@ -1763,10 +1734,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // cancerHotkey.js
     var _lastDigitKey = -1, _lastDigitTime = 0;
     document.addEventListener('keydown', function(event) {
-        if (event.code >= 'Digit1' && event.code <= 'Digit7') {
+        if (/^Digit\d$/.test(event.code)) {
             if (!_slotColors) return;
             event.preventDefault();
-            var idx = parseInt(event.code.slice(5)) - 1;
+            var idx = event.code === 'Digit0' ? 9 : parseInt(event.code.slice(5)) - 1;
+            if (idx >= 10) return;
             var now = Date.now();
             if (idx === _lastDigitKey && now - _lastDigitTime < 400) {
                 _lastDigitKey = -1;

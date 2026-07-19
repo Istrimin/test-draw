@@ -438,49 +438,6 @@ button.active {
 	border-radius: 50%;
 }
 
-.popup-sliders {
-	display: flex;
-	flex-direction: column;
-	gap: 6px;
-	width: 100%;
-	margin-top: 4px;
-}
-.pslider {
-	display: flex;
-	align-items: center;
-	gap: 6px;
-}
-.pslider label {
-	color: #aaa;
-	font-size: 12px;
-	font-weight: bold;
-	min-width: 14px;
-}
-.pslider input[type="range"] {
-	flex: 1;
-	height: 12px;
-	-webkit-appearance: none;
-	appearance: none;
-	background: #444;
-	border-radius: 6px;
-	outline: none;
-}
-.pslider input[type="range"]::-webkit-slider-thumb {
-	-webkit-appearance: none;
-	width: 14px;
-	height: 14px;
-	border-radius: 50%;
-	background: #888;
-	cursor: pointer;
-}
-.pslider span {
-	color: #ccc;
-	font-size: 12px;
-	min-width: 24px;
-	text-align: right;
-	font-family: monospace;
-}
-
 .wheel-label {
 	cursor: pointer;
 }
