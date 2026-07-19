@@ -55,13 +55,34 @@
     <div class="main-area">
         <div class="color-picker-group" id="colorPickerGroup">
             <input type="color" id="colorPicker" value="#000000" style="display:none;">
-            <canvas class="color-wheel" id="colorWheel0" data-num="1" width="120" height="120" title="Текущий цвет (C)"></canvas>
-            <canvas class="color-wheel" id="colorWheel1" data-num="2" width="120" height="120" title="Красный"></canvas>
-            <canvas class="color-wheel" id="colorWheel2" data-num="3" width="120" height="120" title="Зелёный"></canvas>
-            <canvas class="color-wheel" id="colorWheel3" data-num="4" width="120" height="120" title="Синий"></canvas>
-            <canvas class="color-wheel" id="colorWheel4" data-num="5" width="120" height="120" title="Жёлтый"></canvas>
-            <canvas class="color-wheel" id="colorWheel5" data-num="6" width="120" height="120" title="Пурпурный"></canvas>
-            <canvas class="color-wheel" id="colorWheel6" data-num="7" width="120" height="120" title="Голубой"></canvas>
+            <div class="wheel-wrap">
+                <canvas class="color-wheel" id="colorWheel0" width="120" height="120" title="Текущий цвет (C)"></canvas>
+                <span class="wheel-label">1</span>
+            </div>
+            <div class="wheel-wrap">
+                <canvas class="color-wheel" id="colorWheel1" width="120" height="120" title="Красный"></canvas>
+                <span class="wheel-label">2</span>
+            </div>
+            <div class="wheel-wrap">
+                <canvas class="color-wheel" id="colorWheel2" width="120" height="120" title="Зелёный"></canvas>
+                <span class="wheel-label">3</span>
+            </div>
+            <div class="wheel-wrap">
+                <canvas class="color-wheel" id="colorWheel3" width="120" height="120" title="Синий"></canvas>
+                <span class="wheel-label">4</span>
+            </div>
+            <div class="wheel-wrap">
+                <canvas class="color-wheel" id="colorWheel4" width="120" height="120" title="Жёлтый"></canvas>
+                <span class="wheel-label">5</span>
+            </div>
+            <div class="wheel-wrap">
+                <canvas class="color-wheel" id="colorWheel5" width="120" height="120" title="Пурпурный"></canvas>
+                <span class="wheel-label">6</span>
+            </div>
+            <div class="wheel-wrap">
+                <canvas class="color-wheel" id="colorWheel6" width="120" height="120" title="Голубой"></canvas>
+                <span class="wheel-label">7</span>
+            </div>
         </div>
         <div class="canvas-wrapper">
             <div class="canv-container" id="canvContainer" style="position: relative; width: 100%; height: 100%;">
@@ -187,7 +208,8 @@ function renderColorWheel(canvas) {
             if (dist > r) { d[idx4 + 3] = 0; continue; }
             var hue = (Math.atan2(dy, dx) * 180 / Math.PI + 360) % 360;
             var sat = dist / r;
-            var rgb = hsvToRgb(hue, sat * 100, 100);
+            var val = Math.pow(sat, 0.5) * 100;
+            var rgb = hsvToRgb(hue, sat * 100, val);
             d[idx4] = rgb[0];
             d[idx4 + 1] = rgb[1];
             d[idx4 + 2] = rgb[2];
@@ -195,19 +217,6 @@ function renderColorWheel(canvas) {
         }
     }
     ctx.putImageData(imageData, 0, 0);
-
-    // Draw number badge
-    var num = canvas.getAttribute('data-num');
-    var bx = cx + r - 18, by = cy + r - 18;
-    ctx.fillStyle = 'rgba(0,0,0,0.7)';
-    ctx.beginPath();
-    ctx.arc(bx, by, 13, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#fff';
-    ctx.font = 'bold 14px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(num, bx, by);
 
     // Draw marker
     var mx = canvas._markerX, my = canvas._markerY;
@@ -1109,6 +1118,7 @@ colorWheels.forEach(function(canvas) {
         syncSlidersFromColor(hex);
         canvas._markerX = x;
         canvas._markerY = y;
+        canvas._lastColor = hex;
         renderColorWheel(canvas);
     }
     canvas.addEventListener('click', pickFromWheel);
@@ -1311,8 +1321,9 @@ document.addEventListener('mousedown', function(e) {
 resizeCanvases();
 initializeCursor();
 colorWheels.forEach(renderColorWheel);
-// Init markers for preset colors
+// Init markers and lastColor for preset colors
 colorWheels.forEach(function(canvas, idx) {
+    canvas._lastColor = presetColors[idx];
     updateWheelMarker(idx);
 });
 syncSlidersFromColor(colorPicker.value);
@@ -1512,12 +1523,12 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('keydown', function(event) {
         if (event.code >= 'Digit1' && event.code <= 'Digit7') {
             var idx = parseInt(event.code.slice(5)) - 1;
-            if (presetColors[idx]) {
+            var canvas = colorWheels[idx];
+            if (canvas && canvas._lastColor) {
                 event.preventDefault();
-                colorPicker.value = presetColors[idx];
-                ctx.strokeStyle = presetColors[idx];
-                syncSlidersFromColor(presetColors[idx]);
-                updateWheelMarker(idx);
+                colorPicker.value = canvas._lastColor;
+                ctx.strokeStyle = canvas._lastColor;
+                syncSlidersFromColor(canvas._lastColor);
             }
             return;
         }
