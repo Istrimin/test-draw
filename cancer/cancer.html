@@ -1527,12 +1527,7 @@ function closeColorPopup(save) {
         ctx.strokeStyle = _popupColor;
         syncSlidersFromColor(_popupColor);
         updateActiveIndicator(_popupTargetIdx);
-        if (_popupTargetIdx === 0) updateWheelMarker(0);
-        if (canvas._isHovered) {
-            renderColorWheel(canvas);
-        } else {
-            drawSolidWheel(canvas, _popupColor);
-        }
+        updateWheelMarker(_popupTargetIdx);
         saveWheelColors();
     }
 }
