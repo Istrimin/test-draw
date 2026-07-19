@@ -21,15 +21,6 @@
     <!-- Верхняя панель: колорпикеры + загадка по центру -->
     <div class="top-bar">
         <div class="top-center">
-            <div class="color-picker-group" id="colorPickerGroup">
-                <input type="color" id="colorPicker" value="#000000" title="Текущий цвет (C)">
-                <input type="color" id="colorPicker2" value="#ff0000" title="Красный">
-                <input type="color" id="colorPicker3" value="#00ff00" title="Зелёный">
-                <input type="color" id="colorPicker4" value="#0000ff" title="Синий">
-                <input type="color" id="colorPicker5" value="#ffff00" title="Жёлтый">
-                <input type="color" id="colorPicker6" value="#ff00ff" title="Пурпурный">
-                <input type="color" id="colorPicker7" value="#00ffff" title="Голубой">
-            </div>
             <div class="quizz-area">
                 <button id="previousWord" title="Предыдущее слово"><</button>
                 <p id="Quizz"></p>
@@ -62,6 +53,15 @@
 
     <!-- Основная область: канвас слева, кнопки справа -->
     <div class="main-area">
+        <div class="color-picker-group" id="colorPickerGroup">
+            <input type="color" id="colorPicker" value="#000000" title="Текущий цвет (C)">
+            <input type="color" id="colorPicker2" value="#ff0000" title="Красный">
+            <input type="color" id="colorPicker3" value="#00ff00" title="Зелёный">
+            <input type="color" id="colorPicker4" value="#0000ff" title="Синий">
+            <input type="color" id="colorPicker5" value="#ffff00" title="Жёлтый">
+            <input type="color" id="colorPicker6" value="#ff00ff" title="Пурпурный">
+            <input type="color" id="colorPicker7" value="#00ffff" title="Голубой">
+        </div>
         <div class="canvas-wrapper">
             <div class="canv-container" id="canvContainer" style="position: relative; width: 100%; height: 100%;">
                 <canvas id="backgroundCanvas" style="position: absolute; top: 0; left: 0; z-index: 1;"></canvas>
